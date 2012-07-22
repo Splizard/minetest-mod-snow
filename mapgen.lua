@@ -2,7 +2,7 @@
 minetest.register_on_generated(function(minp, maxp, seed)
 if maxp.y >= -10 then
 		local debug = snow.debug
-		
+
 		--Choose a biome type.
 		local pr = PseudoRandom(seed+57)
 		local biome = pr:next(1, 10)
@@ -11,7 +11,7 @@ if maxp.y >= -10 then
 		local cool = biome > 9   --only spawns ice on edge of water
 		local icecave = biome == 5
 		local icehole = biome == 6 --icesheet with holes
-		
+
 		--Misc biome settings.
 		local icy = pr:next(1, 2) == 2   --If enabled spawns ice in sand instead of snow blocks.
 		local mossy = pr:next(1,2) == 1  --Spawns moss in snow.
@@ -27,22 +27,22 @@ if maxp.y >= -10 then
 
 		--Should make things a bit faster.
 		local env = minetest.env
-		
+
 		--Debugging function
 		local biomeToString = function(num)
-			if num == 1 or num == 7 or num == 8 then return "normal"
+			if num == 1 or num == 7 or num == 8 or num == 4 then return "normal"
 			elseif num == 2 then return "icebergs"
 			elseif num == 3 then return "icesheet"
 			elseif num == 5 then return "icecave"
 			elseif num == 9 or num == 10 then return "cool"
 			elseif num == 6 then return "icehole"
-			else return "unknown" end
+			else return "unknown "..num end
 		end
-		
+
 		--Get map specific perlin
 		local perlin1 = env:get_perlin(112,3, 0.5, 150)
 		pr = PseudoRandom(seed+68)
-		
+
 		--Speed hack: checks the corners and middle of the chunk for "snow biome".
 		if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
 		and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
@@ -50,18 +50,17 @@ if maxp.y >= -10 then
 			if debug then print(biomeToString(biome)..": ABORTED!") end
 			return
 		end
-		
+
 		--Loop through chunk.
 		for j=0,divs do
 		for i=0,divs do
 
 			local x = x0+i
-			local z = z0+j	
+			local z = z0+j
 
 			--Check if we are in a "Snow biome"
 			local test = perlin1:get2d({x=x, y=z})
 			if test > 0.53 then
-
 
 				-- Find ground level (0...15)
 				local ground_y = nil
@@ -74,9 +73,9 @@ if maxp.y >= -10 then
 
 				-- Snowy biome stuff
 				local node = env:get_node({x=x,y=ground_y,z=z})
-				
+
 				if ground_y and node.name == "default:dirt_with_grass" then
-						if shrubs and pr:next(1,28) == 1 then 
+						if shrubs and pr:next(1,28) == 1 then
 							--Spawns dry shrubs.
 							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
 							env:add_node({x=x,y=ground_y+1,z=z}, {name="default:dry_shrub"})
@@ -97,6 +96,8 @@ if maxp.y >= -10 then
 					else
 						env:add_node({x=x,y=ground_y,z=z}, {name="snow:ice"})
 					end
+				elseif ground_y and env:get_node({x=x,y=ground_y,z=z}).name == "default:leaves" then
+					env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow"})
 				elseif ground_y and node.name == "default:water_source" then
 					if not icesheet and not icecave and not icehole then
 						--Coastal ice.
