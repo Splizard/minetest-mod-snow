@@ -317,9 +317,9 @@ minetest.register_craft({
 --Melting
 --Any node part of the group melting will melt when near warm nodes such as lava, fire, torches, etc.
 --The amount of water that replaces the node is defined by the number on the group:
---1: one water_flowing
+--1: one water_source
 --2: four water_flowings
---3: one water_source
+--3: one water_flowing
 minetest.register_abm({
     nodenames = {"group:melts"},
     neighbors = {"default:desert_sand", "group:igniter","default:torch","default:furnace_active","group:hot"},
