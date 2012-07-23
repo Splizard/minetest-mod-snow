@@ -3,6 +3,27 @@ minetest.register_on_generated(function(minp, maxp, seed)
 if maxp.y >= -10 then
 		local debug = snow.debug
 
+		--Should make things a bit faster.
+		local env = minetest.env
+
+		--Get map specific perlin
+		local perlin1 = env:get_perlin(112,3, 0.5, 150)
+
+		-- Assume X and Z lengths are equal
+		local divlen = 16
+		local divs = (maxp.x-minp.x);
+		local x0 = minp.x
+		local z0 = minp.z
+		local x1 = maxp.x
+		local z1 = maxp.z
+
+		--Speed hack: checks the corners and middle of the chunk for "snow biome".
+		if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
+		and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
+		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then
+			return
+		end
+
 		--Choose a biome type.
 		local pr = PseudoRandom(seed+57)
 		local biome = pr:next(1, 10)
@@ -16,17 +37,7 @@ if maxp.y >= -10 then
 		local icy = pr:next(1, 2) == 2   --If enabled spawns ice in sand instead of snow blocks.
 		local mossy = pr:next(1,2) == 1  --Spawns moss in snow.
 		local shrubs = pr:next(1,2) == 1 --Spawns dry shrubs in snow.
-
-		-- Assume X and Z lengths are equal
-		local divlen = 16
-		local divs = (maxp.x-minp.x);
-		local x0 = minp.x
-		local z0 = minp.z
-		local x1 = maxp.x
-		local z1 = maxp.z
-
-		--Should make things a bit faster.
-		local env = minetest.env
+		local pines = pr:next(1,2) == 1 --spawns pines.
 
 		--Debugging function
 		local biomeToString = function(num)
@@ -39,17 +50,44 @@ if maxp.y >= -10 then
 			else return "unknown "..num end
 		end
 
-		--Get map specific perlin
-		local perlin1 = env:get_perlin(112,3, 0.5, 150)
-		pr = PseudoRandom(seed+68)
-
-		--Speed hack: checks the corners and middle of the chunk for "snow biome".
-		if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
-		and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
-		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then
-			if debug then print(biomeToString(biome)..": ABORTED!") end
-			return
+		local function make_pine(pos)
+			--Clear ground.
+			for x=-1,1 do
+			for z=-1,1 do
+				if env:get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "snow:snow" then
+					env:remove_node({x=pos.x+x,y=pos.y,z=pos.z+z})
+				end
+			end
+			end
+			--Make tree.
+			for i=0, 4 do
+				local env = minetest.env
+				if i==1 or i==2 then
+					for x=-1,1 do
+					for z=-1,1 do
+						local x = pos.x + x
+						local z = pos.z + z
+						env:add_node({x=x,y=pos.y+i,z=z},{name="default:leaves"})
+					end
+					end
+				end
+				if i==3 or i==4 then
+					local x = pos.x
+					local y = pos.y+i
+					local z = pos.z
+					env:add_node({x=x+1,y=y,z=z},{name="default:leaves"})
+					env:add_node({x=x-1,y=y,z=z},{name="default:leaves"})
+					env:add_node({x=x,y=y,z=z+1},{name="default:leaves"})
+					env:add_node({x=x,y=y,z=z-1},{name="default:leaves"})
+				end
+				env:add_node({x=pos.x,y=pos.y+i,z=pos.z},{name="default:tree"})
+			end
+			env:add_node({x=pos.x,y=pos.y+5,z=pos.z},{name="default:leaves"})
+			env:add_node({x=pos.x,y=pos.y+6,z=pos.z},{name="default:leaves"})
 		end
+
+		--Reseed random.
+		pr = PseudoRandom(seed+68)
 
 		--Loop through chunk.
 		for j=0,divs do
@@ -83,6 +121,10 @@ if maxp.y >= -10 then
 							--Spawns moss inside snow.
 							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
 							env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow",param2=1})
+						elseif pines and test > 0.85 and pr:next(1,36) == 1 then
+							--Spawns pines.
+							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
+							make_pine({x=x,y=ground_y+1,z=z})
 						else
 							--Spawns snow.
 							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
