@@ -1,7 +1,7 @@
 --This file contains configuration options for snow mod.
 
 --Enables experimental falling snow.
-snow.enable_snowfall = true
+snow.enable_snowfall = false
 
 --Enables debuging.
-snow.debug = true
+snow.debug = false
