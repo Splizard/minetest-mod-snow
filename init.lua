@@ -21,75 +21,6 @@ snow = {}
 dofile(minetest.get_modpath("snow").."/mapgen.lua")
 dofile(minetest.get_modpath("snow").."/config.lua")
 
-function minetest.item_place_node(itemstack, placer, pointed_thing)
-	local item = itemstack:peek_item()
-	local def = itemstack:get_definition()
-	if def.type == "node" and pointed_thing.type == "node" then
-		local pos = pointed_thing.above
-
-		----------------
-		--Snow stuff
-		--Allows placing nodes "through" snow.
-		----------------
-		local node = pointed_thing.under
-		if minetest.env:get_node(node).name == "snow:snow" then
-
-			--Gets rid of client-side placement block
-			minetest.env:add_node(pos,{name="air"})
-
-			minetest.env:remove_node(node)
-			pos=node
-		end
-		----------------
-
-		local oldnode = minetest.env:get_node(pos)
-		local olddef = ItemStack({name=oldnode.name}):get_definition()
-
-		if not olddef.buildable_to then
-			minetest.log("info", placer:get_player_name() .. " tried to place"
-				.. " node in invalid position " .. minetest.pos_to_string(pos)
-				.. ", replacing " .. oldnode.name)
-			return
-		end
-
-		minetest.log("action", placer:get_player_name() .. " places node "
-			.. def.name .. " at " .. minetest.pos_to_string(pos))
-
-		local newnode = {name = def.name, param1 = 0, param2 = 0}
-
-		-- Calculate direction for wall mounted stuff like torches and signs
-		if def.paramtype2 == 'wallmounted' then
-			local under = pointed_thing.under
-			local above = pointed_thing.above
-			local dir = {x = under.x - above.x, y = under.y - above.y, z = under.z - above.z}
-			newnode.param2 = minetest.dir_to_wallmounted(dir)
-		-- Calculate the direction for furnaces and chests and stuff
-		elseif def.paramtype2 == 'facedir' then
-			local playerpos = placer:getpos() or {x=0,y=0,z=0}
-			local dir = {x = pos.x - playerpos.x, y = pos.y - playerpos.y, z = pos.z - playerpos.z}
-			newnode.param2 = minetest.dir_to_facedir(dir)
-			minetest.log("action", "facedir: " .. newnode.param2)
-		end
-
-		-- Add node and update
-		minetest.env:add_node(pos, newnode)
-
-		-- Run callback
-		if def.after_place_node then
-			def.after_place_node(pos, placer)
-		end
-
-		-- Run script hook (deprecated)
-		local _, callback
-		for _, callback in ipairs(minetest.registered_on_placenodes) do
-			callback(pos, newnode, placer)
-		end
-
-		itemstack:take_item()
-	end
-	return itemstack
-end
-
 --Replace leaves so snow gets removed on decay.
 minetest.register_node(":default:leaves", {
 	description = "Leaves",
@@ -205,7 +136,10 @@ minetest.register_node("snow:snow", {
 	--Update dirt node underneath snow.
 	after_destruct = function(pos, node, digger)
 		if node.param2 == 1 then
-			minetest.env:add_node(pos,{name="snow:moss",param2=1})
+			local n = minetest.env:get_node(pos).name
+			if  n == "air" or n == "default:water_flowing" or n == "default:water_source" then
+				minetest.env:add_node(pos,{name="snow:moss",param2=1})
+			end
 		end
 		pos.y = pos.y - 1
 		local nodename = minetest.env:get_node(pos).name
