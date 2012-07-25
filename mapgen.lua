@@ -51,6 +51,7 @@ if maxp.y >= -10 then
 		end
 
 		local function make_pine(pos)
+			local perlin1 = env:get_perlin(112,3, 0.5, 150) 
 			--Clear ground.
 			for x=-1,1 do
 			for z=-1,1 do
@@ -68,6 +69,9 @@ if maxp.y >= -10 then
 						local x = pos.x + x
 						local z = pos.z + z
 						env:add_node({x=x,y=pos.y+i,z=z},{name="default:leaves"})
+						if x ~= 0 and z ~= 0 and perlin1:get2d({x=x,y=z}) > 0.53 then
+							env:add_node({x=x,y=pos.y+i+1,z=z},{name="snow:snow"})
+						end
 					end
 					end
 				end
@@ -79,11 +83,26 @@ if maxp.y >= -10 then
 					env:add_node({x=x-1,y=y,z=z},{name="default:leaves"})
 					env:add_node({x=x,y=y,z=z+1},{name="default:leaves"})
 					env:add_node({x=x,y=y,z=z-1},{name="default:leaves"})
+					if perlin1:get2d({x=x+1,y=z}) > 0.53 then
+						env:add_node({x=x+1,y=y+1,z=z},{name="snow:snow"})
+					end
+					if perlin1:get2d({x=x+1,y=z}) > 0.53 then
+						env:add_node({x=x-1,y=y+1,z=z},{name="snow:snow"})
+					end
+					if perlin1:get2d({x=x,y=z+1}) > 0.53 then
+						env:add_node({x=x,y=y+1,z=z+1},{name="snow:snow"})
+					end
+					if perlin1:get2d({x=x,y=z-1}) > 0.53 then
+						env:add_node({x=x,y=y+1,z=z-1},{name="snow:snow"})
+					end
 				end
 				env:add_node({x=pos.x,y=pos.y+i,z=pos.z},{name="default:tree"})
 			end
 			env:add_node({x=pos.x,y=pos.y+5,z=pos.z},{name="default:leaves"})
 			env:add_node({x=pos.x,y=pos.y+6,z=pos.z},{name="default:leaves"})
+			if perlin1:get2d({x=pos.x,y=pos.z}) > 0.53 then
+				env:add_node({x=pos.x,y=pos.y+7,z=pos.z},{name="snow:snow"})
+			end
 		end
 
 		--Reseed random.
@@ -121,7 +140,7 @@ if maxp.y >= -10 then
 							--Spawns moss inside snow.
 							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
 							env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow",param2=1})
-						elseif pines and test > 0.85 and pr:next(1,36) == 1 then
+						elseif pines and pr:next(1,36) == 1 then
 							--Spawns pines.
 							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
 							make_pine({x=x,y=ground_y+1,z=z})
@@ -180,9 +199,16 @@ if maxp.y >= -10 then
 				elseif ground_y and node.name == "default:desert_sand" then
 					--Abort genaration.
 					if debug then
-						print(biomeToString(biome)..": ABORTED!")
-					end
+						print(biomeToString(biome)..": desert found ABORTED!")
 					return
+				elseif ground_y and node.name == "snow:snow" and node.name ~= "snow:ice" then
+					--Abort genaration.
+					if env:get_node({x=x,y=ground_y-1,z=z}).name ~= "default:leaves" then
+						if debug then
+							print(biomeToString(biome)..": snow found ABORTED!")
+						end
+						return
+					end
 				end
 			end
 		end
