@@ -26,10 +26,11 @@ if maxp.y >= -10 then
 
 		--Choose a biome type.
 		local pr = PseudoRandom(seed+57)
-		local biome = pr:next(1, 10)
+		local biome = pr:next(1, 12)
 		local icebergs = biome == 2
 		local icesheet = biome == 3
-		local cool = biome > 9   --only spawns ice on edge of water
+		local alpine = biome == 11 or biome == 12 --rocky terrain
+		local cool = biome == 9 or biome == 10  --only spawns ice on edge of water
 		local icecave = biome == 5
 		local icehole = biome == 6 --icesheet with holes
 
@@ -47,6 +48,7 @@ if maxp.y >= -10 then
 			elseif num == 5 then return "icecave"
 			elseif num == 9 or num == 10 then return "cool"
 			elseif num == 6 then return "icehole"
+			elseif num == 11 or num == 12 then return "alpine"
 			else return "unknown "..num end
 		end
 
@@ -107,6 +109,13 @@ if maxp.y >= -10 then
 
 		--Reseed random.
 		pr = PseudoRandom(seed+68)
+		
+		if alpine then
+			trees = env:find_nodes_in_area(minp, maxp, {"default:leaves","default:tree"})
+			for i,v in pairs(trees) do
+				env:remove_node(v)
+			end
+		end
 
 		--Loop through chunk.
 		for j=0,divs do
@@ -121,7 +130,7 @@ if maxp.y >= -10 then
 
 				-- Find ground level (0...15)
 				local ground_y = nil
-				for y=maxp.y,0,-1 do
+				for y=maxp.y,minp.y+1,-1 do
 					if env:get_node({x=x,y=y,z=z}).name ~= "air" then
 						ground_y = y
 						break
@@ -132,22 +141,30 @@ if maxp.y >= -10 then
 				local node = env:get_node({x=x,y=ground_y,z=z})
 
 				if ground_y and node.name == "default:dirt_with_grass" then
-						if shrubs and pr:next(1,28) == 1 then
+						local veg
+						if mossy and pr:next(1,10) == 1 then veg = 1 end
+						if alpine then
+							--Gets rid of dirt
+							env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow",param2=veg})
+							for y=ground_y,-6,-1 do
+								if env:get_node({x=x,y=y,z=z}) and env:get_node({x=x,y=y,z=z}).name == "default:stone" then
+									break
+								else
+									env:add_node({x=x,y=y,z=z},{name="default:stone"})
+								end
+							end
+						elseif shrubs and pr:next(1,28) == 1 then
 							--Spawns dry shrubs.
 							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
 							env:add_node({x=x,y=ground_y+1,z=z}, {name="default:dry_shrub"})
-						elseif mossy and pr:next(1,10) == 1 then
-							--Spawns moss inside snow.
-							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
-							env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow",param2=1})
 						elseif pines and pr:next(1,36) == 1 then
 							--Spawns pines.
-							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
+							env:add_node({x=x,y=ground_y,z=z}, {name="default:dirt_with_grass"})
 							make_pine({x=x,y=ground_y+1,z=z})
 						else
 							--Spawns snow.
 							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
-							env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow"})
+							env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow",param2=veg})
 						end
 				elseif ground_y and node.name == "default:sand" then
 					--Spawns ice in sand if icy, otherwise spawns snow on top.
@@ -200,6 +217,7 @@ if maxp.y >= -10 then
 					--Abort genaration.
 					if debug then
 						print(biomeToString(biome)..": desert found ABORTED!")
+					end
 					return
 				elseif ground_y and node.name == "snow:snow" and node.name ~= "snow:ice" then
 					--Abort genaration.
@@ -214,7 +232,7 @@ if maxp.y >= -10 then
 		end
 		end
 		if debug then
-			print(biomeToString(biome)..": Snow Biome Genarated")
+			print(biomeToString(biome)..": Snow Biome Genarated near x"..minp.x.." z"..minp.y)
 		end
 end
 end
