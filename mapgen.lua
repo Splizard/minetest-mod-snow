@@ -221,12 +221,6 @@ if maxp.y >= -10 then
 							end
 						end
 					end
-				elseif ground_y and node.name == "default:desert_sand" then
-					--Abort genaration.
-					if debug then
-						print(biomeToString(biome)..": desert found ABORTED!")
-					end
-					return
 				elseif ground_y and node.name == "snow:snow" and node.name ~= "snow:ice" then
 					--Abort genaration.
 					local name = env:get_node({x=x,y=ground_y-1,z=z}).name

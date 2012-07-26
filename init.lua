@@ -303,7 +303,7 @@ minetest.register_craft({
 --3: one water_flowing
 minetest.register_abm({
     nodenames = {"group:melts"},
-    neighbors = {"default:desert_sand", "group:igniter","default:torch","default:furnace_active","group:hot"},
+    neighbors = {"group:igniter","default:torch","default:furnace_active","group:hot"},
     interval = 2,
     chance = 2,
     action = function(pos, node, active_object_count, active_object_count_wider)
