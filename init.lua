@@ -55,6 +55,53 @@ minetest.register_node(":default:leaves", {
 	sounds = default.node_sound_leaves_defaults(),
 })
 
+--Pine leaves.
+minetest.register_node("snow:needles", {
+	description = "Pine Needles",
+	drawtype = "allfaces_optional",
+	visual_scale = 1.3,
+	tiles = {"snow_needles.png"},
+	paramtype = "light",
+	groups = {snappy=3, leafdecay=3, flammable=2},
+	drop = {
+		max_items = 1,
+		items = {
+			{
+				-- player will get sapling with 1/20 chance
+				items = {'snow:sapling_pine'},
+				rarity = 20,
+			},
+			{
+				-- player will get leaves only if he get no saplings,
+				-- this is because max_items is 1
+				items = {'snow:needles'},
+			}
+		}
+	},
+	--Remove snow above leaves after decay.
+	after_destruct = function(pos, node, digger)
+		pos.y = pos.y + 1
+		local nodename = minetest.env:get_node(pos).name
+		if nodename == "snow:snow" then
+			minetest.env:remove_node(pos)
+		end
+	end,
+	sounds = default.node_sound_leaves_defaults(),
+})
+
+minetest.register_node("snow:sapling_pine", {
+	description = "Pine Sapling",
+	drawtype = "plantlike",
+	visual_scale = 1.0,
+	tiles = {"snow_sapling_pine.png"},
+	inventory_image = "snow_sapling_pine.png",
+	wield_image = "snow_sapling_pine.png",
+	paramtype = "light",
+	walkable = false,
+	groups = {snappy=2,dig_immediate=3,flammable=2},
+	sounds = default.node_sound_defaults(),
+})
+
 --Snowballs
 -------------
 snowball_GRAVITY=9
@@ -301,6 +348,16 @@ minetest.register_abm({
     chance = 6,
     action = function(pos, node, active_object_count, active_object_count_wider)
 		minetest.env:add_node(pos,{name="default:mossycobble"})
+    end,
+})
+
+--Grow saplings
+minetest.register_abm({
+    nodenames = {"snow:sapling_pine"},
+    interval = 10,
+    chance = 50,
+    action = function(pos, node, active_object_count, active_object_count_wider)
+		snow.make_pine(pos,false)
     end,
 })
 

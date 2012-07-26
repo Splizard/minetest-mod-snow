@@ -1,3 +1,64 @@
+--Makes pine tree
+function snow.make_pine(pos,snow)
+	local env = minetest.env
+	local perlin1 = env:get_perlin(112,3, 0.5, 150) 
+	--Clear ground.
+	for x=-1,1 do
+	for z=-1,1 do
+		if env:get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "snow:snow" then
+			env:remove_node({x=pos.x+x,y=pos.y,z=pos.z+z})
+		end
+	end
+	end
+	--Make tree.
+	for i=0, 4 do
+		local env = minetest.env
+		if i==1 or i==2 then
+			for x=-1,1 do
+			for z=-1,1 do
+				local x = pos.x + x
+				local z = pos.z + z
+				env:add_node({x=x,y=pos.y+i,z=z},{name="snow:needles"})
+				if snow and x ~= 0 and z ~= 0 and perlin1:get2d({x=x,y=z}) > 0.53 then
+					env:add_node({x=x,y=pos.y+i+1,z=z},{name="snow:snow"})
+				end
+			end
+			end
+		end
+		if i==3 or i==4 then
+			local x = pos.x
+			local y = pos.y+i
+			local z = pos.z
+			env:add_node({x=x+1,y=y,z=z},{name="snow:needles"})
+			env:add_node({x=x-1,y=y,z=z},{name="snow:needles"})
+			env:add_node({x=x,y=y,z=z+1},{name="snow:needles"})
+			env:add_node({x=x,y=y,z=z-1},{name="snow:needles"})
+			if snow then
+				if perlin1:get2d({x=x+1,y=z}) > 0.53 then
+					env:add_node({x=x+1,y=y+1,z=z},{name="snow:snow"})
+				end
+				if perlin1:get2d({x=x+1,y=z}) > 0.53 then
+					env:add_node({x=x-1,y=y+1,z=z},{name="snow:snow"})
+				end
+				if perlin1:get2d({x=x,y=z+1}) > 0.53 then
+					env:add_node({x=x,y=y+1,z=z+1},{name="snow:snow"})
+				end
+				if perlin1:get2d({x=x,y=z-1}) > 0.53 then
+					env:add_node({x=x,y=y+1,z=z-1},{name="snow:snow"})
+				end
+			end
+		end
+		env:add_node({x=pos.x,y=pos.y+i,z=pos.z},{name="default:tree"})
+	end
+	env:add_node({x=pos.x,y=pos.y+5,z=pos.z},{name="snow:needles"})
+	env:add_node({x=pos.x,y=pos.y+6,z=pos.z},{name="snow:needles"})
+	if snow and  perlin1:get2d({x=pos.x,y=pos.z}) > 0.53 then
+		env:add_node({x=pos.x,y=pos.y+7,z=pos.z},{name="snow:snow"})
+	end
+end
+
+
+
 --Snow biomes are found at 0.53 and greater perlin noise.
 minetest.register_on_generated(function(minp, maxp, seed)
 if maxp.y >= -10 then
@@ -52,60 +113,7 @@ if maxp.y >= -10 then
 			else return "unknown "..num end
 		end
 
-		local function make_pine(pos)
-			local perlin1 = env:get_perlin(112,3, 0.5, 150) 
-			--Clear ground.
-			for x=-1,1 do
-			for z=-1,1 do
-				if env:get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "snow:snow" then
-					env:remove_node({x=pos.x+x,y=pos.y,z=pos.z+z})
-				end
-			end
-			end
-			--Make tree.
-			for i=0, 4 do
-				local env = minetest.env
-				if i==1 or i==2 then
-					for x=-1,1 do
-					for z=-1,1 do
-						local x = pos.x + x
-						local z = pos.z + z
-						env:add_node({x=x,y=pos.y+i,z=z},{name="default:leaves"})
-						if x ~= 0 and z ~= 0 and perlin1:get2d({x=x,y=z}) > 0.53 then
-							env:add_node({x=x,y=pos.y+i+1,z=z},{name="snow:snow"})
-						end
-					end
-					end
-				end
-				if i==3 or i==4 then
-					local x = pos.x
-					local y = pos.y+i
-					local z = pos.z
-					env:add_node({x=x+1,y=y,z=z},{name="default:leaves"})
-					env:add_node({x=x-1,y=y,z=z},{name="default:leaves"})
-					env:add_node({x=x,y=y,z=z+1},{name="default:leaves"})
-					env:add_node({x=x,y=y,z=z-1},{name="default:leaves"})
-					if perlin1:get2d({x=x+1,y=z}) > 0.53 then
-						env:add_node({x=x+1,y=y+1,z=z},{name="snow:snow"})
-					end
-					if perlin1:get2d({x=x+1,y=z}) > 0.53 then
-						env:add_node({x=x-1,y=y+1,z=z},{name="snow:snow"})
-					end
-					if perlin1:get2d({x=x,y=z+1}) > 0.53 then
-						env:add_node({x=x,y=y+1,z=z+1},{name="snow:snow"})
-					end
-					if perlin1:get2d({x=x,y=z-1}) > 0.53 then
-						env:add_node({x=x,y=y+1,z=z-1},{name="snow:snow"})
-					end
-				end
-				env:add_node({x=pos.x,y=pos.y+i,z=pos.z},{name="default:tree"})
-			end
-			env:add_node({x=pos.x,y=pos.y+5,z=pos.z},{name="default:leaves"})
-			env:add_node({x=pos.x,y=pos.y+6,z=pos.z},{name="default:leaves"})
-			if perlin1:get2d({x=pos.x,y=pos.z}) > 0.53 then
-				env:add_node({x=pos.x,y=pos.y+7,z=pos.z},{name="snow:snow"})
-			end
-		end
+		local make_pine = snow.make_pine
 
 		--Reseed random.
 		pr = PseudoRandom(seed+68)
@@ -160,7 +168,7 @@ if maxp.y >= -10 then
 						elseif pines and pr:next(1,36) == 1 then
 							--Spawns pines.
 							env:add_node({x=x,y=ground_y,z=z}, {name="default:dirt_with_grass"})
-							make_pine({x=x,y=ground_y+1,z=z})
+							make_pine({x=x,y=ground_y+1,z=z},true)
 						else
 							--Spawns snow.
 							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
@@ -221,7 +229,8 @@ if maxp.y >= -10 then
 					return
 				elseif ground_y and node.name == "snow:snow" and node.name ~= "snow:ice" then
 					--Abort genaration.
-					if env:get_node({x=x,y=ground_y-1,z=z}).name ~= "default:leaves" then
+					local name = env:get_node({x=x,y=ground_y-1,z=z}).name
+					if name ~= "default:leaves" and name ~= "snow:needles" then
 						if debug then
 							print(biomeToString(biome)..": snow found ABORTED!")
 						end
