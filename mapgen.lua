@@ -235,7 +235,7 @@ if maxp.y >= -10 then
 		end
 		end
 		if debug then
-			print(biomeToString(biome)..": Snow Biome Genarated near x"..minp.x.." z"..minp.y)
+			print(biomeToString(biome)..": Snow Biome Genarated near x"..minp.x.." z"..minp.z)
 		end
 end
 end
