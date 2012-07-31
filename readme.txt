@@ -59,6 +59,8 @@ Version 1.2
     Moss
     
 	Alpine biomes
+	
+	Dry shrubs
 
 UNINSTALL:
 ------------
