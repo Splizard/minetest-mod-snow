@@ -15,23 +15,25 @@ INSTALL:
 Place this folder in your minetest mods folder.
 
 NOTICE
-While this mod is installed you may experience slow map loading when a snow biome is generated.
+While this mod is installed you may experience slow map loading while a snow biome is generated.
 
 USAGE:
 -------
 If you walk around a bit you will find snow biomes scattered around the world.
 
-There are six biome types:
+There are seven biome types:
 * Normal
 * Icebergs
 * Icesheet
 * Broken icesheet
 * Icecave
 * Coast
+* Alpine
   
 Snow can be picked up and thrown as snowballs or crafted into snow blocks.
-Snow and ice melts when near warm blocks such as torches, and desert sand or igniters such as lava.
+Snow and ice melts when near warm blocks such as torches or igniters such as lava.
 Snow blocks freeze water source blocks around them.
+Moss can be found in the snow, when moss is placed near cobble it spreads.
 
 CRAFTING:
 -----------
@@ -50,6 +52,13 @@ Version 1.1
 
     Better mapgen
 
+Version 1.2
+
+    Pine trees
+    
+    Moss
+    
+	Alpine biomes
 
 UNINSTALL:
 ------------
