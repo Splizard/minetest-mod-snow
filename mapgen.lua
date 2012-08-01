@@ -114,6 +114,7 @@ if maxp.y >= -10 then
 		end
 
 		local make_pine = snow.make_pine
+		local smooth = snow.smooth
 
 		--Reseed random.
 		pr = PseudoRandom(seed+68)
@@ -132,11 +133,18 @@ if maxp.y >= -10 then
 			local x = x0+i
 			local z = z0+j
 
-			--Check if we are in a "Snow biome"
-			local test = perlin1:get2d({x=x, y=z})
-			if test > 0.53 then
-
-				-- Find ground level (0...15)
+				--Check if we are in a "Snow biome"
+                local in_biome = false
+                local test = perlin1:get2d({x=x, y=z})
+                if smooth and (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
+                    in_biome = true
+                elseif not smooth and test > 0.53 then
+					in_biome = true
+                end
+                
+                if in_biome then
+                
+                 -- Find ground level (0...15)
 				local ground_y = nil
 				for y=maxp.y,minp.y+1,-1 do
 					if env:get_node({x=x,y=y,z=z}).name ~= "air" then
