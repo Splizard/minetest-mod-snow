@@ -147,13 +147,14 @@ minetest.register_entity("snow:snowball_entity", snow_snowball_ENTITY)
 
 --Snowball.
 minetest.register_craftitem("snow:snowball", {
-	Description = "Snowball",
+	description = "Snowball",
 	inventory_image = "snow_snowball.png",
 	on_use = snow_shoot_snowball,
 })
 
 --Snow.
 minetest.register_node("snow:snow", {
+	description = "Snow",
 	tiles = {"snow_snow.png"},
 	drawtype = "nodebox",
 	sunlight_propagates = true,
