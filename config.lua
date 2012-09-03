@@ -7,4 +7,4 @@ snow.enable_snowfall = false
 snow.debug = false
 
 --Enables smooth transition of biomes.
-snow.smooth = false
+snow.smooth = true
