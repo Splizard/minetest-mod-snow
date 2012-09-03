@@ -242,6 +242,8 @@ local unsnowify = function(pos, node, digger)
 	local nodename = minetest.env:get_node(pos).name
 	if nodename == "snow:snow" then
 		minetest.env:remove_node(pos)
+		local obj=minetest.env:add_entity({x=pos.x,y=pos.y,z=pos.z}, "snow:snowball_entity")
+		obj:setacceleration({x=0, y=-snowball_GRAVITY, z=0})
 	end
 end
 
