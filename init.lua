@@ -82,6 +82,19 @@ minetest.register_node("snow:sapling_pine", {
 	sounds = default.node_sound_defaults(),
 })
 
+minetest.register_craft({
+	type = "fuel",
+	recipe = "snow:needles",
+	burntime = 1,
+})
+
+minetest.register_craft({
+	type = "fuel",
+	recipe = "snow:sapling_pine",
+	burntime = 10,
+})
+
+
 --Snowballs
 -------------
 snowball_GRAVITY=9
