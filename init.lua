@@ -22,38 +22,18 @@ dofile(minetest.get_modpath("snow").."/mapgen.lua")
 dofile(minetest.get_modpath("snow").."/config.lua")
 
 --Replace leaves so snow gets removed on decay.
-minetest.register_node(":default:leaves", {
-	description = "Leaves",
-	drawtype = "allfaces_optional",
-	visual_scale = 1.3,
-	tiles = {"default_leaves.png"},
-	paramtype = "light",
-	groups = {snappy=3, leafdecay=3, flammable=2},
-	drop = {
-		max_items = 1,
-		items = {
-			{
-				-- player will get sapling with 1/20 chance
-				items = {'default:sapling'},
-				rarity = 20,
-			},
-			{
-				-- player will get leaves only if he get no saplings,
-				-- this is because max_items is 1
-				items = {'default:leaves'},
-			}
-		}
-	},
-	--Remove snow above leaves after decay.
-	after_destruct = function(pos, node, digger)
-		pos.y = pos.y + 1
-		local nodename = minetest.env:get_node(pos).name
-		if nodename == "snow:snow" then
-			minetest.env:remove_node(pos)
-		end
-	end,
-	sounds = default.node_sound_leaves_defaults(),
-})
+local leaves = {}
+for k,v in pairs(minetest.registered_nodes["default:leaves"]) do
+	leaves[k] = v
+end
+leaves.after_destruct = function(pos, node, digger)
+	pos.y = pos.y + 1
+	local nodename = minetest.env:get_node(pos).name
+	if nodename == "snow:snow" then
+		minetest.env:remove_node(pos)
+	end
+end
+minetest.register_node(":default:leaves", leaves)
 
 --Pine leaves.
 minetest.register_node("snow:needles", {
