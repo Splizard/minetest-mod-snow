@@ -254,6 +254,18 @@ minetest.register_node("snow:snow_block", {
 	}),
 })
 
+--Snow brick.
+minetest.register_node("snow:snow_brick", {
+	description = "Snow Brick",
+	tiles = {"snow_snow_brick.png"},
+	is_ground_content = true,
+	groups = {crumbly=3,melts=2},
+	drop = 'snow:snow_brick',
+	sounds = default.node_sound_dirt_defaults({
+		footstep = {name="default_grass_footstep", gain=0.4},
+	}),
+})
+
 --Ice.
 minetest.register_node("snow:ice", {
 	description = "Ice",
@@ -288,6 +300,14 @@ minetest.register_craft({
     recipe = {
         {'snow:snowball', 'snow:snowball'},
         {'snow:snowball', 'snow:snowball'},
+    },
+})
+
+minetest.register_craft({
+    output = 'snow:snow_brick',
+    recipe = {
+        {'snow:snow_block', 'snow:snow_block'},
+        {'snow:snow_block', 'snow:snow_block'},
     },
 })
 
