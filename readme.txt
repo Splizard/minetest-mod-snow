@@ -5,7 +5,7 @@
   ____) | | | | (_) \ V  V /  | |  | | (_) | (_| |
  |_____/|_| |_|\___/ \_/\_/   |_|  |_|\___/ \__,_|
   
-By Splizard and bob.
+By Splizard, bob and cornernote.
 
 Forum post: http://minetest.net/forum/viewtopic.php?id=2290
 Github: https://github.com/Splizard/minetest-mod-snow
@@ -42,6 +42,11 @@ Snow Block:
 Snowball    Snowball
 Snowball    Snowball
 
+Snow Brick:
+
+Snow Block    Snow Block
+Snow Block    Snow Block
+
 CHANGELOG:
 ------------
 Version 1.0
@@ -58,9 +63,15 @@ Version 1.2
     
     Moss
     
-	Alpine biomes
+    Alpine biomes
 	
-	Dry shrubs
+    Dry shrubs
+    
+Version 1.3
+
+    Smooth transitions
+    
+    Snow Bricks
 
 UNINSTALL:
 ------------
