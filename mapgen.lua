@@ -8,6 +8,9 @@ function snow.make_pine(pos,snow)
 		if env:get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "snow:snow" then
 			env:remove_node({x=pos.x+x,y=pos.y,z=pos.z+z})
 		end
+		if env:get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "snow:snow_block" then
+			env:remove_node({x=pos.x+x,y=pos.y,z=pos.z+z})
+		end
 	end
 	end
 	--Make tree.
@@ -88,6 +91,8 @@ if maxp.y >= -10 then
 		--Choose a biome type.
 		local pr = PseudoRandom(seed+57)
 		local biome = pr:next(1, 12)
+		local snowy = biome == 1 --spawns alot of snow
+		local plain = biome == 7 --spawns not much
 		local icebergs = biome == 2
 		local icesheet = biome == 3
 		local alpine = biome == 11 or biome == 12 --rocky terrain
@@ -103,7 +108,9 @@ if maxp.y >= -10 then
 
 		--Debugging function
 		local biomeToString = function(num)
-			if num == 1 or num == 7 or num == 8 or num == 4 then return "normal"
+			if num == 1 then return "snowy"
+			elseif num == 7 then return "plain"
+			elseif num == 8 or num == 4 then return "normal"
 			elseif num == 2 then return "icebergs"
 			elseif num == 3 then return "icesheet"
 			elseif num == 5 then return "icecave"
@@ -136,114 +143,125 @@ if maxp.y >= -10 then
 				--Check if we are in a "Snow biome"
                 local in_biome = false
                 local test = perlin1:get2d({x=x, y=z})
-                if smooth and (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
+                if smooth and (not snowy) and (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
                     in_biome = true
-                elseif not smooth and test > 0.53 then
+                elseif (not smooth or snowy) and test > 0.53 then
 					in_biome = true
                 end
                 
                 if in_biome then
                 
-                 -- Find ground level (0...15)
-				local ground_y = nil
-				for y=maxp.y,minp.y+1,-1 do
-					if env:get_node({x=x,y=y,z=z}).name ~= "air" then
-						ground_y = y
-						break
+                if not plain or pr:next(1,12) == 1 then  
+                
+					 -- Find ground level (0...15)
+					local ground_y = nil
+					for y=maxp.y,minp.y+1,-1 do
+						if env:get_node({x=x,y=y,z=z}).name ~= "air" then
+							ground_y = y
+							break
+						end
 					end
-				end
 
-				-- Snowy biome stuff
-				local node = env:get_node({x=x,y=ground_y,z=z})
+					-- Snowy biome stuff
+					local node = env:get_node({x=x,y=ground_y,z=z})
 
-				if ground_y and node.name == "default:dirt_with_grass" then
-						local veg
-						if mossy and pr:next(1,10) == 1 then veg = 1 end
-						if alpine then
-							--Gets rid of dirt
-							env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow",param2=veg})
-							for y=ground_y,-6,-1 do
-								if env:get_node({x=x,y=y,z=z}) and env:get_node({x=x,y=y,z=z}).name == "default:stone" then
-									break
-								else
-									env:add_node({x=x,y=y,z=z},{name="default:stone"})
+					if ground_y and node.name == "default:dirt_with_grass" then
+							local veg
+							if mossy and pr:next(1,10) == 1 then veg = 1 end
+							if alpine then
+								--Gets rid of dirt
+								env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow",param2=veg})
+								for y=ground_y,-6,-1 do
+									if env:get_node({x=x,y=y,z=z}) and env:get_node({x=x,y=y,z=z}).name == "default:stone" then
+										break
+									else
+										env:add_node({x=x,y=y,z=z},{name="default:stone"})
+									end
 								end
+							elseif shrubs and pr:next(1,28) == 1 then
+								--Spawns dry shrubs.
+								env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
+								if snowy then
+									env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow_block", param2=3})
+								else
+									env:add_node({x=x,y=ground_y+1,z=z}, {name="default:dry_shrub"})
+								end
+							elseif pines and pr:next(1,36) == 1 then
+								--Spawns pines.
+								env:add_node({x=x,y=ground_y,z=z}, {name="default:dirt_with_grass"})
+								make_pine({x=x,y=ground_y+1,z=z},true)
+							elseif snowy then
+								--Spawns snow blocks.
+								env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow_block"})
+								env:add_node({x=x,y=ground_y+2,z=z}, {name="snow:snow",param2=veg})
+							else
+								--Spawns snow.
+								env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
+								env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow",param2=veg})
 							end
-						elseif shrubs and pr:next(1,28) == 1 then
-							--Spawns dry shrubs.
-							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
-							env:add_node({x=x,y=ground_y+1,z=z}, {name="default:dry_shrub"})
-						elseif pines and pr:next(1,36) == 1 then
-							--Spawns pines.
-							env:add_node({x=x,y=ground_y,z=z}, {name="default:dirt_with_grass"})
-							make_pine({x=x,y=ground_y+1,z=z},true)
-						else
-							--Spawns snow.
-							env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
-							env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow",param2=veg})
-						end
-				elseif ground_y and node.name == "default:sand" then
-					--Spawns ice in sand if icy, otherwise spawns snow on top.
-					if not icy then
-						env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow"})
-						env:add_node({x=x,y=ground_y,z=z}, {name="snow:snow_block"})
-					else
-						env:add_node({x=x,y=ground_y,z=z}, {name="snow:ice"})
-					end
-				elseif ground_y and env:get_node({x=x,y=ground_y,z=z}).name == "default:leaves" then
-					env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow"})
-				elseif ground_y and env:get_node({x=x,y=ground_y,z=z}).name == "default:papyrus" then
-					for i=ground_y, ground_y-4, -1 do
-						if env:get_node({x=x,y=i,z=z}).name == "default:papyrus" then
+					elseif ground_y and node.name == "default:sand" then
+						--Spawns ice in sand if icy, otherwise spawns snow on top.
+						if not icy then
 							env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow"})
-							env:add_node({x=x,y=i,z=z}, {name="snow:snow_block", param2=2})
-						end
-					end
-				elseif ground_y and node.name == "default:water_source" then
-					if not icesheet and not icecave and not icehole then
-						--Coastal ice.
-						local x1 = env:get_node({x=x+1,y=ground_y,z=z}).name
-						local z1 = env:get_node({x=x,y=ground_y,z=z+1}).name
-						local xz1 = env:get_node({x=x+1,y=ground_y,z=z+1}).name
-						local xz2 = env:get_node({x=x-1,y=ground_y,z=z-1}).name
-						local x2 = env:get_node({x=x-1,y=ground_y,z=z}).name
-						local z2 = env:get_node({x=x,y=ground_y,z=z-1}).name
-						local y = env:get_node({x=x,y=ground_y-1,z=z}).name
-						local rand = pr:next(1,4) == 1
-						if
-						((x1  and x1 ~= "default:water_source"  and x1 ~= "snow:ice"  and x1 ~= "air" and x1 ~= "ignore") or ((cool or icebergs) and x1 == "snow:ice"  and rand)) or
-						((z1  and z1 ~= "default:water_source"  and z1 ~= "snow:ice"  and z1 ~= "air" and z1 ~= "ignore") or ((cool or icebergs) and z1 == "snow:ice"  and rand)) or
-						((xz1 and xz1 ~= "default:water_source" and xz1 ~= "snow:ice" and xz1 ~= "air"and xz1 ~= "ignore") or ((cool or icebergs) and xz1 == "snow:ice" and rand)) or
-						((xz2 and xz2 ~= "default:water_source" and xz2 ~= "snow:ice" and xz2 ~= "air"and xz2 ~= "ignore") or ((cool or icebergs) and xz2 == "snow:ice" and rand)) or
-						((x2  and x2 ~= "default:water_source"  and x2 ~= "snow:ice"  and x2 ~= "air" and x2 ~= "ignore") or ((cool or icebergs) and x2 == "snow:ice"  and rand)) or
-						((z2  and z2 ~= "default:water_source"  and z2 ~= "snow:ice"  and z2 ~= "air" and z2 ~= "ignore") or ((cool or icebergs) and z2 == "snow:ice"  and rand)) or
-						(y ~= "default:water_source" and y ~= "snow:ice" and y ~= "air") or (pr:next(1,6) == 1 and icebergs) then
-								env:add_node({x=x,y=ground_y,z=z}, {name="snow:ice"})
-						end
-					else
-						--Icesheets, Broken icesheet, Icecaves
-						if (icehole and pr:next(1,10) > 1) or icecave or icesheet then
+							env:add_node({x=x,y=ground_y,z=z}, {name="snow:snow_block"})
+						else
 							env:add_node({x=x,y=ground_y,z=z}, {name="snow:ice"})
 						end
-						if icecave then
-							--Gets rid of water underneath ice
-							for y=ground_y-1,-60,-1 do
-								if env:get_node({x=x,y=y,z=z}) and env:get_node({x=x,y=y,z=z}).name ~= "default:water_source" then
-									break
-								else
-									env:remove_node({x=x,y=y,z=z})
+					elseif ground_y and env:get_node({x=x,y=ground_y,z=z}).name == "default:leaves" then
+						env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow"})
+					elseif ground_y and env:get_node({x=x,y=ground_y,z=z}).name == "default:papyrus" then
+						for i=ground_y, ground_y-4, -1 do
+							if env:get_node({x=x,y=i,z=z}).name == "default:papyrus" then
+								env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow"})
+								env:add_node({x=x,y=i,z=z}, {name="snow:snow_block", param2=2})
+							end
+						end
+					elseif ground_y and node.name == "default:water_source" then
+						if not icesheet and not icecave and not icehole then
+							--Coastal ice.
+							local x1 = env:get_node({x=x+1,y=ground_y,z=z}).name
+							local z1 = env:get_node({x=x,y=ground_y,z=z+1}).name
+							local xz1 = env:get_node({x=x+1,y=ground_y,z=z+1}).name
+							local xz2 = env:get_node({x=x-1,y=ground_y,z=z-1}).name
+							local x2 = env:get_node({x=x-1,y=ground_y,z=z}).name
+							local z2 = env:get_node({x=x,y=ground_y,z=z-1}).name
+							local y = env:get_node({x=x,y=ground_y-1,z=z}).name
+							local rand = pr:next(1,4) == 1
+							if
+							((x1  and x1 ~= "default:water_source"  and x1 ~= "snow:ice"  and x1 ~= "air" and x1 ~= "ignore") or ((cool or icebergs) and x1 == "snow:ice"  and rand)) or
+							((z1  and z1 ~= "default:water_source"  and z1 ~= "snow:ice"  and z1 ~= "air" and z1 ~= "ignore") or ((cool or icebergs) and z1 == "snow:ice"  and rand)) or
+							((xz1 and xz1 ~= "default:water_source" and xz1 ~= "snow:ice" and xz1 ~= "air"and xz1 ~= "ignore") or ((cool or icebergs) and xz1 == "snow:ice" and rand)) or
+							((xz2 and xz2 ~= "default:water_source" and xz2 ~= "snow:ice" and xz2 ~= "air"and xz2 ~= "ignore") or ((cool or icebergs) and xz2 == "snow:ice" and rand)) or
+							((x2  and x2 ~= "default:water_source"  and x2 ~= "snow:ice"  and x2 ~= "air" and x2 ~= "ignore") or ((cool or icebergs) and x2 == "snow:ice"  and rand)) or
+							((z2  and z2 ~= "default:water_source"  and z2 ~= "snow:ice"  and z2 ~= "air" and z2 ~= "ignore") or ((cool or icebergs) and z2 == "snow:ice"  and rand)) or
+							(y ~= "default:water_source" and y ~= "snow:ice" and y ~= "air") or (pr:next(1,6) == 1 and icebergs) then
+									env:add_node({x=x,y=ground_y,z=z}, {name="snow:ice"})
+							end
+						else
+							--Icesheets, Broken icesheet, Icecaves
+							if (icehole and pr:next(1,10) > 1) or icecave or icesheet then
+								env:add_node({x=x,y=ground_y,z=z}, {name="snow:ice"})
+							end
+							if icecave then
+								--Gets rid of water underneath ice
+								for y=ground_y-1,-60,-1 do
+									if env:get_node({x=x,y=y,z=z}) and env:get_node({x=x,y=y,z=z}).name ~= "default:water_source" then
+										break
+									else
+										env:remove_node({x=x,y=y,z=z})
+									end
 								end
 							end
 						end
-					end
-				elseif ground_y and node.name == "snow:snow" and node.name ~= "snow:ice" then
-					--Abort genaration.
-					local name = env:get_node({x=x,y=ground_y-1,z=z}).name
-					if name ~= "default:leaves" and name ~= "snow:needles" then
-						if debug then
-							print(biomeToString(biome)..": snow found ABORTED!")
-						end
-						return
+					--~ elseif ground_y and node.name == "snow:snow" and node.name ~= "snow:ice" then
+						--~ --Abort genaration.
+						--~ local name = env:get_node({x=x,y=ground_y-1,z=z}).name
+						--~ if name ~= "default:leaves" and name ~= "snow:needles" then
+							--~ if debug then
+								--~ print(biomeToString(biome)..": snow found ABORTED!")
+							--~ end
+							--~ return
+						--~ end
 					end
 				end
 			end

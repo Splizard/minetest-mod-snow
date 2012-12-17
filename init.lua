@@ -250,6 +250,7 @@ minetest.register_node("snow:snow_block", {
 	--mapgen defines the vegetation.
 	--1 = Moss
 	--2 = Papyrus
+	--3 = Dry shrub
 	is_ground_content = true,
 	groups = {crumbly=3,melts=2,falling_node=1},
 	drop = 'snow:snow_block',
@@ -267,6 +268,11 @@ minetest.register_node("snow:snow_block", {
 			local n = minetest.env:get_node(pos).name
 			if  n == "air" or n == "default:water_flowing" or n == "default:water_source" then
 				minetest.env:add_node(pos,{name="default:papyrus"})
+			end
+		elseif node.param2 == 3 then
+			local n = minetest.env:get_node(pos).name
+			if  n == "air" or n == "default:water_flowing" or n == "default:water_source" then
+				minetest.env:add_node(pos,{name="default:dry_shrub"})
 			end
 		end
 	end,
