@@ -246,12 +246,30 @@ minetest.register_on_dignode(unsnowify)
 minetest.register_node("snow:snow_block", {
 	description = "Snow",
 	tiles = {"snow_snow.png"},
+	--param2 is reserved for what vegetation is hiding inside.
+	--mapgen defines the vegetation.
+	--1 = Moss
+	--2 = Papyrus
 	is_ground_content = true,
 	groups = {crumbly=3,melts=2,falling_node=1},
 	drop = 'snow:snow_block',
 	sounds = default.node_sound_dirt_defaults({
 		footstep = {name="default_grass_footstep", gain=0.4},
 	}),
+	--Update dirt node underneath snow.
+	after_destruct = function(pos, node, digger)
+		if node.param2 == 1 then
+			local n = minetest.env:get_node(pos).name
+			if  n == "air" or n == "default:water_flowing" or n == "default:water_source" then
+				minetest.env:add_node(pos,{name="snow:moss",param2=1})
+			end
+		elseif node.param2 == 2 then
+			local n = minetest.env:get_node(pos).name
+			if  n == "air" or n == "default:water_flowing" or n == "default:water_source" then
+				minetest.env:add_node(pos,{name="default:papyrus"})
+			end
+		end
+	end,
 })
 
 --Snow brick.

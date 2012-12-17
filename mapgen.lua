@@ -192,6 +192,13 @@ if maxp.y >= -10 then
 					end
 				elseif ground_y and env:get_node({x=x,y=ground_y,z=z}).name == "default:leaves" then
 					env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow"})
+				elseif ground_y and env:get_node({x=x,y=ground_y,z=z}).name == "default:papyrus" then
+					for i=ground_y, ground_y-4, -1 do
+						if env:get_node({x=x,y=i,z=z}).name == "default:papyrus" then
+							env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow"})
+							env:add_node({x=x,y=i,z=z}, {name="snow:snow_block", param2=2})
+						end
+					end
 				elseif ground_y and node.name == "default:water_source" then
 					if not icesheet and not icecave and not icehole then
 						--Coastal ice.
