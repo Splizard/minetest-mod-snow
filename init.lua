@@ -379,7 +379,7 @@ minetest.register_abm({
 
 if snow.enable_snowfall then
 
-	--Snowing (WIP)
+	--Snowing
 	snow_fall=function (pos)
 		local obj=minetest.env:add_entity(pos, "snow:fall_entity")
 		obj:setvelocity({x=0, y=-1, z=0})
@@ -401,7 +401,12 @@ if snow.enable_snowfall then
 		local pos = self.object:getpos()
 		local node = minetest.env:get_node(pos)
 
-		if self.object:getvelocity().y == 0 then
+		if self.lastpos and self.object:getvelocity().y == 0 then
+			if minetest.env:get_node({x=self.lastpos.x,z=self.lastpos.z,y=self.lastpos.y}).name == "snow:moss" then
+				minetest.env:add_node({x=self.lastpos.x,z=self.lastpos.z,y=self.lastpos.y},{name="snow:snow",param2=1})
+				self.object:remove()
+				return
+			end
 			minetest.env:place_node(self.lastpos,{name="snow:snow"})
 			self.object:remove()
 		end
@@ -411,33 +416,45 @@ if snow.enable_snowfall then
 
 	minetest.register_entity("snow:fall_entity", snow_fall_ENTITY)
 
-	--Snowing abm
+	--Regenerate Snow
 	minetest.register_abm({
-		nodenames = {"default:dirt_with_grass"},
-		interval = 30,
-		chance = 50,
+		nodenames = {"default:dirt_with_grass", "default:desert_sand", "snow:moss"},
+		interval = 500,
+		chance = 150,
 		action = function(pos, node, active_object_count, active_object_count_wider)
+			--Check we are in the right biome
 			local env = minetest.env
 			local perlin1 = env:get_perlin(112,3, 0.5, 150)
 			local test = perlin1:get2d({x=pos.x, y=pos.z})
-			if test > 0.53 then
-				if pos.y >= -10 then
-					if not env:find_node_near(pos, 10, "default:desert_sand") then
-						local ground_y = nil
-						for y=10,0,-1 do
-							if env:get_node({x=pos.x,y=y,z=pos.z}).name ~= "air" then
-								ground_y = y
-								break
+			local in_biome = false
+			local smooth = snow.smooth
+			if smooth and (test > 0.73 or (test > 0.43 and math.random(0,29) > (0.73 - test) * 100 )) then
+				in_biome = true
+			elseif not smooth and test > 0.53 then
+				in_biome = true
+			end
+			if in_biome then
+				--Check if block is under cover
+				local ground_y = nil
+				for y=15,0,-1 do
+					if env:get_node({x=pos.x,y=y+pos.y,z=pos.z}).name ~= "air" then
+						ground_y = pos.y+y
+						break
+					end
+				end
+				if ground_y then
+					local n = env:get_node({x=pos.x,y=ground_y,z=pos.z})
+					if (n.name ~= "snow:snow" and n.name ~= "snow:snow_block" and n.name ~= "snow:ice" and n.name ~= "default:water_source" and n.name ~= "default:papyrus") then
+						local obj = minetest.env:get_objects_inside_radius({x=pos.x,y=ground_y+20,z=pos.z}, 15)
+						for i,v in pairs(obj) do
+							e = v:get_luaentity()
+							if e ~= nil and e.name == "snow:fall_entity" then 
+								return
 							end
 						end
-						if ground_y then
-							local n = env:get_node({x=pos.x,y=ground_y,z=pos.z})
-							if math.random(4) == 1 or (n.name ~= "snow:snow" and n.name ~= "snow:snow_block" and n.name ~= "snow:ice" and n.name ~= "default:water_source") then
-								snow_fall({x=pos.x,y=ground_y+15,z=pos.z})
-								if snow.debug then
-									print("snowfall at x"..pos.x.." y"..pos.z)
-								end
-							end
+						snow_fall({x=pos.x,y=ground_y+15,z=pos.z})
+						if snow.debug then
+							print("snowfall at x"..pos.x.." y"..pos.z)
 						end
 					end
 				end
