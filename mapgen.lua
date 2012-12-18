@@ -82,9 +82,15 @@ if maxp.y >= -10 then
 		local z1 = maxp.z
 
 		--Speed hack: checks the corners and middle of the chunk for "snow biome".
-		if not (perlin1:get2d({x=x0, y=z0}) > 0.53) and not (perlin1:get2d({x=x1, y=z1}) > 0.53)
-		and not (perlin1:get2d({x=x0, y=z1}) > 0.53) and not (perlin1:get2d({x=x1, y=z0}) > 0.53)
-		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) then
+		if not ( perlin1:get2d( {x=x0, y=z0} ) > 0.53 ) 					--top left
+		and not ( perlin1:get2d( { x = x0 + ( (x1-x0)/2), y=z0 } ) > 0.53 )--top middle
+		and not (perlin1:get2d({x=x1, y=z1}) > 0.53) 						--bottom right
+		and not (perlin1:get2d({x=x1, y=z0+((z1-z0)/2)}) > 0.53) 			--right middle
+		and not (perlin1:get2d({x=x0, y=z1}) > 0.53)  						--bottom left
+		and not (perlin1:get2d({x=x1, y=z0}) > 0.53)						--top right
+		and not (perlin1:get2d({x=x0+((x1-x0)/2), y=z1}) > 0.53) 			--left middle
+		and not (perlin1:get2d({x=(x1-x0)/2, y=(z1-z0)/2}) > 0.53) 			--middle
+		and not (perlin1:get2d({x=x0, y=z1+((z1-z0)/2)}) > 0.53) then		--bottom middle
 			return
 		end
 
