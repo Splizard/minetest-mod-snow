@@ -434,6 +434,10 @@ if snow.enable_snowfall then
 			minetest.env:place_node(self.lastpos,{name="snow:snow"})
 			self.object:remove()
 		end
+		
+		if self.timer > 120 then
+			self.object:remove()
+		end
 
 		self.lastpos={x=pos.x, y=pos.y, z=pos.z} -- Set lastpos-->Node will be added at last pos outside the node
 	end
