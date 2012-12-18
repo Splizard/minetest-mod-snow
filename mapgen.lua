@@ -2,6 +2,12 @@
 function snow.make_pine(pos,snow)
 	local env = minetest.env
 	local perlin1 = env:get_perlin(112,3, 0.5, 150) 
+	local try_node = function(pos, node)
+		local n = env:get_node(pos).name
+		if  n == "air" or n == "snow:needles" or n == "default:leaves" or n == "snow:sapling_pine" or n == "snow:snow" then
+			env:add_node(pos,node)
+		end
+	end
 	--Clear ground.
 	for x=-1,1 do
 	for z=-1,1 do
@@ -21,9 +27,9 @@ function snow.make_pine(pos,snow)
 			for z=-1,1 do
 				local x = pos.x + x
 				local z = pos.z + z
-				env:add_node({x=x,y=pos.y+i,z=z},{name="snow:needles"})
+				try_node({x=x,y=pos.y+i,z=z},{name="snow:needles"})
 				if snow and x ~= 0 and z ~= 0 and perlin1:get2d({x=x,y=z}) > 0.53 then
-					env:add_node({x=x,y=pos.y+i+1,z=z},{name="snow:snow"})
+					try_node({x=x,y=pos.y+i+1,z=z},{name="snow:snow"})
 				end
 			end
 			end
@@ -32,31 +38,31 @@ function snow.make_pine(pos,snow)
 			local x = pos.x
 			local y = pos.y+i
 			local z = pos.z
-			env:add_node({x=x+1,y=y,z=z},{name="snow:needles"})
-			env:add_node({x=x-1,y=y,z=z},{name="snow:needles"})
-			env:add_node({x=x,y=y,z=z+1},{name="snow:needles"})
-			env:add_node({x=x,y=y,z=z-1},{name="snow:needles"})
+			try_node({x=x+1,y=y,z=z},{name="snow:needles"})
+			try_node({x=x-1,y=y,z=z},{name="snow:needles"})
+			try_node({x=x,y=y,z=z+1},{name="snow:needles"})
+			try_node({x=x,y=y,z=z-1},{name="snow:needles"})
 			if snow then
 				if perlin1:get2d({x=x+1,y=z}) > 0.53 then
-					env:add_node({x=x+1,y=y+1,z=z},{name="snow:snow"})
+					try_node({x=x+1,y=y+1,z=z},{name="snow:snow"})
 				end
 				if perlin1:get2d({x=x+1,y=z}) > 0.53 then
-					env:add_node({x=x-1,y=y+1,z=z},{name="snow:snow"})
+					try_node({x=x-1,y=y+1,z=z},{name="snow:snow"})
 				end
 				if perlin1:get2d({x=x,y=z+1}) > 0.53 then
-					env:add_node({x=x,y=y+1,z=z+1},{name="snow:snow"})
+					try_node({x=x,y=y+1,z=z+1},{name="snow:snow"})
 				end
 				if perlin1:get2d({x=x,y=z-1}) > 0.53 then
-					env:add_node({x=x,y=y+1,z=z-1},{name="snow:snow"})
+					try_node({x=x,y=y+1,z=z-1},{name="snow:snow"})
 				end
 			end
 		end
-		env:add_node({x=pos.x,y=pos.y+i,z=pos.z},{name="default:tree"})
+		try_node({x=pos.x,y=pos.y+i,z=pos.z},{name="default:tree"})
 	end
-	env:add_node({x=pos.x,y=pos.y+5,z=pos.z},{name="snow:needles"})
-	env:add_node({x=pos.x,y=pos.y+6,z=pos.z},{name="snow:needles"})
+	try_node({x=pos.x,y=pos.y+5,z=pos.z},{name="snow:needles"})
+	try_node({x=pos.x,y=pos.y+6,z=pos.z},{name="snow:needles"})
 	if snow and  perlin1:get2d({x=pos.x,y=pos.z}) > 0.53 then
-		env:add_node({x=pos.x,y=pos.y+7,z=pos.z},{name="snow:snow"})
+		try_node({x=pos.x,y=pos.y+7,z=pos.z},{name="snow:snow"})
 	end
 end
 
