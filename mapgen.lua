@@ -1,7 +1,7 @@
 --Makes pine tree
 function snow.make_pine(pos,snow,xmas)
 	local env = minetest.env
-	local perlin1 = env:get_perlin(112,3, 0.5, 150) 
+	local perlin1 = env:get_perlin(112,3, 0.5, 150)
 	local try_node = function(pos, node)
 		local n = env:get_node(pos).name
 		if  n == "air" or n == "snow:needles" or n == "default:leaves" or n == "snow:sapling_pine" or n == "snow:snow" or "snow:needles_decorated" then
@@ -107,14 +107,14 @@ if maxp.y >= -10 then
 		--Choose a biome types.
 		local pr = PseudoRandom(seed+57)
 		local biome
-		
+
 		--Land biomes
 		biome = pr:next(1, 5)
 		local snowy = biome == 1 --spawns alot of snow
 		local plain = biome == 2 --spawns not much
 		local alpine = biome == 3 --rocky terrain
 		-- biome == 4 or biome == 5 -- normal biome
-		
+
 		--Water biomes
 		biome2 = pr:next(1, 5)
 		local cool = biome == 1  --only spawns ice on edge of water
@@ -137,14 +137,14 @@ if maxp.y >= -10 then
 			elseif num == 3 then biome = "alpine"
 			elseif num == 4 or num == 5 then biome = "normal"
 			else biome =  "unknown "..num end
-			
+
 			if num2 == 1 then biome2 = "cool"
 			elseif num2 == 2 then biome2 = "icebergs"
 			elseif num2 == 3 then biome2 = "icesheet"
 			elseif num2 == 4 then biome2 = "icecave"
 			elseif num2 == 5 then biome2 = "icehole"
 			else biome2 =  "unknown "..num end
-			
+
 			return biome, biome2
 		end
 
@@ -153,9 +153,9 @@ if maxp.y >= -10 then
 
 		--Reseed random.
 		pr = PseudoRandom(seed+68)
-		
+
 		if alpine then
-			trees = env:find_nodes_in_area(minp, maxp, {"default:leaves","default:tree"})
+			local trees = env:find_nodes_in_area(minp, maxp, {"default:leaves","default:tree"})
 			for i,v in pairs(trees) do
 				env:remove_node(v)
 			end
@@ -176,11 +176,11 @@ if maxp.y >= -10 then
                 elseif (not smooth or snowy) and test > 0.53 then
 					in_biome = true
                 end
-                
+
                 if in_biome then
-                
-                if not plain or pr:next(1,12) == 1 then  
-                
+
+                if not plain or pr:next(1,12) == 1 then
+
 					 -- Find ground level (0...15)
 					local ground_y = nil
 					for y=maxp.y,minp.y+1,-1 do
