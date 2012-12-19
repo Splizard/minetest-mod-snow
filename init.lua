@@ -162,6 +162,19 @@ minetest.register_craft({
 	burntime = 10,
 })
 
+minetest.register_craft({
+	type = "fuel",
+	recipe = "snow:needles_decorated",
+	burntime = 1,
+})
+
+minetest.register_craft({
+	type = "fuel",
+	recipe = "snow:xmas_tree",
+	burntime = 10,
+})
+
+
 
 --Snowballs
 -------------
