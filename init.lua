@@ -404,7 +404,7 @@ minetest.register_node("snow:moss", {
 		type = "wallmounted",
 	},
 	is_ground_content = true,
-	groups = {crumbly=3, flammable=2},
+	groups = {crumbly=3, flammable=2, attached_node=1},
 })
 
 minetest.register_craft({
