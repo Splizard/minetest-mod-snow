@@ -349,6 +349,13 @@ minetest.register_node("snow:snow_block", {
 			local n = minetest.env:get_node(pos).name
 			if  n == "air" or n == "default:water_flowing" or n == "default:water_source" then
 				minetest.env:add_node(pos,{name="default:papyrus"})
+				pos.y = pos.y + 1 
+				local n =  minetest.env:get_node(pos)
+				if n.name == "snow:snow_block" and n.param2 == 2 then
+					minetest.env:remove_node(pos)
+					pos.y = pos.y - 1 
+					minetest.env:add_node(pos,{name="snow:snow_block",param2=2})
+				end
 			end
 		elseif node.param2 == 3 then
 			local n = minetest.env:get_node(pos).name
