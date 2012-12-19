@@ -104,17 +104,24 @@ if maxp.y >= -10 then
 			return
 		end
 
-		--Choose a biome type.
+		--Choose a biome types.
 		local pr = PseudoRandom(seed+57)
-		local biome = pr:next(1, 12)
+		local biome
+		
+		--Land biomes
+		biome = pr:next(1, 5)
 		local snowy = biome == 1 --spawns alot of snow
-		local plain = biome == 7 --spawns not much
+		local plain = biome == 2 --spawns not much
+		local alpine = biome == 3 --rocky terrain
+		-- biome == 4 or biome == 5 -- normal biome
+		
+		--Water biomes
+		biome2 = pr:next(1, 5)
+		local cool = biome == 1  --only spawns ice on edge of water
 		local icebergs = biome == 2
 		local icesheet = biome == 3
-		local alpine = biome == 11 or biome == 12 --rocky terrain
-		local cool = biome == 9 or biome == 10  --only spawns ice on edge of water
-		local icecave = biome == 5
-		local icehole = biome == 6 --icesheet with holes
+		local icecave = biome == 4
+		local icehole = biome == 5 --icesheet with holes
 
 		--Misc biome settings.
 		local icy = pr:next(1, 2) == 2   --If enabled spawns ice in sand instead of snow blocks.
@@ -123,17 +130,22 @@ if maxp.y >= -10 then
 		local pines = pr:next(1,2) == 1 --spawns pines.
 
 		--Debugging function
-		local biomeToString = function(num)
-			if num == 1 then return "snowy"
-			elseif num == 7 then return "plain"
-			elseif num == 8 or num == 4 then return "normal"
-			elseif num == 2 then return "icebergs"
-			elseif num == 3 then return "icesheet"
-			elseif num == 5 then return "icecave"
-			elseif num == 9 or num == 10 then return "cool"
-			elseif num == 6 then return "icehole"
-			elseif num == 11 or num == 12 then return "alpine"
-			else return "unknown "..num end
+		local biomeToString = function(num,num2)
+			local biome, biome2
+			if num == 1 then biome = "snowy"
+			elseif num == 2 then biome = "plain"
+			elseif num == 3 then biome = "alpine"
+			elseif num == 4 or num == 5 then biome = "normal"
+			else biome =  "unknown "..num end
+			
+			if num2 == 1 then biome2 = "cool"
+			elseif num2 == 2 then biome2 = "icebergs"
+			elseif num2 == 3 then biome2 = "icesheet"
+			elseif num2 == 4 then biome2 = "icecave"
+			elseif num2 == 5 then biome2 = "icehole"
+			else biome2 =  "unknown "..num end
+			
+			return biome, biome2
 		end
 
 		local make_pine = snow.make_pine
@@ -284,7 +296,8 @@ if maxp.y >= -10 then
 		end
 		end
 		if debug then
-			print(biomeToString(biome)..": Snow Biome Genarated near x"..minp.x.." z"..minp.z)
+			biome_string,biome2_string = biomeToString(biome,biome2)
+			print(biome_string.." and "..biome2_string..": Snow Biome Genarated near x"..minp.x.." z"..minp.z)
 		end
 end
 end
