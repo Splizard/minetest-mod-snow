@@ -526,7 +526,7 @@ if snow.enable_snowfall then
 	minetest.register_abm({
 		nodenames = {"default:dirt_with_grass", "default:desert_sand", "snow:moss"},
 		interval = 50,
-		chance = 100,
+		chance = 150,
 		action = function(pos, node, active_object_count, active_object_count_wider)
 			--Check we are in the right biome
 			local env = minetest.env
