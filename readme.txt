@@ -21,7 +21,7 @@ USAGE:
 -------
 If you walk around a bit you will find snow biomes scattered around the world.
 
-There are seven biome types:
+There are nine biome types:
 * Normal
 * Icebergs
 * Icesheet
@@ -29,11 +29,14 @@ There are seven biome types:
 * Icecave
 * Coast
 * Alpine
+* Snowy
+* Plain
   
 Snow can be picked up and thrown as snowballs or crafted into snow blocks.
 Snow and ice melts when near warm blocks such as torches or igniters such as lava.
 Snow blocks freeze water source blocks around them.
 Moss can be found in the snow, when moss is placed near cobble it spreads.
+Christmas trees can be found when digging pine needles.
 
 CRAFTING:
 -----------
@@ -47,15 +50,25 @@ Snow Brick:
 Snow Block    Snow Block
 Snow Block    Snow Block
 
+UNINSTALL:
+------------
+Simply delete the folder snow from the mods folder.
+
 CHANGELOG:
 ------------
-Version 1.0
+Version 1.4
 
-    Initial release
+    New biomes, snowy and plain
+    
+    Christmas Trees
+    
+    Snowfall
+    
+Version 1.3
 
-Version 1.1
-
-    Better mapgen
+    Smooth transitions
+    
+    Snow Bricks
 
 Version 1.2
 
@@ -66,13 +79,11 @@ Version 1.2
     Alpine biomes
 	
     Dry shrubs
-    
-Version 1.3
 
-    Smooth transitions
-    
-    Snow Bricks
+Version 1.1
 
-UNINSTALL:
-------------
-Simply delete the folder snow from the mods folder.
+    Better mapgen
+
+Version 1.0
+
+    Initial release
