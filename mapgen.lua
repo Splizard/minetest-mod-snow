@@ -193,7 +193,7 @@ if maxp.y >= -10 then
 					-- Snowy biome stuff
 					local node = env:get_node({x=x,y=ground_y,z=z})
 
-					if ground_y and node.name == "default:dirt_with_grass" then
+					if ground_y and (node.name == "default:dirt_with_grass" or node.name == "default:junglegrass") then
 							local veg
 							if mossy and pr:next(1,10) == 1 then veg = 1 end
 							if alpine then
@@ -206,7 +206,7 @@ if maxp.y >= -10 then
 										env:add_node({x=x,y=y,z=z},{name="default:stone"})
 									end
 								end
-							elseif shrubs and pr:next(1,28) == 1 then
+							elseif (shrubs and pr:next(1,28) == 1) or node.name == "default:junglegrass" then
 								--Spawns dry shrubs.
 								env:add_node({x=x,y=ground_y,z=z}, {name="snow:dirt_with_snow"})
 								if snowy then
