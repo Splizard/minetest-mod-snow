@@ -544,7 +544,7 @@ if snow.enable_snowfall then
 
 	--Regenerate Snow
 	minetest.register_abm({
-		nodenames = {"default:dirt_with_grass", "default:desert_sand", "snow:moss"},
+		nodenames = {"default:dirt_with_grass", "snow:moss"},
 		interval = 50,
 		chance = 150,
 		action = function(pos, node, active_object_count, active_object_count_wider)
