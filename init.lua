@@ -17,26 +17,11 @@
    MA 02110-1301, USA.
 ]]--
 
-snow = {}
+dofile(minetest.get_modpath("snow").."/util.lua")
 dofile(minetest.get_modpath("snow").."/mapgen.lua")
-dofile(minetest.get_modpath("snow").."/config.lua")
+dofile(minetest.get_modpath("snow").."/falling_snow.lua")
 
---Replace leaves so snow gets removed on decay.
-local leaves = {}
-for k,v in pairs(minetest.registered_nodes["default:leaves"]) do
-	leaves[k] = v
-end
-leaves.after_destruct = function(pos, node, digger)
-	pos.y = pos.y + 1
-	local nodename = minetest.env:get_node(pos).name
-	if nodename == "snow:snow" then
-		minetest.env:remove_node(pos)
-	end
-end
-minetest.register_node(":default:leaves", leaves)
-
---Pine leaves.
-minetest.register_node("snow:needles", {
+local needles = {
 	description = "Pine Needles",
 	drawtype = "allfaces_optional",
 	visual_scale = 1.3,
@@ -46,11 +31,6 @@ minetest.register_node("snow:needles", {
 	drop = {
 		max_items = 1,
 		items = {
-			{
-				-- player will get xmas tree with 1/50 chance
-				items = {'snow:xmas_tree'},
-				rarity = 50,
-			},
 			{
 				-- player will get sapling with 1/20 chance
 				items = {'snow:sapling_pine'},
@@ -63,16 +43,19 @@ minetest.register_node("snow:needles", {
 			}
 		}
 	},
-	--Remove snow above leaves after decay.
-	after_destruct = function(pos, node, digger)
-		pos.y = pos.y + 1
-		local nodename = minetest.env:get_node(pos).name
-		if nodename == "snow:snow" then
-			minetest.env:remove_node(pos)
-		end
-	end,
 	sounds = default.node_sound_leaves_defaults(),
-})
+}
+
+if snow.christmas_content then
+	needles["drop"]["items"][3] = {
+		-- player will get xmas tree with 1/50 chance
+		items = {'snow:xmas_tree'},
+		rarity = 50,
+	}
+end
+
+--Pine leaves.
+minetest.register_node("snow:needles", needles)
 
 --Decorated Pine leaves.
 minetest.register_node("snow:needles_decorated", {
@@ -101,14 +84,6 @@ minetest.register_node("snow:needles_decorated", {
 			}
 		}
 	},
-	--Remove snow above leaves after decay.
-	after_destruct = function(pos, node, digger)
-		pos.y = pos.y + 1
-		local nodename = minetest.env:get_node(pos).name
-		if nodename == "snow:snow" then
-			minetest.env:remove_node(pos)
-		end
-	end,
 	sounds = default.node_sound_leaves_defaults(),
 })
 
@@ -178,13 +153,13 @@ minetest.register_craft({
 
 --Snowballs
 -------------
-snowball_GRAVITY=9
-snowball_VELOCITY=19
+local snowball_GRAVITY=9
+local snowball_VELOCITY=19
 
 --Shoot snowball.
 local snow_shoot_snowball=function (item, player, pointed_thing)
 	local playerpos=player:getpos()
-	local obj=minetest.env:add_entity({x=playerpos.x,y=playerpos.y+1.5,z=playerpos.z}, "snow:snowball_entity")
+	local obj=minetest.add_entity({x=playerpos.x,y=playerpos.y+1.5,z=playerpos.z}, "snow:snowball_entity")
 	local dir=player:get_look_dir()
 	obj:setvelocity({x=dir.x*snowball_VELOCITY, y=dir.y*snowball_VELOCITY, z=dir.z*snowball_VELOCITY})
 	obj:setacceleration({x=dir.x*-3, y=-snowball_GRAVITY, z=dir.z*-3})
@@ -205,12 +180,12 @@ snow_snowball_ENTITY={
 snow_snowball_ENTITY.on_step = function(self, dtime)
 	self.timer=self.timer+dtime
 	local pos = self.object:getpos()
-	local node = minetest.env:get_node(pos)
+	local node = minetest.get_node(pos)
 
 	--Become item when hitting a node.
 	if self.lastpos.x~=nil then --If there is no lastpos for some reason.
 		if node.name ~= "air" then
-			minetest.env:place_node(self.lastpos,{name="snow:snow"})
+			snow.place(pos)
 			self.object:remove()
 		end
 	end
@@ -226,61 +201,199 @@ minetest.register_craftitem("snow:snowball", {
 	on_use = snow_shoot_snowball,
 })
 
---Snow.
-minetest.register_node("snow:snow", {
-	description = "Snow",
-	tiles = {"snow_snow.png"},
-	drawtype = "nodebox",
-	sunlight_propagates = true,
-	paramtype = "light",
-	param2 = nil,
-	--param2 is reserved for what vegetation is hiding inside.
-	--mapgen defines the vegetation.
-	--1 = Moss
-	groups = {crumbly=3,melts=3},
-	buildable_to = true,
-	drop = 'snow:snowball',
-	node_box = {
-		type = "fixed",
-		fixed = {
-			{-0.5, -0.5, -0.5, 0.5, -0.35, 0.5}
+for i=1,8 do
+	local snow_box =
+	{
+	    type  = "fixed",
+	    fixed = {-0.5, -0.5, -0.5, 0.5, -0.5 + i/9., 0.5}
+	}
+	minetest.register_node("snow:snow"..(tostring(i) ~= "1" and tostring(i) or ""), {
+	   description = "Snow",
+		tiles = {"snow_snow.png"},
+		drawtype = "nodebox",
+		sunlight_propagates = true,
+		paramtype = "light",
+		paramtype2 == "leveled",
+		groups = {crumbly=3,melts=3,falling_node=1,not_in_creative_inventory=1},
+		buildable_to = true,
+		drop = {
+			max_items = 2,
+			items = {
+				{
+					-- player will get sapling with 1/20 chance
+					items = {'snow:moss'},
+					rarity = 20,
+				},
+				{
+					-- player will get leaves only if he get no saplings,
+					-- this is because max_items is 1
+					items = {'snow:snowball'},
+				}
+			}
 		},
-	},
-	selection_box = {
-		type = "fixed",
-		fixed = {
-			{-0.5, -0.5, -0.5, 0.5, -0.35, 0.5}
+		leveled = 7*i,
+		drawtype = "nodebox",
+		node_box = snow_box,
+		sounds = default.node_sound_dirt_defaults({
+			footstep = {name="default_snow_footstep", gain=0.45},
+		}),
+		on_construct = function(pos)
+			pos.y = pos.y - 1
+			if minetest.get_node(pos).name == "default:dirt_with_grass" then
+				minetest.add_node(pos, {name="snow:dirt_with_snow"})
+			end
+		end,
+		after_destruct = function(pos)
+			pos.y = pos.y - 1
+			if minetest.get_node(pos).name == "snow:dirt_with_snow" then
+				minetest.add_node(pos, {name="default:dirt_with_grass"})
+			end
+		end,
+	})
+end
+
+if not snow.legacy then
+	--Snow.
+	minetest.register_node("snow:snow", {
+		description = "Snow",
+		tiles = {"snow_snow.png"},
+		drawtype = "nodebox",
+		sunlight_propagates = true,
+		paramtype = "light",
+		paramtype2 == "leveled",
+		groups = {crumbly=3,melts=3,falling_node=1,not_in_creative_inventory=1},
+		buildable_to = true,
+		drop = {
+			max_items = 2,
+			items = {
+				{
+					-- player will get sapling with 1/20 chance
+					items = {'snow:moss'},
+					rarity = 20,
+				},
+				{
+					-- player will get leaves only if he get no saplings,
+					-- this is because max_items is 1
+					items = {'snow:snowball'},
+				}
+			}
 		},
-	},
-	sounds = default.node_sound_dirt_defaults({
-		footstep = {name="default_gravel_footstep", gain=0.45},
-	}),
-	--Update dirt node underneath snow.
-	after_destruct = function(pos, node, digger)
-		if node.param2 == 1 then
-			local n = minetest.env:get_node(pos).name
-			if  n == "air" or n == "default:water_flowing" or n == "default:water_source" then
-				minetest.env:add_node(pos,{name="snow:moss",param2=1})
+		leveled = 7,
+		drawtype = "nodebox",
+		node_box = {
+			type = "leveled",
+			fixed = {
+				{-0.5, -0.5, -0.5,  0.5, -0.5+2/16, 0.5},
+			},
+		},
+		sounds = default.node_sound_dirt_defaults({
+			footstep = {name="default_snow_footstep", gain=0.45},
+		}),
+		on_construct = function(pos)
+			pos.y = pos.y - 1
+			if minetest.get_node(pos).name == "default:dirt_with_grass" then
+				minetest.add_node(pos, {name="snow:dirt_with_snow"})
+			end
+		end,
+		after_destruct = function(pos)
+			pos.y = pos.y - 1
+			if minetest.get_node(pos).name == "snow:dirt_with_snow" then
+				minetest.add_node(pos, {name="default:dirt_with_grass"})
+			end
+		end,
+	})
+else
+	minetest.add_node_level = function(pos, amount)
+		local node = minetest.get_node(pos)
+		if node.name == "snow:snow" then
+			minetest.add_node(pos,{name="snow:snow2"})
+		elseif node.name:find("snow:snow") and node.name:sub(-1)~="8" then
+			minetest.add_node(pos,{name="snow:snow"..tonumber(node.name:sub(-1))+1})
+		end
+	end
+	minetest.get_node_level = function(pos)
+		local node = minetest.get_node(pos)
+		if node.name == "snow:snow" then
+			return 7
+		elseif node.name:find("snow:snow") and node.name:sub(-1) then
+			return 7*(tonumber(node.name:sub(-1)))
+		end
+	end
+end
+
+function snow.place(pos)
+	local node = minetest.get_node(pos)
+	local drawtype = minetest.registered_nodes[node.name].drawtype
+
+	local bnode = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
+	if node.name:find("snow:snow") and minetest.get_node_level(pos) < 63 then
+		if minetest.get_item_group(bnode.name, "leafdecay") == 0 and snow.is_uneven(pos) ~= true then
+			minetest.add_node_level(pos, 7)
+		end
+	elseif node.name:find("snow:snow") and minetest.get_node_level(pos) == 63 then
+		local p = minetest.find_node_near(pos, 10, "default:dirt_with_grass")
+		if p and minetest.get_node_light(p, 0.5) == 15 then
+			minetest.add_node(p,{name="snow:snow"})
+		else
+			minetest.add_node(pos,{name="snow:snowblock"})
+		end
+	elseif node.name ~= "snow:ice" and node.name ~= "air" then
+		if drawtype == "normal" or drawtype == "allfaces_optional" then
+			minetest.add_node({x=pos.x,y=pos.y+1,z=pos.z}, {name="snow:snow"})
+		elseif drawtype == "plantlike" then
+			pos.y = pos.y - 1
+			if minetest.get_node(pos).name == "default:dirt_with_grass" then
+				minetest.add_node(pos, {name="snow:dirt_with_snow"})
 			end
 		end
-		pos.y = pos.y - 1
-		local nodename = minetest.env:get_node(pos).name
-		if nodename == "snow:dirt_with_snow" then
-			minetest.env:add_node(pos,{name="default:dirt_with_grass"})
+	end
+end
+
+--Checks if the snow level is even at any given pos.
+--Smooth snow
+local smooth_snow = snow.smooth_snow
+snow.is_uneven = function(pos)
+	if smooth_snow then
+		local num = minetest.get_node_level(pos)
+		local get_node = minetest.get_node
+		local add_node = minetest.add_node
+		local found
+		local foundx
+		local foundy
+		for x=-1,1 do
+		for z=-1,1 do
+			local node = get_node({x=pos.x+x,y=pos.y,z=pos.z+z})
+			local bnode = get_node({x=pos.x+x,y=pos.y-1,z=pos.z+z})
+			local drawtype = minetest.registered_nodes[node.name].drawtype
+	
+			if drawtype == "plantlike" then
+				if bnode.name == "default:dirt_with_grass" then
+					add_node({x=pos.x+x,y=pos.y-1,z=pos.z+z}, {name="snow:dirt_with_snow"})
+					return true
+				end
+			end
+			
+			if (not(x == 0 and y == 0)) and node.name == "snow:snow" and minetest.get_node_level({x=pos.x+x,y=pos.y,z=pos.z+z}) < num then
+				found = true
+				foundx = x
+				foundz=z
+			elseif node.name == "air" and bnode.name ~= "air" then
+				if not (bnode.name:find("snow:snow")) then 
+					snow.place({x=pos.x+x,y=pos.y,z=pos.z+z})
+					return true
+				end
+			end
 		end
-	end,
-	on_construct = function(pos, newnode)
-		pos.y = pos.y - 1
-		local nodename = minetest.env:get_node(pos).name
-		if nodename == "default:dirt_with_grass" then
-			minetest.env:remove_node(pos)
-			minetest.env:add_node(pos,{name="snow:dirt_with_snow"})
-		elseif nodename == "air" then
-			pos.y = pos.y + 1
-			minetest.env:remove_node(pos)
 		end
-	end,
-})
+		if found then
+			local node = get_node({x=pos.x+foundx,y=pos.y,z=pos.z+foundz})
+			if snow.is_uneven({x=pos.x+foundx,y=pos.y,z=pos.z+foundz}) ~= true then
+				minetest.add_node_level({x=pos.x+foundx,y=pos.y,z=pos.z+foundz}, 7)
+			end
+			return true
+		end
+	end
+end
 
 --Snow with dirt.
 minetest.register_node("snow:dirt_with_snow", {
@@ -290,80 +403,20 @@ minetest.register_node("snow:dirt_with_snow", {
 	groups = {crumbly=3},
 	drop = 'default:dirt',
 	sounds = default.node_sound_dirt_defaults({
-		footstep = {name="default_grass_footstep", gain=0.4},
+		footstep = {name="default_snow_footstep", gain=0.4},
 	}),
-	--Place snow above this node when placed.
-	after_place_node = function(pos, newnode)
-		pos.y = pos.y + 1
-		local nodename = minetest.env:get_node(pos).name
-		if nodename == "air" then
-			minetest.env:add_node(pos,{name="snow:snow"})
-		end
-	end,
 })
-
---Gets rid of snow when the node underneath is dug.
-local unsnowify = function(pos, node, digger)
-	if node.name == "default:dry_shrub" then
-		pos.y = pos.y - 1
-		local nodename = minetest.env:get_node(pos).name
-		if nodename == "snow:dirt_with_snow" then
-			minetest.env:add_node(pos,{name="default:dirt_with_grass"})
-		end
-		pos.y = pos.y + 1
-	end
-	pos.y = pos.y + 1
-	local nodename = minetest.env:get_node(pos).name
-	if nodename == "snow:snow" then
-		minetest.env:remove_node(pos)
-		local obj=minetest.env:add_entity({x=pos.x,y=pos.y,z=pos.z}, "snow:snowball_entity")
-		obj:setacceleration({x=0, y=-snowball_GRAVITY, z=0})
-	end
-end
-
-minetest.register_on_dignode(unsnowify)
 
 --Snow block.
 minetest.register_node("snow:snow_block", {
 	description = "Snow",
 	tiles = {"snow_snow.png"},
-	--param2 is reserved for what vegetation is hiding inside.
-	--mapgen defines the vegetation.
-	--1 = Moss
-	--2 = Papyrus
-	--3 = Dry shrub
 	is_ground_content = true,
 	groups = {crumbly=3,melts=2,falling_node=1},
 	drop = 'snow:snow_block',
 	sounds = default.node_sound_dirt_defaults({
-		footstep = {name="default_grass_footstep", gain=0.4},
+		footstep = {name="default_snow_footstep", gain=0.4},
 	}),
-	--Update dirt node underneath snow.
-	after_destruct = function(pos, node, digger)
-		if node.param2 == 1 then
-			local n = minetest.env:get_node(pos).name
-			if  n == "air" or n == "default:water_flowing" or n == "default:water_source" then
-				minetest.env:add_node(pos,{name="snow:moss",param2=1})
-			end
-		elseif node.param2 == 2 then
-			local n = minetest.env:get_node(pos).name
-			if  n == "air" or n == "default:water_flowing" or n == "default:water_source" then
-				minetest.env:add_node(pos,{name="default:papyrus"})
-				pos.y = pos.y + 1 
-				local n =  minetest.env:get_node(pos)
-				if n.name == "snow:snow_block" and n.param2 == 2 then
-					minetest.env:remove_node(pos)
-					pos.y = pos.y - 1 
-					minetest.env:add_node(pos,{name="snow:snow_block",param2=2})
-				end
-			end
-		elseif node.param2 == 3 then
-			local n = minetest.env:get_node(pos).name
-			if  n == "air" or n == "default:water_flowing" or n == "default:water_source" then
-				minetest.env:add_node(pos,{name="default:dry_shrub"})
-			end
-		end
-	end,
 })
 
 --Snow brick.
@@ -437,20 +490,20 @@ minetest.register_abm({
     action = function(pos, node, active_object_count, active_object_count_wider)
 		local intensity = minetest.get_item_group(node.name,"melts")
 		if intensity == 1 then
-			minetest.env:add_node(pos,{name="default:water_source"})
+			minetest.add_node(pos,{name="default:water_source"})
 		elseif intensity == 2 then
 			local check_place = function(pos,node)
-				if minetest.env:get_node(pos).name == "air" then
-					minetest.env:place_node(pos,node)
+				if minetest.get_node(pos).name == "air" then
+					minetest.place_node(pos,node)
 				end
 			end
-			minetest.env:add_node(pos,{name="default:water_flowing"})
+			minetest.add_node(pos,{name="default:water_flowing"})
 			check_place({x=pos.x+1,y=pos.y,z=pos.z},{name="default:water_flowing"})
 			check_place({x=pos.x-1,y=pos.y,z=pos.z},{name="default:water_flowing"})
 			check_place({x=pos.x,y=pos.y+1,z=pos.z},{name="default:water_flowing"})
 			check_place({x=pos.x,y=pos.y-1,z=pos.z},{name="default:water_flowing"})
 		elseif intensity == 3 then
-			minetest.env:add_node(pos,{name="default:water_flowing"})
+			minetest.add_node(pos,{name="default:water_flowing"})
 		end
 		nodeupdate(pos)
     end,
@@ -464,7 +517,7 @@ minetest.register_abm({
     interval = 20,
     chance = 4,
     action = function(pos, node, active_object_count, active_object_count_wider)
-		minetest.env:add_node(pos,{name="snow:ice"})
+		minetest.add_node(pos,{name="snow:ice"})
     end,
 })
 
@@ -475,7 +528,7 @@ minetest.register_abm({
     interval = 20,
     chance = 6,
     action = function(pos, node, active_object_count, active_object_count_wider)
-		minetest.env:add_node(pos,{name="default:mossycobble"})
+		minetest.add_node(pos,{name="default:mossycobble"})
     end,
 })
 
@@ -498,93 +551,3 @@ minetest.register_abm({
 		snow.make_pine(pos,false,true)
     end,
 })
-
-if snow.enable_snowfall then
-
-	--Snowing
-	snow_fall=function (pos)
-		local obj=minetest.env:add_entity(pos, "snow:fall_entity")
-		obj:setvelocity({x=0, y=-1, z=0})
-	end
-
-	-- The snowfall Entity
-	snow_fall_ENTITY={
-		physical = true,
-		timer=0,
-		textures = {"snow_snowfall.png"},
-		lastpos={},
-		collisionbox = {0,0,0,0,0,0},
-	}
-
-
-	-- snowfall_entity.on_step()--> called when snow is falling
-	snow_fall_ENTITY.on_step = function(self, dtime)
-		self.timer=self.timer+dtime
-		local pos = self.object:getpos()
-		local node = minetest.env:get_node(pos)
-
-		if self.lastpos and self.object:getvelocity().y == 0 then
-			if minetest.env:get_node({x=self.lastpos.x,z=self.lastpos.z,y=self.lastpos.y}).name == "snow:moss" then
-				minetest.env:add_node({x=self.lastpos.x,z=self.lastpos.z,y=self.lastpos.y},{name="snow:snow",param2=1})
-				self.object:remove()
-				return
-			end
-			minetest.env:place_node(self.lastpos,{name="snow:snow"})
-			self.object:remove()
-		end
-		
-		if self.timer > 120 then
-			self.object:remove()
-		end
-
-		self.lastpos={x=pos.x, y=pos.y, z=pos.z} -- Set lastpos-->Node will be added at last pos outside the node
-	end
-
-	minetest.register_entity("snow:fall_entity", snow_fall_ENTITY)
-
-	--Regenerate Snow
-	minetest.register_abm({
-		nodenames = {"default:dirt_with_grass", "snow:moss"},
-		interval = 50,
-		chance = 150,
-		action = function(pos, node, active_object_count, active_object_count_wider)
-			--Check we are in the right biome
-			local env = minetest.env
-			local perlin1 = env:get_perlin(112,3, 0.5, 150)
-			local test = perlin1:get2d({x=pos.x, y=pos.z})
-			local in_biome = false
-			local smooth = snow.smooth
-			if smooth and (test > 0.73 or (test > 0.43 and math.random(0,29) > (0.73 - test) * 100 )) then
-				in_biome = true
-			elseif not smooth and test > 0.53 then
-				in_biome = true
-			end
-			if in_biome then
-				--Check if block is under cover
-				local ground_y = nil
-				for y=15,0,-1 do
-					if env:get_node({x=pos.x,y=y+pos.y,z=pos.z}).name ~= "air" then
-						ground_y = pos.y+y
-						break
-					end
-				end
-				if ground_y then
-					local n = env:get_node({x=pos.x,y=ground_y,z=pos.z})
-					if (n.name ~= "snow:snow" and n.name ~= "snow:snow_block" and n.name ~= "snow:ice" and n.name ~= "default:water_source" and n.name ~= "default:papyrus") then
-						local obj = minetest.env:get_objects_inside_radius({x=pos.x,y=ground_y+20,z=pos.z}, 15)
-						for i,v in pairs(obj) do
-							e = v:get_luaentity()
-							if e ~= nil and e.name == "snow:fall_entity" then 
-								return
-							end
-						end
-						snow_fall({x=pos.x,y=ground_y+15,z=pos.z})
-						if snow.debug then
-							print("snowfall at x"..pos.x.." y"..pos.z)
-						end
-					end
-				end
-			end
-		end
-	})
-end
