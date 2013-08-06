@@ -5,7 +5,7 @@
   ____) | | | | (_) \ V  V /  | |  | | (_) | (_| |
  |_____/|_| |_|\___/ \_/\_/   |_|  |_|\___/ \__,_|
   
-By Splizard, bob and cornernote.
+By Splizard.
 
 Forum post: http://minetest.net/forum/viewtopic.php?id=2290
 Github: https://github.com/Splizard/minetest-mod-snow
@@ -13,6 +13,7 @@ Github: https://github.com/Splizard/minetest-mod-snow
 INSTALL:
 ----------
 Place this folder in your minetest mods folder.
+(http://dev.minetest.net/Installing_Mods)
 
 NOTICE
 While this mod is installed you may experience slow map loading while a snow biome is generated.
@@ -50,40 +51,17 @@ Snow Brick:
 Snow Block    Snow Block
 Snow Block    Snow Block
 
+MAPGEN_V7:
+------------
+If you are using minetest 0.4.8 or the latest dev version of minetest you can choose to generate a v7 map.
+This option can be found when creating a new map from the menu.
+Snow Biomes has support for this and includes a base grass biome for this.
+There are a couple of bugs and limitations with this such as no ice being generated at the moment.
+
+Config file:
+------------
+After starting a game in minetest with snow mod, a config file will be placed in this folder that contains the various options for snow mod.
+
 UNINSTALL:
 ------------
 Simply delete the folder snow from the mods folder.
-
-CHANGELOG:
-------------
-Version 1.4
-
-    New biomes, snowy and plain
-    
-    Christmas Trees
-    
-    Snowfall
-    
-Version 1.3
-
-    Smooth transitions
-    
-    Snow Bricks
-
-Version 1.2
-
-    Pine trees
-    
-    Moss
-    
-    Alpine biomes
-	
-    Dry shrubs
-
-Version 1.1
-
-    Better mapgen
-
-Version 1.0
-
-    Initial release
