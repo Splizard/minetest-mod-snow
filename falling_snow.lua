@@ -4,7 +4,7 @@ if snow.enable_snowfall then
 	--Weather for legacy versions of minetest.
 	local save_weather_legacy = function ()
 		local file = io.open(minetest.get_worldpath().."/weather_v6", "w+")
-		file:write(weather_legacy)
+		file:write(tostring(weather_legacy))
 		file:close()
 	end
 
