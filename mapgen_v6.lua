@@ -84,7 +84,7 @@ if snow.legacy then
 			pr = PseudoRandom(seed+68)
 
 			if alpine then
-				local trees = env:find_nodes_in_area(minp, maxp, {"default:leaves","default:tree"})
+				local trees = env:find_nodes_in_area(minp, maxp, {"default:leaves","default:tree", "default:apple"})
 				for i,v in pairs(trees) do
 					env:remove_node(v)
 				end
