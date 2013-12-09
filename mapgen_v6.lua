@@ -134,7 +134,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					in_biome = true
 		        end
 
-
 		        if in_biome then
 		        
 		        	local perlin2 = env:get_perlin(322345,3, 0.5, 80)

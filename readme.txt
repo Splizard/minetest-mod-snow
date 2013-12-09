@@ -38,6 +38,7 @@ Snow and ice melts when near warm blocks such as torches or igniters such as lav
 Snow blocks freeze water source blocks around them.
 Moss can be found in the snow, when moss is placed near cobble it spreads.
 Christmas trees can be found when digging pine needles.
+Sleds allow for faster travel on snow.
 
 CRAFTING:
 -----------
@@ -50,6 +51,11 @@ Snow Brick:
 
 Snow Block    Snow Block
 Snow Block    Snow Block
+
+Sled:
+
+				Stick
+Wood	Wood	Wood
 
 MAPGEN_V7:
 ------------
