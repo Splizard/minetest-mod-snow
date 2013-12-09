@@ -1,6 +1,7 @@
 --Global config and function table.
 snow = {
 	legacy = true,
+	sleds = true,
 	enable_snowfall = true,
 	lighter_snowfall = false,
 	debug = false,
@@ -13,6 +14,7 @@ snow = {
 --Config documentation.
 local doc = {
 	legacy = "Whether you are running a legacy minetest version (auto-detected).",
+	sleds = "Disable this to prevent sleds from being riden.",
 	enable_snowfall = "Enables falling snow.",
 	lighter_snowfall = "Reduces the amount of resources and fps used by snowfall.",
 	debug = "Enables debug output.",

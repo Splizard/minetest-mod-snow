@@ -20,6 +20,9 @@
 dofile(minetest.get_modpath("snow").."/util.lua")
 dofile(minetest.get_modpath("snow").."/mapgen.lua")
 dofile(minetest.get_modpath("snow").."/falling_snow.lua")
+dofile(minetest.get_modpath("snow").."/sled.lua")
+
+
 
 local needles = {
 	description = "Pine Needles",
