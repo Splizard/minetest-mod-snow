@@ -2,6 +2,7 @@
 snow = {
 	legacy = true,
 	enable_snowfall = true,
+	lighter_snowfall = false,
 	debug = false,
 	smooth_biomes = true,
 	christmas_content = true,
@@ -13,6 +14,7 @@ snow = {
 local doc = {
 	legacy = "Whether you are running a legacy minetest version (auto-detected).",
 	enable_snowfall = "Enables falling snow.",
+	lighter_snowfall = "Reduces the amount of resources and fps used by snowfall.",
 	debug = "Enables debug output.",
 	smooth_biomes = "Enables smooth transition of biomes",
 	christmas_content = "Disable this to remove christmas saplings from being found.",

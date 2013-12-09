@@ -1,7 +1,7 @@
 minetest.register_biome({
 	name           = "snow_biome_default",
 
-	node_top       = "snow:dirt_with_snow",
+	node_top       = "default:dirt_with_snow",
 	depth_top      = 1,
 	node_filler    = "default:dirt",
 	depth_filler   = 2,
@@ -15,7 +15,7 @@ minetest.register_biome({
 minetest.register_biome({
 	name           = "snow_biome_forest",
 
-	node_top       = "snow:dirt_with_snow",
+	node_top       = "default:dirt_with_snow",
 	depth_top      = 1,
 	node_filler    = "default:dirt",
 	depth_filler   = 2,
@@ -29,7 +29,7 @@ minetest.register_biome({
 minetest.register_biome({
 	name           = "snow_biome_lush",
 
-	node_top       = "snow:dirt_with_snow",
+	node_top       = "default:dirt_with_snow",
 	depth_top      = 1,
 	node_filler    = "default:dirt",
 	depth_filler   = 2,
@@ -80,7 +80,7 @@ minetest.register_biome({
 --Pine tree.
 minetest.register_decoration({
 	deco_type = "schematic",
-	place_on = "snow:dirt_with_snow",
+	place_on = "default:dirt_with_snow",
 	sidelen = 16,
 	fill_ratio = 0.005,
 	biomes = {"snow_biome_default"},
@@ -90,7 +90,7 @@ minetest.register_decoration({
 
 minetest.register_decoration({
 	deco_type = "schematic",
-	place_on = "snow:dirt_with_snow",
+	place_on = "default:dirt_with_snow",
 	sidelen = 16,
 	fill_ratio = 0.05,
 	biomes = {"snow_biome_forest"},
@@ -100,7 +100,7 @@ minetest.register_decoration({
 
 minetest.register_decoration({
 	deco_type = "schematic",
-	place_on = "snow:dirt_with_snow",
+	place_on = "default:dirt_with_snow",
 	sidelen = 16,
 	fill_ratio = 0.1,
 	biomes = {"snow_biome_lush"},
@@ -111,7 +111,7 @@ minetest.register_decoration({
 --Dry shrubs.
 minetest.register_decoration({
 	deco_type = "simple",
-	place_on = "snow:dirt_with_snow",
+	place_on = "default:dirt_with_snow",
 	sidelen = 16,
 	fill_ratio = 0.005,
 	biomes = {"snow_biome_default"},
@@ -120,7 +120,7 @@ minetest.register_decoration({
 
 minetest.register_decoration({
 	deco_type = "simple",
-	place_on = "snow:dirt_with_snow",
+	place_on = "default:dirt_with_snow",
 	sidelen = 16,
 	fill_ratio = 0.05,
 	biomes = {"snow_biome_forest", "snow_biome_lush"},
@@ -130,11 +130,11 @@ minetest.register_decoration({
 --Snow.
 minetest.register_decoration({
 	deco_type = "simple",
-	place_on = "snow:dirt_with_snow",
+	place_on = "default:dirt_with_snow",
 	sidelen = 16,
 	fill_ratio = 10,
 	biomes = {"snow_biome_default", "snow_biome_forest", "snow_biome_lush"},
-	decoration = "snow:snow",
+	decoration = "default:snow",
 })
 
 minetest.register_decoration({
@@ -143,6 +143,6 @@ minetest.register_decoration({
 	sidelen = 16,
 	fill_ratio = 10,
 	biomes = {"snow_biome_alpine"},
-	decoration = "snow:snow",
+	decoration = "default:snow",
 })
 

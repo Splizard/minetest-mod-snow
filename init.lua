@@ -26,6 +26,7 @@ local needles = {
 	drawtype = "allfaces_optional",
 	visual_scale = 1.3,
 	tiles = {"snow_needles.png"},
+	waving = 1,
 	paramtype = "light",
 	groups = {snappy=3, leafdecay=3, flammable=2},
 	drop = {
@@ -111,6 +112,7 @@ minetest.register_node("snow:sapling_pine", {
 	walkable = false,
 	groups = {snappy=2,dig_immediate=3,flammable=2},
 	sounds = default.node_sound_defaults(),
+	
 })
 
 minetest.register_node("snow:star", {
@@ -201,149 +203,101 @@ minetest.register_craftitem("snow:snowball", {
 	on_use = snow_shoot_snowball,
 })
 
-for i=1,8 do
-	local snow_box =
-	{
-	    type  = "fixed",
-	    fixed = {-0.5, -0.5, -0.5, 0.5, -0.5 + i/9., 0.5}
-	}
-	minetest.register_node("snow:snow"..(tostring(i) ~= "1" and tostring(i) or ""), {
-	   description = "Snow",
-		tiles = {"snow_snow.png"},
-		drawtype = "nodebox",
-		sunlight_propagates = true,
-		paramtype = "light",
-		paramtype2 == "leveled",
-		groups = {crumbly=3,melts=3,falling_node=1,not_in_creative_inventory=1},
-		buildable_to = true,
-		drop = {
-			max_items = 2,
-			items = {
-				{
-					-- player will get sapling with 1/20 chance
-					items = {'snow:moss'},
-					rarity = 20,
-				},
-				{
-					-- player will get leaves only if he get no saplings,
-					-- this is because max_items is 1
-					items = {'snow:snowball'},
-				}
-			}
-		},
-		leveled = 7*i,
-		drawtype = "nodebox",
-		node_box = snow_box,
-		sounds = default.node_sound_dirt_defaults({
-			footstep = {name="default_snow_footstep", gain=0.45},
-		}),
-		on_construct = function(pos)
-			pos.y = pos.y - 1
-			if minetest.get_node(pos).name == "default:dirt_with_grass" then
-				minetest.add_node(pos, {name="snow:dirt_with_snow"})
-			end
-		end,
-		after_destruct = function(pos)
-			pos.y = pos.y - 1
-			if minetest.get_node(pos).name == "snow:dirt_with_snow" then
-				minetest.add_node(pos, {name="default:dirt_with_grass"})
-			end
-		end,
-	})
-end
 
-if not snow.legacy then
-	--Snow.
-	minetest.register_node("snow:snow", {
-		description = "Snow",
-		tiles = {"snow_snow.png"},
-		drawtype = "nodebox",
-		sunlight_propagates = true,
-		paramtype = "light",
-		paramtype2 == "leveled",
-		groups = {crumbly=3,melts=3,falling_node=1,not_in_creative_inventory=1},
-		buildable_to = true,
-		drop = {
-			max_items = 2,
-			items = {
-				{
-					-- player will get sapling with 1/20 chance
-					items = {'snow:moss'},
-					rarity = 20,
-				},
-				{
-					-- player will get leaves only if he get no saplings,
-					-- this is because max_items is 1
-					items = {'snow:snowball'},
-				}
-			}
-		},
-		leveled = 7,
-		drawtype = "nodebox",
-		node_box = {
-			type = "leveled",
-			fixed = {
-				{-0.5, -0.5, -0.5,  0.5, -0.5+2/16, 0.5},
+--Backwards Compatability.
+minetest.register_abm({
+    nodenames = {"snow:snow1","snow:snow2","snow:snow3","gsnow4","snow:snow5","snow:snow6","snow:snow7","snow:snow8"},
+    interval = 1,
+    chance = 1,
+    action = function(pos, node, active_object_count, active_object_count_wider)
+    	local level = 7*(tonumber(node.name:sub(-1)))
+    	minetest.add_node(pos,{name="default:snow"})
+    	minetest.set_node_level(pos, level)
+    end,
+})
+
+minetest.register_alias("snow:snow", "default:snow")
+minetest.register_alias("snow:ice", "default:ice")
+minetest.register_alias("snow:dirt_with_snow", "default:dirt_with_snow")
+minetest.register_alias("snow:snow_block", "default:snowblock")
+minetest.register_alias("snow:ice", "default:ice")
+
+
+--Snow.
+minetest.register_node(":default:snow", {
+	description = "Snow",
+	tiles = {"default_snow.png"},
+	drawtype = "nodebox",
+	sunlight_propagates = true,
+	paramtype = "light",
+	paramtype2 == "leveled",
+	groups = {crumbly=3,melts=3,falling_node=1,not_in_creative_inventory=1},
+	buildable_to = true,
+	freezemelt = "default:water_flowing",
+	drop = {
+		max_items = 2,
+		items = {
+			{
+				-- player will get sapling with 1/20 chance
+				items = {'snow:moss'},
+				rarity = 20,
 			},
+			{
+				-- player will get leaves only if he get no saplings,
+				-- this is because max_items is 1
+				items = {'snow:snowball'},
+			}
+		}
+	},
+	leveled = 7,
+	drawtype = "nodebox",
+	node_box = {
+		type = "leveled",
+		fixed = {
+			{-0.5, -0.5, -0.5,  0.5, -0.5+2/16, 0.5},
 		},
-		sounds = default.node_sound_dirt_defaults({
-			footstep = {name="default_snow_footstep", gain=0.45},
-		}),
-		on_construct = function(pos)
-			pos.y = pos.y - 1
-			if minetest.get_node(pos).name == "default:dirt_with_grass" then
-				minetest.add_node(pos, {name="snow:dirt_with_snow"})
-			end
-		end,
-		after_destruct = function(pos)
-			pos.y = pos.y - 1
-			if minetest.get_node(pos).name == "snow:dirt_with_snow" then
-				minetest.add_node(pos, {name="default:dirt_with_grass"})
-			end
-		end,
-	})
-else
-	minetest.add_node_level = function(pos, amount)
-		local node = minetest.get_node(pos)
-		if node.name == "snow:snow" then
-			minetest.add_node(pos,{name="snow:snow2"})
-		elseif node.name:find("snow:snow") and node.name:sub(-1)~="8" then
-			minetest.add_node(pos,{name="snow:snow"..tonumber(node.name:sub(-1))+1})
+	},
+	sounds = default.node_sound_dirt_defaults({
+		footstep = {name="default_snow_footstep", gain=0.45},
+	}),
+	on_construct = function(pos)
+		pos.y = pos.y - 1
+		if minetest.get_node(pos).name == "default:dirt_with_grass" then
+			minetest.add_node(pos, {name="default:dirt_with_snow"})
 		end
-	end
-	minetest.get_node_level = function(pos)
-		local node = minetest.get_node(pos)
-		if node.name == "snow:snow" then
-			return 7
-		elseif node.name:find("snow:snow") and node.name:sub(-1) then
-			return 7*(tonumber(node.name:sub(-1)))
+	end,
+	after_destruct = function(pos)
+		pos.y = pos.y - 1
+		if minetest.get_node(pos).name == "default:dirt_with_snow" then
+			minetest.add_node(pos, {name="default:dirt_with_grass"})
 		end
-	end
-end
+	end,
+})
 
 function snow.place(pos)
+	local node = minetest.get_node({x=pos.x,y=pos.y+1,z=pos.z})
 	local node = minetest.get_node(pos)
 	local drawtype = minetest.registered_nodes[node.name].drawtype
 
 	local bnode = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
-	if node.name:find("snow:snow") and minetest.get_node_level(pos) < 63 then
+	if node.name == "default:snow" and minetest.get_node_level(pos) < 63 then
 		if minetest.get_item_group(bnode.name, "leafdecay") == 0 and snow.is_uneven(pos) ~= true then
 			minetest.add_node_level(pos, 7)
 		end
-	elseif node.name:find("snow:snow") and minetest.get_node_level(pos) == 63 then
+	elseif node.name == "default:snow" and minetest.get_node_level(pos) == 63 then
 		local p = minetest.find_node_near(pos, 10, "default:dirt_with_grass")
 		if p and minetest.get_node_light(p, 0.5) == 15 then
-			minetest.add_node(p,{name="snow:snow"})
+			minetest.add_node(p,{name="default:snow"})
 		else
-			minetest.add_node(pos,{name="snow:snowblock"})
+			minetest.add_node(pos,{name="default:snowblock"})
 		end
-	elseif node.name ~= "snow:ice" and node.name ~= "air" then
+	elseif node.name ~= "default:ice" and bnode.name ~= "air" then
 		if drawtype == "normal" or drawtype == "allfaces_optional" then
-			minetest.add_node({x=pos.x,y=pos.y+1,z=pos.z}, {name="snow:snow"})
+			minetest.add_node({x=pos.x,y=pos.y+1,z=pos.z}, {name="default:snow"})
 		elseif drawtype == "plantlike" then
 			pos.y = pos.y - 1
 			if minetest.get_node(pos).name == "default:dirt_with_grass" then
-				minetest.add_node(pos, {name="snow:dirt_with_snow"})
+				minetest.add_node(pos, {name="default:dirt_with_snow"})
 			end
 		end
 	end
@@ -368,18 +322,18 @@ snow.is_uneven = function(pos)
 	
 			if drawtype == "plantlike" then
 				if bnode.name == "default:dirt_with_grass" then
-					add_node({x=pos.x+x,y=pos.y-1,z=pos.z+z}, {name="snow:dirt_with_snow"})
+					add_node({x=pos.x+x,y=pos.y-1,z=pos.z+z}, {name="default:dirt_with_snow"})
 					return true
 				end
 			end
 			
-			if (not(x == 0 and y == 0)) and node.name == "snow:snow" and minetest.get_node_level({x=pos.x+x,y=pos.y,z=pos.z+z}) < num then
+			if (not(x == 0 and y == 0)) and node.name == "default:snow" and minetest.get_node_level({x=pos.x+x,y=pos.y,z=pos.z+z}) < num then
 				found = true
 				foundx = x
 				foundz=z
 			elseif node.name == "air" and bnode.name ~= "air" then
-				if not (bnode.name:find("snow:snow")) then 
-					snow.place({x=pos.x+x,y=pos.y,z=pos.z+z})
+				if not (bnode.name == "default:snow") then 
+					snow.place({x=pos.x+x,y=pos.y-1,z=pos.z+z})
 					return true
 				end
 			end
@@ -396,9 +350,9 @@ snow.is_uneven = function(pos)
 end
 
 --Snow with dirt.
-minetest.register_node("snow:dirt_with_snow", {
+minetest.register_node(":default:dirt_with_snow", {
 	description = "Dirt with Snow",
-	tiles = {"snow_snow.png", "default_dirt.png", "default_dirt.png^snow_snow_side.png"},
+	tiles = {"default_snow.png", "default_dirt.png", "default_dirt.png^snow_snow_side.png"},
 	is_ground_content = true,
 	groups = {crumbly=3},
 	drop = 'default:dirt',
@@ -408,12 +362,13 @@ minetest.register_node("snow:dirt_with_snow", {
 })
 
 --Snow block.
-minetest.register_node("snow:snow_block", {
+minetest.register_node(":default:snowblock", {
 	description = "Snow",
-	tiles = {"snow_snow.png"},
+	tiles = {"default_snow.png"},
+	freezemelt = "default:water_source",
 	is_ground_content = true,
 	groups = {crumbly=3,melts=2,falling_node=1},
-	drop = 'snow:snow_block',
+	drop = 'default:snowblock',
 	sounds = default.node_sound_dirt_defaults({
 		footstep = {name="default_snow_footstep", gain=0.4},
 	}),
@@ -428,20 +383,6 @@ minetest.register_node("snow:snow_brick", {
 	drop = 'snow:snow_brick',
 	sounds = default.node_sound_dirt_defaults({
 		footstep = {name="default_grass_footstep", gain=0.4},
-	}),
-})
-
---Ice.
-minetest.register_node("snow:ice", {
-	description = "Ice",
-	tiles = {"snow_ice.png"},
-	is_ground_content = true,
-	groups = {snappy=2,cracky=3,melts=1},
-	drop = 'snow:ice',
-	paramtype = "light",
-	sunlight_propagates = true,
-	sounds = default.node_sound_glass_defaults({
-		footstep = {name="default_stone_footstep", gain=0.4},
 	}),
 })
 
@@ -471,8 +412,8 @@ minetest.register_craft({
 minetest.register_craft({
     output = 'snow:snow_brick',
     recipe = {
-        {'snow:snow_block', 'snow:snow_block'},
-        {'snow:snow_block', 'snow:snow_block'},
+        {'default:snowblock', 'default:snowblock'},
+        {'default:snowblock', 'default:snowblock'},
     },
 })
 
@@ -513,11 +454,11 @@ minetest.register_abm({
 --Water freezes when in contact with snow.
 minetest.register_abm({
     nodenames = {"default:water_source"},
-    neighbors = {"snow:snow", "snow:snow_block"},
+    neighbors = {"default:snow", "default:snowblock"},
     interval = 20,
     chance = 4,
     action = function(pos, node, active_object_count, active_object_count_wider)
-		minetest.add_node(pos,{name="snow:ice"})
+		minetest.add_node(pos,{name="default:ice"})
     end,
 })
 
