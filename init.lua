@@ -22,8 +22,6 @@ dofile(minetest.get_modpath("snow").."/mapgen.lua")
 dofile(minetest.get_modpath("snow").."/falling_snow.lua")
 dofile(minetest.get_modpath("snow").."/sled.lua")
 
-
-
 local needles = {
 	description = "Pine Needles",
 	drawtype = "allfaces_optional",
@@ -51,11 +49,19 @@ local needles = {
 }
 
 if snow.christmas_content then
+	--Cristmas trees.
 	needles["drop"]["items"][3] = {
 		-- player will get xmas tree with 1/50 chance
 		items = {'snow:xmas_tree'},
 		rarity = 50,
 	}
+	
+	--Christmas easter egg.
+	minetest.register_on_mapgen_init( function()
+		if skins then
+			skins.add("character_snow_man")
+		end
+	end)
 end
 
 --Pine leaves.
