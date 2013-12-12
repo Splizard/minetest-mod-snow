@@ -69,7 +69,9 @@ minetest.register_on_shutdown(function() saveConfig(minetest.get_modpath("snow")
 local config = loadConfig(minetest.get_modpath("snow").."/config.txt")
 if config then
 	for i,v in pairs(config) do
-		snow[i] = v
+		if type(snow[i]) == type(v) then
+			snow[i] = v
+		end
 	end
 else
 	saveConfig(minetest.get_modpath("snow").."/config.txt", snow, doc)
@@ -100,3 +102,53 @@ end
 if config and snow.legacy ~= config.legacy then
 	saveConfig(minetest.get_modpath("snow").."/config.txt", snow, doc)
 end
+
+--MENU
+
+local get_formspec = function()
+	local p = -0.5
+	local formspec = "label[0,-0.3;Settings:]"
+	for i,v in pairs(snow) do
+		local t = type(v)
+		if t == "string" or t == "number" then
+			p = p + 1.5
+			formspec = formspec.."field[0.3,"..p..";2,1;snow:"..i..";"..i..";"..v.."]"
+		elseif t == "boolean" then
+			p = p + 0.5
+			formspec = formspec.."checkbox[0,"..p..";snow:"..i..";"..i..";"..tostring(v).."]"
+		end
+	end
+	p = p + 1
+	formspec = "size[4,"..p..";]\n"..formspec
+	return formspec
+end
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+	if formname == "snow:menu" then
+		for i,v in pairs(snow) do
+			local t = type(v)
+			if t == "string" or t == "number" or t == "boolean" then
+				if fields["snow:"..i] then
+					if t == "string" then 
+						snow[i] = fields["snow:"..i] 
+					end
+					if t == "number" then 
+						snow[i] = tonumber(fields["snow:"..i]) 
+					end
+					if t == "boolean" then 
+						if fields["snow:"..i] == "true" then snow[i] = true end
+						if fields["snow:"..i] == "false" then snow[i] = false end
+					end
+				end	
+			end
+		end
+	end
+end)
+
+
+minetest.register_chatcommand("snow", {
+	description = "Show a menu for various actions",
+	func = function(name, param)
+		minetest.show_formspec(name, "snow:menu", get_formspec())
+	end,
+})
