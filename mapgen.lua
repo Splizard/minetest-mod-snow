@@ -42,6 +42,52 @@ local xmas_tree = {
 }
 
 --Makes pine tree
+function snow.make_pine(pos,snow,xmas)
+        local env = minetest.env
+        local perlin1 = env:get_perlin(112,3, 0.5, 150)
+        local try_node = function(pos, node)
+                local n = env:get_node(pos).name
+                if n == "air" or n == "ignore" then
+                        env:add_node(pos,node)
+                end
+        end
+        --Clear ground.
+        for x=-1,1 do
+        for z=-1,1 do
+                if env:get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "snow:snow" then
+                        env:remove_node({x=pos.x+x,y=pos.y,z=pos.z+z})
+                end
+                if env:get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "snow:snow_block" then
+                        env:remove_node({x=pos.x+x,y=pos.y,z=pos.z+z})
+                end
+        end
+        end
+        if xmas then
+                env:remove_node(pos)
+                minetest.env:spawn_tree(pos, xmas_tree)
+        else
+                minetest.env:spawn_tree(pos, pine_tree)
+        end
+        if snow then
+                local x,z = pos.x,pos.z
+                try_node({x=x+1,y=pos.y+3,z=z+1},{name="snow:snow"})
+                try_node({x=x-1,y=pos.y+3,z=z-1},{name="snow:snow"})
+                try_node({x=x-1,y=pos.y+3,z=z+1},{name="snow:snow"})
+                try_node({x=x+1,y=pos.y+3,z=z-1},{name="snow:snow"})
+                
+                try_node({x=x+1,y=pos.y+5,z=z},{name="snow:snow"})
+                try_node({x=x-1,y=pos.y+5,z=z},{name="snow:snow"})
+                try_node({x=x,y=pos.y+5,z=z+1},{name="snow:snow"})
+                try_node({x=x,y=pos.y+5,z=z-1},{name="snow:snow"})
+        end
+        if xmas then
+                try_node({x=pos.x,y=pos.y+7,z=pos.z},{name="snow:star"})
+        elseif snow and perlin1:get2d({x=pos.x,y=pos.z}) > 0.53 then
+                try_node({x=pos.x,y=pos.y+7,z=pos.z},{name="snow:snow"})
+        end
+end
+
+--Makes pine tree
 function snow.voxelmanip_pine(pos,a,data)
     local c_snow = minetest.get_content_id("default:snow")
     local c_pine_needles = minetest.get_content_id("snow:needles")
