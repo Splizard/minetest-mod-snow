@@ -94,7 +94,7 @@ end
 
 --legacy--
 --Detect if we are running the latest minetest.
-if minetest.register_on_mapgen_init and minetest.get_heat and minetest.get_humidity then
+if minetest.register_on_mapgen_init then
 	snow.legacy = false
 else
 	snow.legacy = true

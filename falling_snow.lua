@@ -1,10 +1,49 @@
 
 if snow.enable_snowfall then
+
+	local weather_legacy
+	
+	local read_weather_legacy = function ()
+		local file = io.open(minetest.get_worldpath().."/weather_v6", "r")
+		if not file then return end
+		local readweather = file:read()
+		file:close()
+		return readweather
+	end
+	
+	--Weather for legacy versions of minetest.
+	local save_weather_legacy = function ()
+		local file = io.open(minetest.get_worldpath().."/weather_v6", "w+")
+		file:write(weather_legacy)
+		file:close()
+	end
+	
+		weather_legacy = read_weather_legacy() or ""
+
+		minetest.register_globalstep(function(dtime)
+			if weather_legacy == "snow" then
+				if math.random(1, 10000) == 1 then
+					weather_legacy = "none"
+					save_weather_legacy()
+				end
+			else
+				if math.random(1, 50000) == 2 then
+					weather_legacy = "snow"
+					save_weather_legacy()
+				end
+			end
+		end)
 	
 	--Get snow at position.
 	local get_snow = function(pos)
-		if minetest.get_heat(pos) <= 0 and minetest.get_humidity(pos) > 65 then
-			return true
+		--Legacy support.
+		if weather_legacy == "snow" then
+			local perlin1 = minetest.env:get_perlin(112,3, 0.5, 150)
+			if perlin1:get2d( {x=pos.x, y=pos.z} ) > 0.53 then
+				return true
+			else
+				return false
+			end
 		else
 			return false
 		end
