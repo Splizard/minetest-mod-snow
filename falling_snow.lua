@@ -1,3 +1,44 @@
+--[[
+--=================
+--======================================
+LazyJ's Fork of Splizard's "Snow" Mod
+by LazyJ
+version: Umpteen and 7/5ths something or another.
+2014_04_12
+--======================================
+--=================
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+THE LIST OF CHANGES I'VE MADE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+* Falling snow would destroy nodes it deposited snow on. I figured out that if
+I switched the 'snow.place' with 'minetest.place_node' and increased the
+y position by 2, then the nodes were nolonger destroyed and the snow
+would start to pile up.
+
+
+
+~~~~~~
+TODO
+~~~~~~
+
+* Add code to prevent snowfall from depositing snow on or
+near torches and lava.
+
+* Add code to prevent snowfall from depositing snow on
+'walkable = false' defined nodes.
+
+--]]
+
+
+
+--=============================================================
+-- CODE STUFF
+--=============================================================
+
 
 if snow.enable_snowfall then
 
@@ -96,7 +137,8 @@ if snow.enable_snowfall then
 							50, 50,
 					false, "weather_snow.png", player:get_player_name())
 				end
-				snow.place(pos, true)
+				--snow.place(pos, true)
+				minetest.place_node({x=pos.x, y=pos.y+2, z=pos.z}, {name="default:snow"}) -- LazyJ
 			end
 	end
 

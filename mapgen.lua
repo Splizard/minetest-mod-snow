@@ -1,3 +1,19 @@
+--[[
+If you want to run PlantLife and mods that depend on it, i.e. MoreTrees, Disable the mapgen by 
+commenting-out the lines starting with "local mgname = " through "end" (I left a note were to start
+and stop) Disabling "Snow's" mapgen allows MoreTrees and PlantLife to do their thing until the 
+issue is figured out. However, the pine and xmas tree code is still needed for when those 
+saplings grow into trees.
+
+The *starting* comment looks like this:  --[[
+The *closing* comment looks like this:  --]]
+
+-- ~ LazyJ, 2014_05_13
+
+
+-- Part 1: To disable the mapgen, add the *starting* comment under this line.
+
+
 local mgname = ""
 
 --Identify the mapgen.
@@ -16,6 +32,11 @@ minetest.register_on_mapgen_init(function(MapgenParams)
 	end
 end)
 
+-- To complete the commenting-out add the *closing* comment under this line.
+
+
+
+
 local pine_tree = {
 	axiom="TABff",
 	rules_a="[&T+f+ff+ff+ff+f]GA",
@@ -28,6 +49,9 @@ local pine_tree = {
 	trunk_type="single",
 	thin_branches=true,
 }
+
+
+
 local xmas_tree = {
 	axiom="TABff",
 	rules_a="[&T+f+ff+ff+ff+f]GA",
@@ -40,6 +64,8 @@ local xmas_tree = {
 	trunk_type="single",
 	thin_branches=true,
 }
+
+
 
 --Makes pine tree
 function snow.make_pine(pos,snow,xmas)
@@ -54,10 +80,10 @@ function snow.make_pine(pos,snow,xmas)
         --Clear ground.
         for x=-1,1 do
         for z=-1,1 do
-                if env:get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "snow:snow" then
+                if env:get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "default:snow" then
                         env:remove_node({x=pos.x+x,y=pos.y,z=pos.z+z})
                 end
-                if env:get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "snow:snow_block" then
+                if env:get_node({x=pos.x+x,y=pos.y,z=pos.z+z}).name == "default:snowblock" then
                         env:remove_node({x=pos.x+x,y=pos.y,z=pos.z+z})
                 end
         end
@@ -70,22 +96,24 @@ function snow.make_pine(pos,snow,xmas)
         end
         if snow then
                 local x,z = pos.x,pos.z
-                try_node({x=x+1,y=pos.y+3,z=z+1},{name="snow:snow"})
-                try_node({x=x-1,y=pos.y+3,z=z-1},{name="snow:snow"})
-                try_node({x=x-1,y=pos.y+3,z=z+1},{name="snow:snow"})
-                try_node({x=x+1,y=pos.y+3,z=z-1},{name="snow:snow"})
+                try_node({x=x+1,y=pos.y+3,z=z+1},{name="default:snow"})
+                try_node({x=x-1,y=pos.y+3,z=z-1},{name="default:snow"})
+                try_node({x=x-1,y=pos.y+3,z=z+1},{name="default:snow"})
+                try_node({x=x+1,y=pos.y+3,z=z-1},{name="default:snow"})
                 
-                try_node({x=x+1,y=pos.y+5,z=z},{name="snow:snow"})
-                try_node({x=x-1,y=pos.y+5,z=z},{name="snow:snow"})
-                try_node({x=x,y=pos.y+5,z=z+1},{name="snow:snow"})
-                try_node({x=x,y=pos.y+5,z=z-1},{name="snow:snow"})
+                try_node({x=x+1,y=pos.y+5,z=z},{name="default:snow"})
+                try_node({x=x-1,y=pos.y+5,z=z},{name="default:snow"})
+                try_node({x=x,y=pos.y+5,z=z+1},{name="default:snow"})
+                try_node({x=x,y=pos.y+5,z=z-1},{name="default:snow"})
         end
         if xmas then
-                try_node({x=pos.x,y=pos.y+7,z=pos.z},{name="snow:star"})
+                try_node({x=pos.x,y=pos.y+7,z=pos.z},{name="snow:star_lit"}) -- Added lit star. ~ LazyJ
         elseif snow and perlin1:get2d({x=pos.x,y=pos.z}) > 0.53 then
-                try_node({x=pos.x,y=pos.y+7,z=pos.z},{name="snow:snow"})
+                try_node({x=pos.x,y=pos.y+7,z=pos.z},{name="default:snow"})
         end
 end
+
+
 
 --Makes pine tree
 function snow.voxelmanip_pine(pos,a,data)

@@ -145,4 +145,3 @@ minetest.register_decoration({
 	biomes = {"snow_biome_alpine"},
 	decoration = "default:snow",
 })
-
