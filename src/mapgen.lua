@@ -3,10 +3,9 @@ If you want to run PlantLife and mods that depend on it, i.e. MoreTrees, Disable
 commenting-out the lines starting with "local mgname = " through "end" (I left a note were to start
 and stop) Disabling "Snow's" mapgen allows MoreTrees and PlantLife to do their thing until the 
 issue is figured out. However, the pine and xmas tree code is still needed for when those 
-saplings grow into trees.
-
-The *starting* comment looks like this:  --[[
-The *closing* comment looks like this:  --]]
+saplings grow into trees. --]]
+--The *starting* comment looks like this:  --[[
+--The *closing* comment looks like this:  --]]
 
 -- ~ LazyJ, 2014_05_13
 
@@ -25,10 +24,10 @@ minetest.register_on_mapgen_init(function(MapgenParams)
 	end
 	if mgname == "v7" then
 		--Load mapgen_v7 compatibility.
-		dofile(minetest.get_modpath("snow").."/mapgen_v7.lua")
+		dofile(minetest.get_modpath("snow").."/src/mapgen_v7.lua")
 	else
 		--Load mapgen_v6 compatibility.
-		dofile(minetest.get_modpath("snow").."/mapgen_v6.lua")
+		dofile(minetest.get_modpath("snow").."/src/mapgen_v6.lua")
 	end
 end)
 

@@ -48,24 +48,24 @@ http://github.com/Splizard/minetest-mod-snow/
 -- dofile(minetest.get_modpath("snow").."/falling_snow.lua")
 
 -- Original init.lua File Broken into Smaller Files
-dofile(minetest.get_modpath("snow").."/abms.lua")
-dofile(minetest.get_modpath("snow").."/aliases.lua")
-dofile(minetest.get_modpath("snow").."/basic_stairs_slabs.lua")
-dofile(minetest.get_modpath("snow").."/crafting.lua")
-dofile(minetest.get_modpath("snow").."/snowball.lua")
+dofile(minetest.get_modpath("snow").."/src/abms.lua")
+dofile(minetest.get_modpath("snow").."/src/aliases.lua")
+dofile(minetest.get_modpath("snow").."/src/basic_stairs_slabs.lua")
+dofile(minetest.get_modpath("snow").."/src/crafting.lua")
+dofile(minetest.get_modpath("snow").."/src/snowball.lua")
 
 
 -- The formspec menu didn't work when util.lua was the very first "dofile" so I moved
 -- it and all the other original "dofiles", in order, to the bottom of the list. ~ LazyJ
 -- Minetest would crash if the mapgen was called upon before the rest of other snow lua files so 
 -- I put it lower on the list and that seems to do the trick. ~ LazyJ
-dofile(minetest.get_modpath("snow").."/util.lua")
+dofile(minetest.get_modpath("snow").."/src/util.lua")
 -- To get Xmas tree saplings, the "christmas_content", true or false, in "util.lua" has to be determined first.
 -- That means "nodes.lua", where the saplings are controlled, has to come after "util.lua". ~ LazyJ
-dofile(minetest.get_modpath("snow").."/nodes.lua")
-dofile(minetest.get_modpath("snow").."/mapgen.lua")
-dofile(minetest.get_modpath("snow").."/sled.lua")
-dofile(minetest.get_modpath("snow").."/falling_snow.lua")
+dofile(minetest.get_modpath("snow").."/src/nodes.lua")
+dofile(minetest.get_modpath("snow").."/src/mapgen.lua")
+dofile(minetest.get_modpath("snow").."/src/sled.lua")
+dofile(minetest.get_modpath("snow").."/src/falling_snow.lua")
 
 
 
@@ -73,7 +73,7 @@ dofile(minetest.get_modpath("snow").."/falling_snow.lua")
 
 if (minetest.get_modpath("moreblocks")) then
 
-	dofile(minetest.get_modpath("snow").."/stairsplus.lua")
+	dofile(minetest.get_modpath("snow").."/src/stairsplus.lua")
 
 else
 end
