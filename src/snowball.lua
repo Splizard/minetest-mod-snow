@@ -48,10 +48,10 @@ snow_snowball_ENTITY.on_step = function(self, dtime)
 			-- the snow on it. ~ Original line of code by Splizard, comment by LazyJ so I can 
 			-- keep track of what this code does. ~ LazyJ, 2014_04_07
 			if node.name ~= "air" then
-				--snow.place(pos) -- this is the original code, I replaced it with 
+				snow.place(pos) -- this is the original code, I replaced it with 
 				-- minetest.place_node and bumped the y position up by 2 (make the snow drop 
 				-- from a node above and pile up). ~ LazyJ, 2014_04_07
-				minetest.place_node({x=pos.x, y=pos.y+2, z=pos.z}, {name="default:snow"})
+				--minetest.place_node({x=pos.x, y=pos.y+2, z=pos.z}, {name="default:snow"})
 				self.object:remove()
 			end	
 			else -- If findwhatisabove is not equal to "air" then cancel the snowball 

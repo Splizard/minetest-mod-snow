@@ -78,7 +78,36 @@ if (minetest.get_modpath("moreblocks")) then
 else
 end
 
+--This function places snow checking at the same time for snow level and increasing as needed.
+--This also takes into account sourrounding snow and makes snow even.
+function snow.place(pos)
+	local node = minetest.get_node({x=pos.x,y=pos.y+1,z=pos.z})
+	local node = minetest.get_node(pos)
+	local drawtype = minetest.registered_nodes[node.name].drawtype
 
+	local bnode = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
+	if node.name == "default:snow" and minetest.get_node_level(pos) < 63 then
+		if minetest.get_item_group(bnode.name, "leafdecay") == 0 and snow.is_uneven(pos) ~= true then
+			minetest.add_node_level(pos, 7)
+		end
+	elseif node.name == "default:snow" and minetest.get_node_level(pos) == 63 then
+		local p = minetest.find_node_near(pos, 10, "default:dirt_with_grass")
+		if p and minetest.get_node_light(p, 0.5) == 15 then
+			minetest.place_node({x=pos.x,y=pos.y+1,z=pos.z},{name="default:snow"})
+		else
+			minetest.add_node(pos,{name="default:snowblock"})
+		end
+	elseif node.name ~= "default:ice" and bnode.name ~= "air" then
+		if drawtype == "normal" or drawtype == "allfaces_optional" then
+			minetest.place_node({x=pos.x,y=pos.y+1,z=pos.z}, {name="default:snow"})
+		elseif drawtype == "plantlike" then
+			pos.y = pos.y - 1
+			if minetest.get_node(pos).name == "default:dirt_with_grass" then
+				minetest.add_node(pos, {name="default:dirt_with_snow"})
+			end
+		end
+	end
+end
 
 -- Checks if the snow level is even at any given pos.
 -- Smooth Snow

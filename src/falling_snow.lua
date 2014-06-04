@@ -137,8 +137,8 @@ if snow.enable_snowfall then
 							50, 50,
 					false, "weather_snow.png", player:get_player_name())
 				end
-				--snow.place(pos, true)
-				minetest.place_node({x=pos.x, y=pos.y+2, z=pos.z}, {name="default:snow"}) -- LazyJ
+				snow.place(pos, true)
+				--minetest.place_node({x=pos.x, y=pos.y+2, z=pos.z}, {name="default:snow"}) -- LazyJ
 			end
 	end
 
