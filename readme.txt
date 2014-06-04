@@ -5,15 +5,37 @@
   ____) | | | | (_) \ V  V /  | |  | | (_) | (_| |
  |_____/|_| |_|\___/ \_/\_/   |_|  |_|\___/ \__,_|
   
-By Splizard.
+By Splizard and LazyJ.
+
+Minetest version:  0.4.9
+Depends: default
+Recommended Additional Mods: "More Blocks" by Calinou (2014_05_11 or newer)
+License:  GPL v2
+
+Install:
 
 Forum post: http://minetest.net/forum/viewtopic.php?id=2290
 Github: https://github.com/Splizard/minetest-mod-snow
+Website: http://splizard.com/minetest/mods/snow/
 
 INSTALL:
 ----------
 Place this folder in your minetest mods folder.
 (http://dev.minetest.net/Installing_Mods)
+
+	* After downloading, unzip the file.
+	* Rename the directory "minetest-mod-snow-master" to "snow"
+	* Copy the "snow" directory into either
+	../minetest/worlds/yourworld'sname/worldmods/
+	or
+	../minetest/mods/
+	* If you put "snow" in the ../minetest/mods/ directory, either
+	enable the mod from within Minetest's "Configure" button
+	(main menu, bottom right) or by adding this line to the
+	world's "world.mt" file:
+	load_mod_snow = true
+
+
 
 NOTICE
 While this mod is installed you may experience slow map loading while a snow biome is generated.

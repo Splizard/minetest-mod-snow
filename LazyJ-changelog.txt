@@ -1,39 +1,4 @@
-##### LazyJ's Fork of Splizard's "Snow" Mod
-
-This version of 'Snow' is based off of Splizard's 2013_12_25 release.
-
-At LinuxGaming.us, we have been using the Snow mod in our Minetest server for
-a year now. I've been tweaking and patching things here-and-there and had a
-few ideas. The little here-and-there things progressed into bigger and more
-complex changes. Maybe other folks will enjoy these fixes, changes,
-and additions.
-
 ~ LazyJ, 2014_06_01
-
-
-
-Original Mod by Splizard: "Snow"
-Minetest version:  0.4.9
-Depends: default
-Recommended Additional Mods: "More Blocks" by Calinou (2014_05_11 or newer)
-License:  GPL v2
-Source Code:  http://github.com/LazyJ/snow
-Download (.zip):  http://github.com/LazyJ/snow/archive/master.zip
-
-Install:
-	* After downloading, unzip the file.
-	* Rename the directory "snow-master" to "snow"
-	* Copy the "snow" directory into either
-	../minetest/worlds/yourworld'sname/worldmods/
-	or
-	../minetest/mods/
-	* If you put "snow" in the ../minetest/mods/ directory, either
-	enable the mod from within Minetest's "Configure" button
-	(main menu, bottom right) or by adding this line to the
-	world's "world.mt" file:
-	load_mod_snow = true
-
-
 
 ~~~~~~~~~~~~~~~~~~~~
 List of Changes
