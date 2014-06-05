@@ -116,21 +116,83 @@ minetest.register_node(":default:snow", {
 
 minetest.override_item("default:snow", {
 	groups = {cracky=3, crumbly=3, choppy=3, oddly_breakable_by_hand=3,falling_node=1, melts=2, float=1},
+	sunlight_propagates = true,
+	--Disable placement prediction for snow.
+ 	node_placement_prediction = "",
 	on_construct = function(pos)
 		if minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name == "default:dirt_with_grass"
 		or minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name == "default:dirt" then
 			minetest.set_node({x=pos.x, y=pos.y-1, z=pos.z}, {name="default:dirt_with_snow"})
 		end
-		-- Now, let's turn the snow pile into a snowblock.
-		if minetest.get_node({x=pos.x, y=pos.y-2, z=pos.z}).name == "default:snow" and
-		-- Minus 2 because at the end of this, the layer that triggers the change to a snowblock
-		-- is the second snowball layer more than the full block below. That second layer,from 
-		-- what I've observed, seems to push into a third node box above so by subracting 2, 
-		-- the swap_node target is moved back down to the first get_node y=pos.
-		-- ~ LazyJ, 2014_04_24
-			minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name == "default:snow" then
-			minetest.set_node({x=pos.x, y=pos.y-2, z=pos.z}, {name="default:snowblock"})
+	end,
+	--Remove dirt_with_snow and replace with dirt_with_grass.
+	after_destruct = function(pos)
+		if minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name == "default:dirt_with_snow" then
+			minetest.set_node({x=pos.x, y=pos.y-1, z=pos.z}, {name="default:dirt_with_grass"})
 		end
+	end,
+	--Handle node drops due to node level.
+	on_dig = function(pos, node, digger)
+		local level = minetest.get_node_level(pos)
+		minetest.node_dig(pos, node, digger)
+		if minetest.get_node(pos).name ~= node.name then
+			if digger:get_inventory() then
+				local _, dropped_item
+				local left = digger:get_inventory():add_item("main", "default:snow "..tostring(level/7-1))
+				if not left:is_empty() then
+					local p = {
+						x = pos.x + math.random()/2-0.25,
+						y = pos.y + math.random()/2-0.25,
+						z = pos.z + math.random()/2-0.25,
+					}
+					minetest.add_item(p, left)
+				end
+			end
+		end
+	end,
+	--Manage snow levels.
+	on_place = function(itemstack, placer, pointed_thing)
+		local node
+		local above
+		local level
+		
+		local under = pointed_thing.under
+		local oldnode_under = minetest.get_node_or_nil(under)
+		local above = pointed_thing.above
+		local oldnode_above = minetest.get_node_or_nil(above)
+		
+		if not oldnode_under or not oldnode_above then
+			return
+		end
+		
+		local olddef_under = ItemStack({name=oldnode_under.name}):get_definition()
+		olddef_under = olddef_under or minetest.nodedef_default
+		local olddef_above = ItemStack({name=oldnode_above.name}):get_definition()
+		olddef_above = olddef_above or minetest.nodedef_default
+		
+		-- Place above pointed node
+		local place_to = {x = above.x, y = above.y, z = above.z}
+
+		-- If node under is buildable_to, place into it instead (eg. snow)
+		if olddef_under.buildable_to then
+			place_to = {x = under.x, y = under.y, z = under.z}
+		end
+		
+		node = minetest.get_node(place_to)
+		level = minetest.get_node_level(place_to)
+		if level == 63 then
+			minetest.set_node(place_to, {name="default:snowblock"})
+		else
+			minetest.set_node_level(place_to, level+7)
+		end
+		itemstack:take_item()
+		
+		if node.name ~= "default:snow" then
+			local itemstack, placed = minetest.item_place_node(itemstack, placer, pointed_thing)
+			return itemstack, placed
+		end
+		
+		return itemstack
 	end,
 	on_use = snow_shoot_snowball  -- This line is from the 'Snow' mod, 
 								-- the reset is default Minetest. ~ LazyJ
