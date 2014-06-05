@@ -115,6 +115,21 @@ minetest.register_node(":default:snow", {
 
 
 minetest.override_item("default:snow", {
+	drop = {
+		max_items = 2,
+		items = {
+			{
+				-- player will get sapling with 1/20 chance
+				items = {'snow:moss'},
+				rarity = 20,
+			},
+			{
+				-- player will get leaves only if he get no saplings,
+				-- this is because max_items is 1
+				items = {'default:snow'},
+			}
+		}
+	},
 	groups = {cracky=3, crumbly=3, choppy=3, oddly_breakable_by_hand=3,falling_node=1, melts=2, float=1},
 	sunlight_propagates = true,
 	--Disable placement prediction for snow.
