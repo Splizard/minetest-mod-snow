@@ -1,5 +1,8 @@
 --Identify content ID's of nodes		
 local c_dirt_with_grass  = minetest.get_content_id("default:dirt_with_grass")
+local c_dirt  = minetest.get_content_id("default:dirt")
+local c_tree = minetest.get_content_id("default:tree")
+local c_apple = minetest.get_content_id("default:apple")
 local c_snow = minetest.get_content_id("default:snow")
 local c_snow_block = minetest.get_content_id("default:snowblock")
 local c_dirt_with_snow = minetest.get_content_id("default:dirt_with_snow")
@@ -135,8 +138,33 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		        elseif (not smooth or snowy) and test > 0.53 then
 					in_biome = true
 		        end
-
-		        if in_biome then
+				if not in_biome then
+					if alpine == true and test > 0.43 then
+						local ground_y = nil
+						for y=maxp.y,minp.y,-1 do
+							local n = data[a:index(x, y, z)]
+							if n ~= c_air and n ~= c_ignore then
+								ground_y = y
+								break
+							end
+						end
+						if ground_y then
+							local node = a:index(x, ground_y, z)
+							if (data[node] == c_leaves or data[node] == c_jungleleaves) then
+						
+								for y=ground_y,-6,-1 do
+									local stone = a:index(x, y, z)
+									if data[stone] ~= c_leaves and data[stone] ~= c_jungleleaves and data[stone] ~= c_tree and data[stone] ~= c_air and data[stone] ~= c_apple then
+										break
+									else
+										data[stone] = c_air
+									end
+								end
+							end			
+						end	
+					end
+					
+		        elseif in_biome then
 					write_to_map = true
 		        
 		        	local perlin2 = env:get_perlin(322345,3, 0.5, 80)
@@ -174,7 +202,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									data[abovenode] = c_snow
 									for y=ground_y,-6,-1 do
 										local stone = a:index(x, y, z)
-										if data[stone] == "default:stone" then
+										if data[stone] ==  c_stone then
 											break
 										else
 											data[stone] = c_stone
@@ -205,7 +233,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								data[belownode] = c_ice
 							end
 						elseif ground_y and data[node] == c_leaves or data[node] == c_jungleleaves then
-							data[abovenode] = c_snow
+							if alpine then
+								--Gets rid of dirt
+								data[abovenode] = c_snow
+								for y=ground_y,-6,-1 do
+									local stone = a:index(x, y, z)
+									if data[stone] ==  c_stone then
+										break
+									else
+										data[stone] = c_stone
+									end
+								end
+							else
+								data[abovenode] = c_snow
+							end
 						elseif ground_y and data[node] == c_junglegrass then
 							data[node] = c_dry_shrub
 						elseif ground_y and data[node] == c_papyrus then
@@ -256,8 +297,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								end
 							end
 						end
+					
 					end
 				--end
+			
 			end
 		end
 		end
