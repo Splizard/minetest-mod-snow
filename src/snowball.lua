@@ -200,12 +200,13 @@ minetest.override_item("default:snow", {
 		else
 			minetest.set_node_level(place_to, level+7)
 		end
-		itemstack:take_item()
 		
 		if node.name ~= "default:snow" then
 			local itemstack, placed = minetest.item_place_node(itemstack, placer, pointed_thing)
 			return itemstack, placed
 		end
+		
+		itemstack:take_item()
 		
 		return itemstack
 	end,
