@@ -197,7 +197,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						if ground_y and data[node] == c_dirt_with_grass then
 								--local veg
 								--if legacy and mossy and pr:next(1,10) == 1 then veg = 1 end
-								if alpine then
+								if alpine and test > 0.53 then
 									--Gets rid of dirt
 									data[abovenode] = c_snow
 									for y=ground_y,-6,-1 do
