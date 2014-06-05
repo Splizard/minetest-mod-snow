@@ -68,6 +68,7 @@ local sled = {
 	visual = "mesh",
 	mesh = "sled.x",
 	textures = {"sled.png"},
+	HUD,
 	
 	driver = nil,
 	sliding = false,
@@ -100,7 +101,7 @@ function sled:on_rightclick(clicker)
 --]]
 
 -- Here is part 1 of the fix. ~ LazyJ
-		HUD = clicker:hud_add({
+		self.HUD = clicker:hud_add({
 				hud_elem_type = "text",
 				position = {x=0.5, y=0.89},
 				name = "sled",
@@ -156,7 +157,7 @@ function sled:on_step(dtime)
 			players_sled[self.driver:get_player_name()] = false
 			self.object:set_detach()
 			--self.driver:hud_remove("sled")
-			self.driver:hud_remove(HUD) -- And here is part 2. ~ LazyJ
+			self.driver:hud_remove(self.HUD) -- And here is part 2. ~ LazyJ
 			self.driver = nil
 			self.object:remove()
 
