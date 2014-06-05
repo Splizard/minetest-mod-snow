@@ -141,11 +141,11 @@ minetest.override_item("default:snow", {
 		end
 	end,
 	--Remove dirt_with_snow and replace with dirt_with_grass.
-	after_destruct = function(pos)
+	--[[after_destruct = function(pos)
 		if minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name == "default:dirt_with_snow" then
 			minetest.set_node({x=pos.x, y=pos.y-1, z=pos.z}, {name="default:dirt_with_grass"})
 		end
-	end,
+	end,]]
 	--Handle node drops due to node level.
 	on_dig = function(pos, node, digger)
 		local level = minetest.get_node_level(pos)
