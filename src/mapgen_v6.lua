@@ -231,7 +231,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							else
 								data[belownode] = c_ice
 							end
-						elseif ground_y and data[node] == c_leaves or data[node] == c_jungleleaves then
+						elseif ground_y and data[node] == c_leaves or data[node] == c_jungleleaves or data[node] == c_apple then
 							if alpine then
 								--Gets rid of dirt
 								data[abovenode] = c_snow
