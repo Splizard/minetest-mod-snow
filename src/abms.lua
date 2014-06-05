@@ -93,6 +93,47 @@ minetest.register_abm({
     end,
 })
 
+--Freeze Ice according to it's param2 value.
+minetest.register_abm({
+    nodenames = {"default:ice"},
+    neighbors = {"default:water_source"},
+    interval = 20,
+    chance = 4,
+    action = function(pos, node, active_object_count, active_object_count_wider)
+    	if node.param2 > 0 then
+			if math.random(2) == 2 and minetest.get_node({x=pos.x+1, y=pos.y, z=pos.z}).name == "default:water_source" then
+				minetest.add_node({x=pos.x+1, y=pos.y, z=pos.z},{name="default:ice", param2 = math.random(0,node.param2-1)})
+			end
+			if math.random(2) == 2 and  minetest.get_node({x=pos.x-1, y=pos.y, z=pos.z}).name == "default:water_source" then
+				minetest.add_node({x=pos.x-1, y=pos.y, z=pos.z},{name="default:ice", param2 = math.random(0,node.param2-1)})
+			end
+			if math.random(2) == 2 and  minetest.get_node({x=pos.x, y=pos.y, z=pos.z-1}).name == "default:water_source" then
+				minetest.add_node({x=pos.x, y=pos.y, z=pos.z-1},{name="default:ice", param2 = math.random(0,node.param2-1)})
+			end
+			if math.random(2) == 2 and  minetest.get_node({x=pos.x, y=pos.y, z=pos.z+1}).name == "default:water_source" then
+				minetest.add_node({x=pos.x, y=pos.y, z=pos.z+1},{name="default:ice", param2 = math.random(0,node.param2-1)})
+			end
+			if math.random(2) == 2 and  minetest.get_node({x=pos.x+1, y=pos.y, z=pos.z-1}).name == "default:water_source" then
+				minetest.add_node({x=pos.x+1, y=pos.y, z=pos.z-1},{name="default:ice", param2 = math.random(0,node.param2-1)})
+			end
+			if math.random(2) == 2 and  minetest.get_node({x=pos.x-1, y=pos.y, z=pos.z+1}).name == "default:water_source" then
+				minetest.add_node({x=pos.x-1, y=pos.y, z=pos.z+1},{name="default:ice", param2 = math.random(0,node.param2-1)})
+			end
+			if math.random(2) == 2 and  minetest.get_node({x=pos.x+1, y=pos.y, z=pos.z+1}).name == "default:water_source" then
+				minetest.add_node({x=pos.x+1, y=pos.y, z=pos.z+1},{name="default:ice", param2 = math.random(0,node.param2-1)})
+			end
+			if math.random(2) == 2 and  minetest.get_node({x=pos.x-1, y=pos.y, z=pos.z-1}).name == "default:water_source" then
+				minetest.add_node({x=pos.x-1, y=pos.y, z=pos.z-1},{name="default:ice", param2 = math.random(0,node.param2-1)})
+			end
+			if math.random(8) == 8 then
+				minetest.add_node({x=pos.x, y=pos.y, z=pos.z}, {name="default:water_source"})
+			else
+				minetest.add_node({x=pos.x, y=pos.y, z=pos.z}, {name="default:ice", param2 = 0})
+			end
+		end
+    end,
+})
+
 
 
 --Spread moss to cobble.

@@ -317,6 +317,8 @@ minetest.override_item("default:ice", {
 	-- The Lines: 1. Alpah to make semi-transparent ice, 2 to work with 
 	-- the dirt_with_grass/snow/just dirt ABMs. ~ LazyJ, 2014_03_09
 	use_texture_alpha = true, -- 1
+	param2 = 0,
+	--param2 is reserved for how much ice will freezeover.
 	sunlight_propagates = true, -- 2
 	drawtype = "glasslike",
 	inventory_image  = minetest.inventorycube("default_ice.png"),
@@ -330,6 +332,11 @@ minetest.override_item("default:ice", {
 			or minetest.get_node(pos).name == "default:dirt" then
 			minetest.set_node(pos, {name="default:dirt_with_snow"})
 		end
+	end,
+	liquids_pointable = true,
+	--Make ice freeze over when placed by a maximum of 10 blocks.
+	after_place_node = function(pos, placer, itemstack, pointed_thing)
+		minetest.set_node(pos, {name="default:ice", param2=math.random(0,10)})
 	end
 })
 
