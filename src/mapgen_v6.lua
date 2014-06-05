@@ -120,11 +120,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				env:remove_node(v)
 			end
 		end]]
+		
+		local write_to_map = false
     	
 		--Loop through chunk.
 		for x = minp.x, maxp.x do
 		for z = minp.z, maxp.z do
-
+				
 				--Check if we are in a "Snow biome"
 		        local in_biome = false
 		        local test = perlin1:get2d({x=x, y=z})
@@ -135,6 +137,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		        end
 
 		        if in_biome then
+					write_to_map = true
 		        
 		        	local perlin2 = env:get_perlin(322345,3, 0.5, 80)
 		        	local icetype = perlin2:get2d({x=x, y=z})
@@ -258,21 +261,24 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 		end
 		end
+		
+		if write_to_map then
+			vm:set_data(data)
+	   
+			vm:calc_lighting(
+					{x=minp.x-16, y=minp.y, z=minp.z-16},
+					{x=maxp.x+16, y=maxp.y, z=maxp.z+16}
+			)
 
-		vm:set_data(data)
-   
-		vm:calc_lighting(
-			    {x=minp.x-16, y=minp.y, z=minp.z-16},
-			    {x=maxp.x+16, y=maxp.y, z=maxp.z+16}
-		)
-
-		vm:write_to_map(data)
+			vm:write_to_map(data)
+			vm:update_map()
 
 		
-		if debug then
-			biome_string,biome2_string = biomeToString(biome,biome2)
-			print(biome_string.." and "..biome2_string..": Snow Biome Genarated near x"..minp.x.." z"..minp.z)
-			print(string.format("elapsed time: %.2fms", (os.clock() - t1) * 1000))
+			if debug then
+				biome_string,biome2_string = biomeToString(biome,biome2)
+				print(biome_string.." and "..biome2_string..": Snow Biome Genarated near x"..minp.x.." z"..minp.z)
+				print(string.format("elapsed time: %.2fms", (os.clock() - t1) * 1000))
+			end
 		end
 	--end
 end)
