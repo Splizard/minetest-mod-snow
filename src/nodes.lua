@@ -290,7 +290,7 @@ minetest.register_node("snow:snow_cobble", {
 	paramtype2 = "facedir",
 	 -- I made this a little harder to dig than snow blocks because 
 	 -- I imagine snow brick as being much more dense and solid than fluffy snow. ~ LazyJ
-	groups = {cracky=2, crumbly=2, choppy=2, oddly_breakable_by_hand=2, melts=1, icemaker=1, cooks_into_ice},
+	groups = {cracky=2, crumbly=2, choppy=2, oddly_breakable_by_hand=2, melts=1, icemaker=1, cooks_into_ice=1},
 	sounds = default.node_sound_dirt_defaults({
 		footstep = {name="default_snow_footstep", gain=0.25},
 		dig = {name="default_dig_crumbly", gain=0.4},
