@@ -89,6 +89,7 @@ There are a couple of bugs and limitations with this such as no ice being genera
 Config file:
 ------------
 After starting a game in minetest with snow mod, a config file will be placed in this folder that contains the various options for snow mod.
+As admin you can use the /snow command in-game to make various changes.
 
 UNINSTALL:
 ------------
