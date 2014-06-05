@@ -179,9 +179,12 @@ minetest.register_craftitem("snow:sled", {
  	on_use = function(itemstack, placer)
  		local pos = {x=0,y=-1000, z=0}
  		local name = placer:get_player_name()
+ 		local player_pos = placer:getpos()
  		if not players_sled[name] then
-			local sled = minetest.env:add_entity(pos, "snow:sled")
-			sled:get_luaentity():on_rightclick(placer)
+ 			if minetest.get_node({x=player_pos.x,y=player_pos.y, z=player_pos.z}).name == "default:snow" then
+				local sled = minetest.env:add_entity(pos, "snow:sled")
+				sled:get_luaentity():on_rightclick(placer)
+			end
 		end
 	end,
 })
