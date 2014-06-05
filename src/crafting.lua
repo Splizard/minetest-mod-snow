@@ -95,7 +95,7 @@ of snowblocks (and then use them to water-grief by melting the snow blocks).
 
 minetest.register_craft({
 	type = "shapeless",
-	output = 'default:snowblock 3',
+	output = 'default:snowblock 2',
 	recipe = {
 		'snow:snow_cobble',
 		'snow:snow_cobble'
@@ -104,14 +104,14 @@ minetest.register_craft({
 
 
 
-minetest.register_craft({
+--[[minetest.register_craft({
 	type = "shapeless",
 	output = 'default:snowblock 3',
 	recipe = {
 		'default:snowblock',
 		'default:snowblock'
 		}
-})
+})]]
 
 
 
