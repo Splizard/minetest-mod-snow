@@ -216,10 +216,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									--Spawns pines.
 									data[node] = c_dirt_with_snow
 									spawn_pine({x=x, y=ground_y+1, z=z},a,data)
-								--elseif snowy then
+								elseif snowy then
 									--Spawns snow blocks.
-									--env:add_node({x=x,y=ground_y+1,z=z}, {name="snow:snow_block"})
-									--data[aanode] = c_snow
+									data[abovenode] = c_snow_block
 								else
 									--Spawns snow.
 									data[node] = c_dirt_with_snow
