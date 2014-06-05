@@ -216,7 +216,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									--Spawns pines.
 									data[node] = c_dirt_with_snow
 									spawn_pine({x=x, y=ground_y+1, z=z},a,data)
-								elseif snowy then
+								elseif snowy and test > 0.63 then
 									--Spawns snow blocks.
 									data[abovenode] = c_snow_block
 								else
