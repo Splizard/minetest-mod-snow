@@ -54,15 +54,6 @@ minetest.register_biome({
 })
 
 minetest.register_biome({
-	name           = "base_normal",
-	
-	height_min     = 3,
-	height_max     = 40,
-	heat_point     = 40.0,
-	humidity_point = 40.0,
-})
-
-minetest.register_biome({
 	name           = "snow_biome_sand",
 	
 	node_top       = "default:sand",
