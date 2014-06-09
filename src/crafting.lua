@@ -126,21 +126,50 @@ minetest.register_craft({
 --Craft icy snow.
 minetest.register_craft({
 	type = "shapeless",
-	output = 'default:snow_cobble 3',
+	output = 'snow:snow_cobble 6',
 	recipe = {
 		'default:snow',
 		'default:snow',
+		'default:snow',
+		'default:snow',
+		'default:snow',
+		'default:snow',
 		'default:ice',
-		'defaul:ice'
+		'default:ice'
+		'default:ice'
+		}
+})
+
+
+minetest.register_craft({
+	type = "shapeless",
+	output = 'snow:snow_cobble 4',
+	recipe = {
+		'default:snow',
+		'default:snow',
+		'default:snow',
+		'default:snow',
+		'default:ice',
+		'default:ice'
 		}
 })
 
 minetest.register_craft({
 	type = "shapeless",
-	output = 'default:snow_cobble',
+	output = 'snow:snow_cobble 2',
 	recipe = {
 		'default:snow',
-		'defaul:ice'
+		'default:snow',
+		'default:ice'
+		}
+})
+
+minetest.register_craft({
+	type = "shapeless",
+	output = 'snow:snow_cobble',
+	recipe = {
+		'default:snow',
+		'default:ice'
 		}
 })
 
