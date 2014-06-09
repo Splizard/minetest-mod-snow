@@ -123,6 +123,26 @@ minetest.register_craft({
     }
 })
 
+--Craft icy snow.
+minetest.register_craft({
+	type = "shapeless",
+	output = 'default:snow_cobble 2',
+	recipe = {
+		'snow:snow',
+		'snow:snow',
+		'snow:ice',
+		'snow:ice'
+		}
+})
+
+minetest.register_craft({
+	type = "shapeless",
+	output = 'default:snow_cobble',
+	recipe = {
+		'snow:snow',
+		'snow:ice'
+		}
+})
 
 
 -- Why not recycle snow_bricks back into snowblocks? ~ LazyJ

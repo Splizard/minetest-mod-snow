@@ -279,11 +279,11 @@ minetest.register_node("snow:snow_brick", {
 
 
 -- Snow Cobble  ~ LazyJ
+-- Described as Icy Snow
 minetest.register_node("snow:snow_cobble", {
-	description = "Snow Cobble",
+	description = "Icy Snow",
 	tiles = {"snow_snow_cobble.png"},
 	is_ground_content = true,
-	freezemelt = "default:water_source",
 	liquidtype = "none",
 	paramtype = "light",
 	sunlight_propagates = true,	
@@ -348,8 +348,8 @@ minetest.override_item("default:snowblock", {
 	paramtype = "light",  -- LazyJ to make dirt below change to dirt_with_snow (see default, nodes.lua, dirt ABM)
 	sunlight_propagates = true, -- LazyJ to make dirt below change to dirt_with_snow (see default, nodes.lua, dirt ABM)
 	 -- Snow blocks should be easy to dig because they are just fluffy snow. ~ LazyJ
-	groups = {cracky=3, crumbly=3, choppy=3, oddly_breakable_by_hand=3, melts=1, icemaker=1, cooks_into_ice=1},
-	drop = "snow:snow_cobble",
+	groups = {cracky=3, crumbly=3, choppy=3, oddly_breakable_by_hand=3, melts=1, icemaker=1, cooks_into_ice=1, falling_node=1},
+	--drop = "snow:snow_cobble",
 	on_construct = function(pos)
 		pos.y = pos.y - 1
 		if minetest.get_node(pos).name == "default:dirt_with_grass"

@@ -64,11 +64,6 @@ Sleds allow for faster travel on snow.
 
 CRAFTING:
 -----------
-Snow Block:
-
-Snowball    Snowball
-Snowball    Snowball
-
 Snow Brick:
 
 Snow Block    Snow Block
@@ -79,6 +74,10 @@ Sled:
 				Stick
 Wood	Wood	Wood
 
+Icy Snow:
+
+Snow	Ice
+Ice		Snow
 MAPGEN_V7:
 ------------
 If you are using minetest 0.4.8 or the latest dev version of minetest you can choose to generate a v7 map.
