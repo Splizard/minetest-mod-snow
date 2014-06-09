@@ -325,7 +325,7 @@ minetest.override_item("default:ice", {
 	liquidtype = "none",
 	 -- I made this a lot harder to dig than snow blocks because ice is much more dense
 	 -- and solid than fluffy snow. ~ LazyJ
-	groups = {cracky=1, crumbly=1, choppy=1, --[[oddly_breakable_by_hand=1,]] melts=1},
+	groups = {cracky=2, crumbly=1, choppy=1, --[[oddly_breakable_by_hand=1,]] melts=1},
 	on_construct = function(pos)
 		pos.y = pos.y - 1
 		if minetest.get_node(pos).name == "default:dirt_with_grass"
