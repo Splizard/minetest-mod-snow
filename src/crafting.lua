@@ -135,7 +135,7 @@ minetest.register_craft({
 		'default:snow',
 		'default:snow',
 		'default:ice',
-		'default:ice'
+		'default:ice',
 		'default:ice'
 		}
 })
