@@ -6,6 +6,8 @@ Version 3.0
 	Ice freezes-over.
 	
 	Better leveled snow.
+	
+	PLUS MORE! (see commit log)
 
 Version 2.0
 

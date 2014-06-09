@@ -9,8 +9,14 @@ By Splizard and LazyJ.
 
 Minetest version:  0.4.9
 Depends: default
-Recommended Additional Mods: "More Blocks" by Calinou (2014_05_11 or newer)
 License:  GPL v2
+
+Complimentary Mods: 
+---------------------
+*	"Snowdrift" by paramat
+*	"More Blocks" by Calinou (2014_05_11 or newer)
+*	"Skins" by Zeg9
+
 
 Install:
 
@@ -38,7 +44,7 @@ Place this folder in your minetest mods folder.
 
 
 NOTICE
-While this mod is installed you may experience slow map loading while a snow biome is generated.
+While this mod is installed you may experience slower map loading while a snow biome is generated.
 
 USAGE:
 -------
@@ -55,7 +61,7 @@ There are nine biome types:
 * Snowy
 * Plain
   
-Snow can be picked up and thrown as snowballs or crafted into snow blocks.
+Snow can be picked up and thrown as snowballs or stacked into snow blocks.
 Snow and ice melts when near warm blocks such as torches or igniters such as lava.
 Snow blocks freeze water source blocks around them.
 Moss can be found in the snow, when moss is placed near cobble it spreads.
@@ -70,7 +76,6 @@ Snow Block    Snow Block
 Snow Block    Snow Block
 
 Sled:
-
 				Stick
 Wood	Wood	Wood
 
@@ -78,11 +83,12 @@ Icy Snow:
 
 Snow	Ice
 Ice		Snow
+
 MAPGEN_V7:
 ------------
 If you are using minetest 0.4.8 or the latest dev version of minetest you can choose to generate a v7 map.
 This option can be found when creating a new map from the menu.
-Snow Biomes has support for this and includes a base grass biome for this.
+Snow Biomes has support for this though you might need a couple other biomes too otherwise you will only spawn snow.
 There are a couple of bugs and limitations with this such as no ice being generated at the moment.
 
 Config file:
