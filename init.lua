@@ -86,6 +86,11 @@ function snow.place(pos)
 	if node and minetest.registered_nodes[node.name] then
 		drawtype = minetest.registered_nodes[node.name].drawtype
 	end
+	
+	--Oops, maybe there is no node?
+	if node == nil then
+		return
+	end
 
 	local bnode = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
 	if node.name == "default:snow" and minetest.get_node_level(pos) < 63 then
