@@ -130,6 +130,12 @@ minetest.override_item("default:snow", {
 			}
 		}
 	},
+	node_box = {
+		type = "leveled",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, -0.5+2/16, 0.5},
+		},
+	},
 	groups = {cracky=3, crumbly=3, choppy=3, oddly_breakable_by_hand=3,falling_node=1, melts=2, float=1},
 	sunlight_propagates = true,
 	--Disable placement prediction for snow.
