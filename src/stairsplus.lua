@@ -51,8 +51,9 @@ There is one in each of the "stairsplus.register_all" sections.
 -- next section of stairsplus stuff. ~LazyJ
 
 if (minetest.get_modpath("moreblocks"))
+and rawget(_G, "stairsplus")
 
--- 'If' MoreBlocks was found, well, 'then' go ahead with this next part:
+-- 'If' MoreBlocks was found and stairsplus is available, well, 'then' go ahead with this next part:
 
 then
 
