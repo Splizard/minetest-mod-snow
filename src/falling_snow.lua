@@ -103,6 +103,27 @@ if snow.enable_snowfall then
 		return {x=x,y=y,z=z}
 	end
 
+	local default_snow_particle = {
+		amount = 3,
+		time = 0.5,
+		exptime = 5,
+		size = 50,
+		collisiondetection = false,
+		vertical = false,
+	}
+
+	local function get_snow_particledef(data)
+		for n,i in pairs(default_snow_particle) do
+			data[n] = data[n] or i
+		end
+		for _,i in pairs({"vel", "acc", "exptime", "size"}) do
+			data["min"..i] = data[i]
+			data["max"..i] = data[i]
+		end
+		data.texture = "weather_snow.png^[transform"..math.random(0,7)
+		return data
+	end
+
 	local snow_fall=function (pos, player, animate)
 			local ground_y = nil
 			for y=pos.y+10,pos.y+20,1 do
@@ -129,13 +150,13 @@ if snow.enable_snowfall then
 					local maxp = addvectors(spos, {x= 9, y=5, z= 9})
 			  		local vel = {x=0, y=   -1, z=-1}
 					local acc = {x=0, y=   0, z=0}
-		 		 	minetest.add_particlespawner(3, 0.5,
-							minp, maxp,
-							vel, vel,
-							acc, acc,
-							5, 5,
-							50, 50,
-					false, "weather_snow.png", player:get_player_name())
+					minetest.add_particlespawner(get_snow_particledef({
+						minpos = minp,
+						maxpos = maxp,
+						vel = vel,
+						acc = acc,
+						playername = player:get_player_name()
+					}))
 				end
 				snow.place(pos, true)
 				--minetest.place_node({x=pos.x, y=pos.y+2, z=pos.z}, {name="default:snow"}) -- LazyJ
@@ -163,22 +184,27 @@ if snow.enable_snowfall then
 				local acc = {x=0, y=   0, z=0}
 				
 				if not snow.lighter_snowfall then
-					minetest.add_particlespawner(5, 0.5,
-						minp, maxp,
-						vel, vel,
-						acc, acc,
-						5, 5,
-						25, 25,
-						false, "weather_snow.png", player:get_player_name())
+					minetest.add_particlespawner(get_snow_particledef({
+						amount = 5,
+						minpos = minp,
+						maxpos = maxp,
+						vel = vel,
+						acc = acc,
+						size = 25,
+						playername = player:get_player_name()
+					}))
 
-					minetest.add_particlespawner(4, 0.5,
-						minp_deep, maxp_deep,
-						vel, vel,
-						acc, acc,
-						4, 4,
-						25, 25,
-						false, "weather_snow.png", player:get_player_name())
-						
+					minetest.add_particlespawner(get_snow_particledef({
+						amount = 4,
+						minpos = minp_deep,
+						maxpos = maxp_deep,
+						vel = vel,
+						acc = acc,
+						exptime = 4,
+						size = 25,
+						playername = player:get_player_name()
+					}))
+
 					if math.random(1,5) == 4 then	
 						snow_fall(randpos(sminp, smaxp), player)
 					end
