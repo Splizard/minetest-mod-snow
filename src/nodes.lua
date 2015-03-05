@@ -321,7 +321,7 @@ minetest.override_item("default:ice", {
 	--param2 is reserved for how much ice will freezeover.
 	sunlight_propagates = true, -- 2
 	drawtype = "glasslike",
-	inventory_image  = minetest.inventorycube("default_ice.png"),
+	inventory_image  = minetest.inventorycube("default_ice.png").."^[brighten",
 	liquidtype = "none",
 	 -- I made this a lot harder to dig than snow blocks because ice is much more dense
 	 -- and solid than fluffy snow. ~ LazyJ
