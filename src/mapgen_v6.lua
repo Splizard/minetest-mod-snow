@@ -150,14 +150,17 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					if data[vi] == c_leaves or data[vi] == c_jungleleaves then						
 						for y = ground_y, -16, -1 do
 							local vi = area:index(x, y, z)
-							if data[vi] ~= c_leaves
-							and data[vi] ~= c_jungleleaves
-							and data[vi] ~= c_tree
-							and data[vi] ~= c_air
-							and data[vi] ~= c_apple then
-								break
-							else
-								data[vi] = c_air
+							local id = data[vi]
+							if id ~= c_air then
+								if id == c_leaves
+								or id == c_jungleleaves
+								or id == c_tree
+								or id == c_air
+								or id == c_apple then
+									data[vi] = c_air
+								else
+									break
+								end
 							end
 						end
 					end			
