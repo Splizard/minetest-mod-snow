@@ -40,7 +40,7 @@ local pine_tree = {
 	axiom="TABff",
 	rules_a="[&T+f+ff+ff+ff+f]GA",
 	rules_b="[&T+f+Gf+Gf+Gf]GB",
-	trunk="default:tree",
+	trunk="default:pinetree",
 	leaves="snow:needles",
 	angle=90,
 	iterations=1,
@@ -55,7 +55,7 @@ local xmas_tree = {
 	axiom="TABff",
 	rules_a="[&T+f+ff+ff+ff+f]GA",
 	rules_b="[&T+f+Gf+Gf+Gf]GB",
-	trunk="default:tree",
+	trunk="default:pinetree",
 	leaves="snow:needles_decorated",
 	angle=90,
 	iterations=1,
@@ -118,7 +118,7 @@ end
 function snow.voxelmanip_pine(pos,a,data)
     local c_snow = minetest.get_content_id("default:snow")
     local c_pine_needles = minetest.get_content_id("snow:needles")
-    local c_tree = minetest.get_content_id("default:tree")
+    local c_pinetree = minetest.get_content_id("default:pinetree")
     local c_air = minetest.get_content_id("air")
     
 	local perlin1 = minetest.get_perlin(112,3, 0.5, 150) 
@@ -170,7 +170,7 @@ function snow.voxelmanip_pine(pos,a,data)
 				end
 			end
 		end
-		data[a:index(pos.x,pos.y+i,pos.z)] = c_tree
+		data[a:index(pos.x,pos.y+i,pos.z)] = c_pinetree
 	end
 	data[a:index(pos.x,pos.y+5,pos.z)] = c_pine_needles
 	data[a:index(pos.x,pos.y+6,pos.z)] = c_pine_needles

@@ -256,24 +256,24 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						local rand = pr:next(1,4) == 1
 						if ((x1 and x1 ~= c_water and x1 ~= c_ice
 						and x1 ~= c_air and x1 ~= c_ignore)
-						or ((cool or icebergs) and x1 == c_ice and rand))
+						or (rand and (cool or icebergs) and x1 == c_ice))
 						or ((z1 and z1 ~= c_water and z1 ~= c_ice
 						and z1 ~= c_air and z1 ~= c_ignore)
-						or ((cool or icebergs) and z1 == c_ice and rand))
+						or (rand and (cool or icebergs) and z1 == c_ice))
 						or ((xz1 and xz1 ~= c_water and xz1 ~= c_ice
 						and xz1 ~= c_air and xz1 ~= c_ignore)
-						or ((cool or icebergs) and xz1 == c_ice and rand))
+						or (rand and (cool or icebergs) and xz1 == c_ice))
 						or ((xz2 and xz2 ~= c_water and xz2 ~= c_ice
 						and xz2 ~= c_air and xz2 ~= c_ignore)
-						or ((cool or icebergs) and xz2 == c_ice and rand))
+						or (rand and (cool or icebergs) and xz2 == c_ice))
 						or ((x2 and x2 ~= c_water and x2 ~= c_ice
 						and x2 ~= c_air and x2 ~= c_ignore)
-						or ((cool or icebergs) and x2 == c_ice and rand))
+						or (rand and (cool or icebergs) and x2 == c_ice))
 						or ((z2 and z2 ~= c_water and z2 ~= c_ice
 						and z2 ~= c_air and z2 ~= c_ignore)
-						or ((cool or icebergs) and z2 == c_ice and rand))
-						or (y ~= c_water and y ~= c_ice and y ~= "air")
-						or (pr:next(1,6) == 1 and icebergs) then
+						or (rand and (cool or icebergs) and z2 == c_ice))
+						or (y ~= c_water and y ~= c_ice) -- and y ~= "air") …I don't think y can be a string here ~HybridDog
+						or (icebergs and pr:next(1,6) == 1) then
 							data[node] = c_ice
 						end
 					else
