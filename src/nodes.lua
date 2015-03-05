@@ -242,6 +242,18 @@ minetest.register_node("snow:moss", {
 
 
 
+local function snow_onto_dirt(pos)
+	pos.y = pos.y - 1
+	local node = minetest.get_node(pos)
+	if node.name == "default:dirt_with_grass"
+	or node.name == "default:dirt" then
+		node.name = "default:dirt_with_snow"
+		minetest.set_node(pos, node)
+	end
+end
+
+
+
 -- Snow Brick
 minetest.register_node("snow:snow_brick", {
 	description = "Snow Brick",
@@ -265,15 +277,7 @@ minetest.register_node("snow:snow_brick", {
 	}),
  	-- The "on_construct" part below, thinking in terms of layers, dirt_with_snow could also 
  	-- double as dirt_with_frost which adds subtlety to the winterscape. ~ LazyJ
-	on_construct = function(pos)
-		pos.y = pos.y - 1
-		if minetest.get_node(pos).name == "default:dirt_with_grass"
-			-- Thinking in terms of layers, dirt_with_snow could also double as 
-			-- dirt_with_frost which adds subtlety to the winterscape. ~ LazyJ, 2014_04_04
-			or minetest.get_node(pos).name == "default:dirt" then
-			minetest.set_node(pos, {name="default:dirt_with_snow"})
-		end
-	end
+	on_construct = snow_onto_dirt
 })
 
 
@@ -299,13 +303,7 @@ minetest.register_node("snow:snow_cobble", {
 	}),
  	-- The "on_construct" part below, thinking in terms of layers, dirt_with_snow could also 
  	-- double as dirt_with_frost which adds subtlety to the winterscape. ~ LazyJ
-	on_construct = function(pos)
-		pos.y = pos.y - 1
-		if minetest.get_node(pos).name == "default:dirt_with_grass"
-			or minetest.get_node(pos).name == "default:dirt" then
-			minetest.set_node(pos, {name="default:dirt_with_snow"})
-		end
-	end
+	on_construct = snow_onto_dirt
 })
 
 
@@ -326,13 +324,7 @@ minetest.override_item("default:ice", {
 	 -- I made this a lot harder to dig than snow blocks because ice is much more dense
 	 -- and solid than fluffy snow. ~ LazyJ
 	groups = {cracky=2, crumbly=1, choppy=1, --[[oddly_breakable_by_hand=1,]] melts=1},
-	on_construct = function(pos)
-		pos.y = pos.y - 1
-		if minetest.get_node(pos).name == "default:dirt_with_grass"
-			or minetest.get_node(pos).name == "default:dirt" then
-			minetest.set_node(pos, {name="default:dirt_with_snow"})
-		end
-	end,
+	on_construct = snow_onto_dirt,
 	liquids_pointable = true,
 	--Make ice freeze over when placed by a maximum of 10 blocks.
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
@@ -350,13 +342,7 @@ minetest.override_item("default:snowblock", {
 	 -- Snow blocks should be easy to dig because they are just fluffy snow. ~ LazyJ
 	groups = {cracky=3, crumbly=3, choppy=3, oddly_breakable_by_hand=3, melts=1, icemaker=1, cooks_into_ice=1, falling_node=1},
 	--drop = "snow:snow_cobble",
-	on_construct = function(pos)
-		pos.y = pos.y - 1
-		if minetest.get_node(pos).name == "default:dirt_with_grass"
-			-- Thinking in terms of layers, dirt_with_snow could also double as 
-			-- dirt_with_frost which adds subtlety to the winterscape. ~ LazyJ, 2014_04_04
-			or minetest.get_node(pos).name == "default:dirt" then
-			minetest.set_node(pos, {name="default:dirt_with_snow"})
-		end
-	end
+	on_construct = snow_onto_dirt
+		-- Thinking in terms of layers, dirt_with_snow could also double as 
+		-- dirt_with_frost which adds subtlety to the winterscape. ~ LazyJ, 2014_04_04
 })
