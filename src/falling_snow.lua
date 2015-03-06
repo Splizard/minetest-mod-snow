@@ -165,7 +165,7 @@ if snow.enable_snowfall then
 
 	-- Snow
 	minetest.register_globalstep(function(dtime)
-		for _, player in ipairs(minetest.get_connected_players()) do
+		for _, player in pairs(minetest.get_connected_players()) do
 			local ppos = player:getpos()
 			
 			local sminp = addvectors(ppos, {x=-20, y=0, z=-20})

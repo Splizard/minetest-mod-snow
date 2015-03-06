@@ -228,6 +228,7 @@ minetest.register_node("snow:star_lit", {
 -- Moss
 minetest.register_node("snow:moss", {
 	description = "Moss",
+	inventory_image = "snow_moss.png",
 	tiles = {"snow_moss.png"},
 	drawtype = "signlike",
 	paramtype = "light",
