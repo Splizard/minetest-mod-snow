@@ -90,7 +90,7 @@ local get_snow = function(pos)
 		local perlin1 = minetest.get_perlin(112,3, 0.5, 150)
 		local x = pos.x
 		local y = pos.z
-		if perlin1:get2d({x, y}) <= 0.53 then
+		if perlin1:get2d({x=x, y=y}) <= 0.53 then
 			return false
 		end
 
