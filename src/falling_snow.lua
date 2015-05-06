@@ -88,15 +88,13 @@ local get_snow = function(pos)
 	--Legacy support.
 	if weather_legacy == "snow" then
 		local perlin1 = minetest.get_perlin(112,3, 0.5, 150)
-		local x = pos.x
-		local y = pos.z
-		if perlin1:get2d({x=x, y=y}) <= 0.53 then
+		if perlin1:get2d({x=pos.x, y=pos.z}) <= 0.53 then
 			return false
 		end
 
 		-- disable falling snow in desert
 		local desert_perlin = minetest.get_perlin(SEEDDIFF3, OCTAVES3, PERSISTENCE3, SCALE3)
-		local noise3 = desert_perlin:get2d({x=x+150,y=y+50}) -- Offsets must match minetest mapgen desert perlin.
+		local noise3 = desert_perlin:get2d({x=pos.x+150,y=pos.z+50}) -- Offsets must match minetest mapgen desert perlin.
 		if noise3 > 0.35 then -- Smooth transition 0.35 to 0.45.
 			return false
 		end
