@@ -71,7 +71,7 @@ dofile(minetest.get_modpath("snow").."/src/falling_snow.lua")
 
 -- Check for "MoreBlocks". If not found, skip this next "dofile".
 
-if (minetest.get_modpath("moreblocks")) then
+if minetest.get_modpath("moreblocks") then
 
 	dofile(minetest.get_modpath("snow").."/src/stairsplus.lua")
 
@@ -81,31 +81,37 @@ end
 --This also takes into account sourrounding snow and makes snow even.
 function snow.place(pos)
 	local node = minetest.get_node_or_nil(pos)
-	local drawtype = ""
-	if node and minetest.registered_nodes[node.name] then
-		drawtype = minetest.registered_nodes[node.name].drawtype
-	end
 	
 	--Oops, maybe there is no node?
-	if node == nil then
+	if not node
+	or not minetest.registered_nodes[node.name] then
 		return
 	end
 
-	local bnode = minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z})
-	if node.name == "default:snow" and minetest.get_node_level(pos) < 63 then
-		if minetest.get_item_group(bnode.name, "leafdecay") == 0 and snow.is_uneven(pos) ~= true then
-			minetest.add_node_level(pos, 7)
+	local bnode = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
+	if node.name == "default:snow" then
+		local level = minetest.get_node_level(pos)
+		if level < 63 then
+			if minetest.get_item_group(bnode.name, "leafdecay") == 0
+			and not snow.is_uneven(pos) then
+				minetest.add_node_level(pos, 7)
+			end
+		elseif level == 63 then
+			local p = minetest.find_node_near(pos, 10, "default:dirt_with_grass")
+			if p
+			and minetest.get_node_light(p, 0.5) == 15 then
+				minetest.place_node({x=pos.x, y=pos.y+1, z=pos.z}, {name="default:snow"})
+			else
+				minetest.add_node(pos,{name="default:snowblock"})
+			end
 		end
-	elseif node.name == "default:snow" and minetest.get_node_level(pos) == 63 then
-		local p = minetest.find_node_near(pos, 10, "default:dirt_with_grass")
-		if p and minetest.get_node_light(p, 0.5) == 15 then
-			minetest.place_node({x=pos.x,y=pos.y+1,z=pos.z},{name="default:snow"})
-		else
-			minetest.add_node(pos,{name="default:snowblock"})
-		end
-	elseif node.name ~= "default:ice" and bnode.name ~= "air" then
-		if drawtype == "normal" or drawtype == "allfaces_optional" then
-			minetest.place_node({x=pos.x,y=pos.y+1,z=pos.z}, {name="default:snow"})
+	elseif node.name ~= "default:ice"
+	and bnode.name ~= "air" then
+		local drawtype = minetest.registered_nodes[node.name].drawtype
+		if drawtype == "normal"
+		or drawtype == "allfaces_optional" then
+			pos.y = pos.y+1
+			minetest.place_node(pos, {name="default:snow"})
 		elseif drawtype == "plantlike" then
 			pos.y = pos.y - 1
 			if minetest.get_node(pos).name == "default:dirt_with_grass" then
@@ -117,9 +123,8 @@ end
 
 -- Checks if the snow level is even at any given pos.
 -- Smooth Snow
-local smooth_snow = snow.smooth_snow
-snow.is_uneven = function(pos)
-	if smooth_snow then
+if snow.smooth_snow then
+	snow.is_uneven = function(pos)
 		local num = minetest.get_node_level(pos)
 		local get_node = minetest.get_node
 		local add_node = minetest.add_node
@@ -127,40 +132,46 @@ snow.is_uneven = function(pos)
 		local foundx
 		local foundy
 		local foundz
-		for x=-1,1 do
-		for z=-1,1 do
-			local node = get_node({x=pos.x+x,y=pos.y,z=pos.z+z})
-			local bnode = get_node({x=pos.x+x,y=pos.y-1,z=pos.z+z})
-			local drawtype
-			if node and minetest.registered_nodes[node.name] then
-				drawtype = minetest.registered_nodes[node.name].drawtype
-			end
-	
-			if drawtype == "plantlike" then
-				if bnode.name == "default:dirt_with_grass" then
-					add_node({x=pos.x+x,y=pos.y-1,z=pos.z+z}, {name="default:dirt_with_snow"})
+		for z = -1,1 do
+			for x = -1,1 do
+				local p = {x=pos.x+x, y=pos.y, z=pos.z+z}
+				local node = get_node(p)
+				p.y = p.y-1
+				local bnode = get_node(p)
+
+				if node
+				and minetest.registered_nodes[node.name]
+				and minetest.registered_nodes[node.name].drawtype == "plantlike"
+				and bnode.name == "default:dirt_with_grass" then
+					add_node(p, {name="default:dirt_with_snow"})
+					return true
+				end
+
+				p.y = p.y+1
+				if not (x == 0 and z == 0)
+				and node.name == "default:snow"
+				and minetest.get_node_level(p) < num then
+					found = true
+					foundx = x
+					foundz = z
+				elseif node.name == "air"
+				and bnode.name ~= "air"
+				and bnode.name ~= "default:snow" then
+					p.y = p.y-1
+					snow.place(p)
 					return true
 				end
 			end
-			
-			if (not(x == 0 and y == 0)) and node.name == "default:snow" and minetest.get_node_level({x=pos.x+x,y=pos.y,z=pos.z+z}) < num then
-				found = true
-				foundx = x
-				foundz=z
-			elseif node.name == "air" and bnode.name ~= "air" then
-				if not (bnode.name == "default:snow") then 
-					snow.place({x=pos.x+x,y=pos.y-1,z=pos.z+z})
-					return true
-				end
-			end
-		end
 		end
 		if found then
-			local node = get_node({x=pos.x+foundx,y=pos.y,z=pos.z+foundz})
-			if snow.is_uneven({x=pos.x+foundx,y=pos.y,z=pos.z+foundz}) ~= true then
-				minetest.add_node_level({x=pos.x+foundx,y=pos.y,z=pos.z+foundz}, 7)
+			local p = {x=pos.x+foundx, y=pos.y, z=pos.z+foundz}
+			if snow.is_uneven(p) ~= true then
+				minetest.add_node_level(p, 7)
 			end
 			return true
 		end
+	end
+else
+	snow.is_uneven = function()
 	end
 end

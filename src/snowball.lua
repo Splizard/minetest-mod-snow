@@ -31,17 +31,20 @@ snow_snowball_ENTITY={
 
 --Snowball_entity.on_step()--> called when snowball is moving.
 snow_snowball_ENTITY.on_step = function(self, dtime)
-	self.timer=self.timer+dtime
+	self.timer = self.timer+dtime
+	if self.timer > 600 then
+		-- 10 minutes are too long for a snowball to fly somewhere
+		self.object:remove()
+	end
 	local pos = self.object:getpos()
 	local node = minetest.get_node(pos)
 
 	--Become item when hitting a node.
-	if self.lastpos.x~=nil then --If there is no lastpos for some reason. ~ Splizard
+	if self.lastpos.x then --If there is no lastpos for some reason. ~ Splizard
 		-- Check to see what is one node above where the snow is
 		-- going to be placed. ~ LazyJ, 2014_04_08
-		local abovesnowballtarget = {x=pos.x, y=pos.y+1, z=pos.z}
 		-- Identify the name of the node that was found above. ~ LazyJ, 2014_04_08
-		local findwhatisabove = minetest.get_node(abovesnowballtarget).name
+		local findwhatisabove = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z}).name
 		-- If the node above is air, then it's OK to go on to the next step. ~ LazyJ, 2014_04_08
 		if findwhatisabove == "air" then
 			-- If the node where the snow is going is anything except air, then it's OK to put 
@@ -54,12 +57,12 @@ snow_snowball_ENTITY.on_step = function(self, dtime)
 				--minetest.place_node({x=pos.x, y=pos.y+2, z=pos.z}, {name="default:snow"})
 				self.object:remove()
 			end	
-			else -- If findwhatisabove is not equal to "air" then cancel the snowball 
+		else -- If findwhatisabove is not equal to "air" then cancel the snowball 
 			-- with self.object:remove() ~ LazyJ, 2014_04_08
-				self.object:remove()
+			self.object:remove()
 		end	
 	end
-	self.lastpos={x=pos.x, y=pos.y, z=pos.z}
+	self.lastpos = vector.new(pos)
 end
 
 
@@ -142,9 +145,12 @@ minetest.override_item("default:snow", {
 	--Disable placement prediction for snow.
  	node_placement_prediction = "",
 	on_construct = function(pos)
-		if minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name == "default:dirt_with_grass"
-		or minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name == "default:dirt" then
-			minetest.set_node({x=pos.x, y=pos.y-1, z=pos.z}, {name="default:dirt_with_snow"})
+		pos.y = pos.y-1
+		local node = minetest.get_node(pos)
+		if node.name == "default:dirt_with_grass"
+		or node.name == "default:dirt" then
+			node.name = "default:dirt_with_snow"
+			minetest.set_node(pos, node)
 		end
 	end,
 	--Remove dirt_with_snow and replace with dirt_with_grass.
@@ -158,57 +164,52 @@ minetest.override_item("default:snow", {
 		local level = minetest.get_node_level(pos)
 		minetest.node_dig(pos, node, digger)
 		if minetest.get_node(pos).name ~= node.name then
-			if digger:get_inventory() then
-				local _, dropped_item
-				local left = digger:get_inventory():add_item("main", "default:snow "..tostring(level/7-1))
-				if not left:is_empty() then
-					local p = {
-						x = pos.x + math.random()/2-0.25,
-						y = pos.y + math.random()/2-0.25,
-						z = pos.z + math.random()/2-0.25,
-					}
-					minetest.add_item(p, left)
-				end
+			local inv = digger:get_inventory()
+			if not inv then
+				return
+			end
+			local left = inv:add_item("main", "default:snow "..tostring(level/7-1))
+			if not left:is_empty() then
+				local p = {
+					x = pos.x + math.random()/2-0.25,
+					y = pos.y + math.random()/2-0.25,
+					z = pos.z + math.random()/2-0.25,
+				}
+				minetest.add_item(p, left)
 			end
 		end
 	end,
 	--Manage snow levels.
 	on_place = function(itemstack, placer, pointed_thing)
-		local node
-		local above
-		local level
-		
 		local under = pointed_thing.under
 		local oldnode_under = minetest.get_node_or_nil(under)
 		local above = pointed_thing.above
-		local oldnode_above = minetest.get_node_or_nil(above)
 		
-		if not oldnode_under or not oldnode_above then
+		if not oldnode_under
+		or not above then
 			return
 		end
 		
 		local olddef_under = ItemStack({name=oldnode_under.name}):get_definition()
 		olddef_under = olddef_under or minetest.nodedef_default
-		local olddef_above = ItemStack({name=oldnode_above.name}):get_definition()
-		olddef_above = olddef_above or minetest.nodedef_default
 		
-		-- Place above pointed node
-		local place_to = {x = above.x, y = above.y, z = above.z}
-
+		local place_to
 		-- If node under is buildable_to, place into it instead (eg. snow)
 		if olddef_under.buildable_to then
-			place_to = {x = under.x, y = under.y, z = under.z}
+			place_to = under
+		else
+			-- Place above pointed node
+			place_to = above
 		end
 		
-		node = minetest.get_node(place_to)
-		level = minetest.get_node_level(place_to)
+		local level = minetest.get_node_level(place_to)
 		if level == 63 then
 			minetest.set_node(place_to, {name="default:snowblock"})
 		else
 			minetest.set_node_level(place_to, level+7)
 		end
 		
-		if node.name ~= "default:snow" then
+		if minetest.get_node(place_to).name ~= "default:snow" then
 			local itemstack, placed = minetest.item_place_node(itemstack, placer, pointed_thing)
 			return itemstack, placed
 		end

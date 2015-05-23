@@ -139,7 +139,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local ground_y = nil
 				for y = maxp.y, minp.y, -1 do
 					local nodid = data[area:index(x, y, z)]
-					if nodid ~= c_air and nodid ~= c_ignore then
+					if nodid ~= c_air
+					and nodid ~= c_ignore then
 						ground_y = y
 						break
 					end

@@ -203,7 +203,7 @@ for _, name in pairs(recycle_default_slabs) do
 		recipe = {
 			"snow:slab_"..subname_default,
 			"snow:slab_"..subname_default,
-			}
+		}
 	})
 end
 
@@ -229,6 +229,6 @@ for _, name in pairs(recycle_snowmod_slabs) do
 		recipe = {
 			"snow:slab_"..subname_snowmod,
 			"snow:slab_"..subname_snowmod,
-			}
+		}
 	})
 end

@@ -197,8 +197,9 @@ minetest.register_node("snow:star", {
 	--groups = {snappy=2,dig_immediate=3},
 	groups = {cracky=1, crumbly=1, choppy=1, oddly_breakable_by_hand=1}, -- Don't want the ornament breaking too easily because you have to punch it to turn it on and off. ~ LazyJ
 	sounds = default.node_sound_glass_defaults({dig = {name="default_glass_footstep", gain=0.2}}), -- Breaking "glass" sound makes it sound like a real, broken, Xmas tree ornament (Sorry, Mom!).  ;)-  ~ LazyJ
-	on_punch = function(pos, node, puncher) -- Added a "lit" star that can be punched on or off depending on your preference. ~ LazyJ
-		minetest.set_node(pos, {name = "snow:star_lit"})
+	on_punch = function(pos, node) -- Added a "lit" star that can be punched on or off depending on your preference. ~ LazyJ
+		node.name = "snow:star_lit"
+		minetest.set_node(pos, node)
 		nodeupdate(pos)
 	end,
 })
@@ -217,8 +218,9 @@ minetest.register_node("snow:star_lit", {
 	drop = "snow:star",
 	groups = {cracky=1, crumbly=1, choppy=1, oddly_breakable_by_hand=1, not_in_creative_inventory=1},
 	sounds = default.node_sound_glass_defaults({dig = {name="default_glass_footstep", gain=0.2}}),
-	on_punch = function(pos, node, puncher)
-		minetest.set_node(pos, {name = "snow:star"})
+	on_punch = function(pos, node)
+		node.name = "snow:star"
+		minetest.set_node(pos, node)
 		nodeupdate(pos)
 	end,
 })
@@ -328,7 +330,7 @@ minetest.override_item("default:ice", {
 	on_construct = snow_onto_dirt,
 	liquids_pointable = true,
 	--Make ice freeze over when placed by a maximum of 10 blocks.
-	after_place_node = function(pos, placer, itemstack, pointed_thing)
+	after_place_node = function(pos)
 		minetest.set_node(pos, {name="default:ice", param2=math.random(0,10)})
 	end
 })
