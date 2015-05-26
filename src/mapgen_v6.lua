@@ -22,32 +22,13 @@ local np_ice = {
 
 -- Debugging function
 
-local biome_to_string = function(num,num2)
-	local biome, biome2
-	if num == 1 then
-		biome = "snowy"
-	elseif num == 2 then
-		biome = "plain"
-	elseif num == 3 then
-		biome = "alpine"
-	elseif num == 4 or num == 5 then
-		biome = "normal"
-	else
-		biome = "unknown "..num
-	end
-	if num2 == 1 then
-		biome2 = "cool"
-	elseif num2 == 2 then
-		biome2 = "icebergs"
-	elseif num2 == 3 then
-		biome2 = "icesheet"
-	elseif num2 == 4 then
-		biome2 = "icecave"
-	elseif num2 == 5 then
-		biome2 = "icehole"
-	else
-		biome2 = "unknown "..num
-	end		
+local biome_strings = {
+	{"snowy", "plain", "alpine", "normal", "normal"},
+	{"cool", "icebergs", "icesheet", "icecave", "icehole"}
+}
+local function biome_to_string(num,num2)
+	local biome = biome_strings[1][num] or "unknown "..num
+	local biome2 = biome_strings[2][num2] or "unknown "..num2
 	return biome, biome2
 end
 
@@ -61,11 +42,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local x1 = maxp.x
 	local z1 = maxp.z
 			
-	local debug = snow.debug
-	local min_height = snow.min_height
 	local spawn_pine = snow.voxelmanip_pine
 	local smooth = snow.smooth_biomes
-	local legacy = snow.legacy
 
 	local c_dirt_with_grass = minetest.get_content_id("default:dirt_with_grass")
 	local c_dirt = minetest.get_content_id("default:dirt")
@@ -93,7 +71,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	local sidelen = x1 - x0 + 1
 	local chulens = {x=sidelen, y=sidelen, z=sidelen}
-	local minpos = {x=x0, y=z0}
 	local nvals_cold = minetest.get_perlin_map(np_cold, chulens):get2dMap_flat({x=x0, y=z0})
 	local nvals_ice = minetest.get_perlin_map(np_ice, chulens):get2dMap_flat({x=x0, y=z0})
 
@@ -305,7 +282,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:calc_lighting()
 	vm:write_to_map()
 
-	if write_to_map and debug then -- print if any column of mapchunk was snow biome
+	if write_to_map
+	and snow.debug then -- print if any column of mapchunk was snow biome
 		local biome_string,biome2_string = biome_to_string(biome,biome2)
 		local chugent = math.ceil((os.clock() - t1) * 1000)
 		print("[snow] "..biome_string.." and "..biome2_string.." x "..minp.x.." z "..minp.z.." time "..chugent.." ms")

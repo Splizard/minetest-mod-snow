@@ -161,8 +161,7 @@ function sled:on_step(dtime)
 	p.y = p.y+0.4
 	local s = self.object:getpos()
 	s.y = s.y -0.5
-	local keys = self.driver:get_player_control()
-	if keys["sneak"]
+	if self.driver:get_player_control().sneak
 	or is_water(p)
 	or not minetest.find_node_near(s, 1, {"default:snow","default:snowblock","default:ice","default:dirt_with_snow", "group:icemaker"}) then  -- LazyJ
 		self.driver:set_physics_override({
