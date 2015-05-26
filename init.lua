@@ -123,55 +123,56 @@ end
 
 -- Checks if the snow level is even at any given pos.
 -- Smooth Snow
-if snow.smooth_snow then
-	snow.is_uneven = function(pos)
-		local num = minetest.get_node_level(pos)
-		local get_node = minetest.get_node
-		local add_node = minetest.add_node
-		local found
-		local foundx
-		local foundy
-		local foundz
-		for z = -1,1 do
-			for x = -1,1 do
-				local p = {x=pos.x+x, y=pos.y, z=pos.z+z}
-				local node = get_node(p)
+local function is_uneven(pos)
+	local num = minetest.get_node_level(pos)
+	local get_node = minetest.get_node
+	local add_node = minetest.add_node
+	local found
+	local foundx
+	local foundy
+	local foundz
+	for z = -1,1 do
+		for x = -1,1 do
+			local p = {x=pos.x+x, y=pos.y, z=pos.z+z}
+			local node = get_node(p)
+			p.y = p.y-1
+			local bnode = get_node(p)
+
+			if node
+			and minetest.registered_nodes[node.name]
+			and minetest.registered_nodes[node.name].drawtype == "plantlike"
+			and bnode.name == "default:dirt_with_grass" then
+				add_node(p, {name="default:dirt_with_snow"})
+				return true
+			end
+
+			p.y = p.y+1
+			if not (x == 0 and z == 0)
+			and node.name == "default:snow"
+			and minetest.get_node_level(p) < num then
+				found = true
+				foundx = x
+				foundz = z
+			elseif node.name == "air"
+			and bnode.name ~= "air"
+			and bnode.name ~= "default:snow" then
 				p.y = p.y-1
-				local bnode = get_node(p)
-
-				if node
-				and minetest.registered_nodes[node.name]
-				and minetest.registered_nodes[node.name].drawtype == "plantlike"
-				and bnode.name == "default:dirt_with_grass" then
-					add_node(p, {name="default:dirt_with_snow"})
-					return true
-				end
-
-				p.y = p.y+1
-				if not (x == 0 and z == 0)
-				and node.name == "default:snow"
-				and minetest.get_node_level(p) < num then
-					found = true
-					foundx = x
-					foundz = z
-				elseif node.name == "air"
-				and bnode.name ~= "air"
-				and bnode.name ~= "default:snow" then
-					p.y = p.y-1
-					snow.place(p)
-					return true
-				end
+				snow.place(p)
+				return true
 			end
-		end
-		if found then
-			local p = {x=pos.x+foundx, y=pos.y, z=pos.z+foundz}
-			if snow.is_uneven(p) ~= true then
-				minetest.add_node_level(p, 7)
-			end
-			return true
 		end
 	end
-else
-	snow.is_uneven = function()
+	if found then
+		local p = {x=pos.x+foundx, y=pos.y, z=pos.z+foundz}
+		if snow.is_uneven(p) ~= true then
+			minetest.add_node_level(p, 7)
+		end
+		return true
+	end
+end
+
+function snow.is_uneven(pos)
+	if snow.smooth_snow then
+		return is_uneven(pos)
 	end
 end

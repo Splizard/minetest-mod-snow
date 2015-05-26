@@ -53,8 +53,7 @@ than I originally planned. :p  ~ LazyJ
 --
 
 local function is_water(pos)
-	local nn = minetest.get_node(pos).name
-	return minetest.get_item_group(nn, "water") ~= 0
+	return minetest.get_item_group(minetest.get_node(pos).name, "water") ~= 0
 end
 
 
@@ -77,7 +76,8 @@ local sled = {
 local players_sled = {}
 
 function sled:on_rightclick(clicker)
-	if (not self.driver) and snow.sleds then
+	if not self.driver
+	and snow.sleds then
 		players_sled[clicker:get_player_name()] = true
 		self.driver = clicker
 		self.object:set_attach(clicker, "", {x=0,y=-9,z=0}, {x=0,y=90,z=0})
@@ -110,7 +110,7 @@ function sled:on_rightclick(clicker)
 				direction = 0,
 			})
 -- End part 1	
- 	end
+	end
 end
 
 function sled:on_activate(staticdata, dtime_s)
@@ -126,13 +126,20 @@ end
 
 function sled:on_punch(puncher, time_from_last_punch, tool_capabilities, direction)
 	self.object:remove()
-	if puncher and puncher:is_player() then
+	if puncher
+	and puncher:is_player() then
 		puncher:get_inventory():add_item("main", "snow:sled")
 	end
 end
 
 
+local timer = 0
 minetest.register_globalstep(function(dtime)
+	timer = timer+dtime
+	if timer < 1 then
+		return
+	end
+	timer = 0
 	for _, player in pairs(minetest.get_connected_players()) do
 		if players_sled[player:get_player_name()] then
 			default.player_set_animation(player, "sit", 0)
@@ -140,28 +147,37 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
+local timer = 0
 function sled:on_step(dtime)
-	if self.driver then
-		local p = self.object:getpos()
-		p.y = p.y+0.4
-		local s = self.object:getpos()
-		s.y = s.y -0.5
-		local keys = self.driver:get_player_control()
-		if keys["sneak"] or is_water(p) or (not minetest.find_node_near(s, 1, {"default:snow","default:snowblock","default:ice","default:dirt_with_snow", "group:icemaker"})) then  -- LazyJ
-			self.driver:set_physics_override({
-				speed = 1, -- multiplier to default value
-				jump = 1, -- multiplier to default value
-				gravity = 1
-		  	})
+	if not self.driver then
+		return
+	end
+	timer = timer+dtime
+	if timer < 1 then
+		return
+	end
+	timer = 0
+	local p = self.object:getpos()
+	p.y = p.y+0.4
+	local s = self.object:getpos()
+	s.y = s.y -0.5
+	local keys = self.driver:get_player_control()
+	if keys["sneak"]
+	or is_water(p)
+	or not minetest.find_node_near(s, 1, {"default:snow","default:snowblock","default:ice","default:dirt_with_snow", "group:icemaker"}) then  -- LazyJ
+		self.driver:set_physics_override({
+			speed = 1, -- multiplier to default value
+			jump = 1, -- multiplier to default value
+			gravity = 1
+		})
 
-			players_sled[self.driver:get_player_name()] = false
-			self.object:set_detach()
-			--self.driver:hud_remove("sled")
-			self.driver:hud_remove(self.HUD) -- And here is part 2. ~ LazyJ
-			self.driver = nil
-			self.object:remove()
+		players_sled[self.driver:get_player_name()] = false
+		self.object:set_detach()
+		--self.driver:hud_remove("sled")
+		self.driver:hud_remove(self.HUD) -- And here is part 2. ~ LazyJ
+		self.driver = nil
+		self.object:remove()
 
-		end
 	end
 end
 
@@ -176,15 +192,13 @@ minetest.register_craftitem("snow:sled", {
 	liquids_pointable = true,
 	stack_max = 1,
 	
- 	on_use = function(itemstack, placer)
- 		local pos = {x=0,y=-1000, z=0}
- 		local name = placer:get_player_name()
- 		local player_pos = placer:getpos()
- 		if not players_sled[name] then
- 			if minetest.get_node(player_pos).name == "default:snow" then
-				local sled = minetest.add_entity(pos, "snow:sled")
-				sled:get_luaentity():on_rightclick(placer)
-			end
+	on_use = function(itemstack, placer)
+		if players_sled[placer:get_player_name()] then
+			return
+		end
+		if minetest.get_node(placer:getpos()).name == "default:snow" then
+			local sled = minetest.add_entity({x=0,y=-1000, z=0}, "snow:sled")
+			sled:get_luaentity():on_rightclick(placer)
 		end
 	end,
 })
