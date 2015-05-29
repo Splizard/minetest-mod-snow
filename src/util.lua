@@ -1,6 +1,5 @@
 --Global config and function table.
 snow = {
-	legacy = true,
 	sleds = true,
 	enable_snowfall = true,
 	lighter_snowfall = false,
@@ -13,15 +12,14 @@ snow = {
 
 --Config documentation.
 local doc = {
-	legacy = "Whether you are running a legacy minetest version (auto-detected).",
 	sleds = "Disable this to prevent sleds from being riden.",
 	enable_snowfall = "Enables falling snow.",
 	lighter_snowfall = "Reduces the amount of resources and fps used by snowfall.",
-	debug = "Enables debug output. Currently it only prints mgapgen_v6 info.",
-	smooth_biomes = "Enables smooth transition of biomes",
-	christmas_content = "Disable this to remove christmas saplings from being found.",
+	debug = "Enables debug output. Currently it only prints mgv6 info.",
+	smooth_biomes = "Enables smooth transition of biomes (mgv6)",
 	smooth_snow = "Disable this to stop snow from being smoothed.",
-	min_height = "The minumum height a snow biome will generate.",
+	christmas_content = "Disable this to remove christmas saplings from being found.",
+	min_height = "The minumum height a snow biome will generate (mgv7)",
 }
 
 --Manage config.
@@ -64,7 +62,9 @@ local function loadConfig(path)
 	end
 end
 
-minetest.register_on_shutdown(function() saveConfig(minetest.get_modpath("snow").."/config.txt", snow, doc) end)
+minetest.register_on_shutdown(function()
+	saveConfig(minetest.get_modpath("snow").."/config.txt", snow, doc)
+end)
 
 local config = loadConfig(minetest.get_modpath("snow").."/config.txt")
 if config then
@@ -92,19 +92,6 @@ for i,v in pairs(snow) do
 	end
 end
 
---AUTO DETECT and/or OVERIDEN values--
-
---legacy--
---Detect if we are running the latest minetest.
-if minetest.register_on_mapgen_init then
-	snow.legacy = false
-else
-	snow.legacy = true
-end
-if config
-and snow.legacy ~= config.legacy then
-	saveConfig(minetest.get_modpath("snow").."/config.txt", snow, doc)
-end
 
 --MENU
 

@@ -13,13 +13,10 @@ saplings grow into trees. --]]
 -- Part 1: To disable the mapgen, add the *starting* comment under this line.
 
 
-local mgname = ""
-
 --Identify the mapgen.
 minetest.register_on_mapgen_init(function(MapgenParams)
-	if MapgenParams.mgname then
-		mgname = MapgenParams.mgname
-	else
+	local mgname = MapgenParams.mgname
+	if not mgname then
 		io.write("[MOD] Snow Biomes: WARNING! mapgen could not be identifyed!\n")
 	end
 	if mgname == "v7" then
