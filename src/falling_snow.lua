@@ -158,7 +158,7 @@ local function snow_fall(pos, player, animate)
 	end
 
 	pos = {x=pos.x, y=ground_y, z=pos.z}
-  
+
   	if get_snow(pos) then
   		if animate then
 			local spos = {x=pos.x, y=ground_y+10, z=pos.z}
@@ -213,7 +213,7 @@ local function calc_snowfall()
 				animate = true
 			end
 
-			if math.random(1,5) == 4 then	
+			if math.random(1,5) == 4 then
 				snow_fall(
 					randpos(
 						addvectors(ppos, {x=-20, y=0, z=-20}),

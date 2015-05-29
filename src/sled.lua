@@ -15,9 +15,9 @@ THE LIST OF CHANGES I'VE MADE
 
 
 
-* The HUD message that displayed when a player sat on the sled would not go away after the player 
-got off the sled. I spent hours on trial-and-error while reading the lua_api.txt and scrounging 
-the Internet for a needle-in-the-haystack solution as to why the hud_remove wasn't working. 
+* The HUD message that displayed when a player sat on the sled would not go away after the player
+got off the sled. I spent hours on trial-and-error while reading the lua_api.txt and scrounging
+the Internet for a needle-in-the-haystack solution as to why the hud_remove wasn't working.
 Turns out Splizard's code was mostly correct, just not assembled in the right order.
 
 The key to the solution was found in the code of leetelate's scuba mod:
@@ -30,13 +30,13 @@ http://forum.minetest.net/viewtopic.php?id=7175
 TODO
 ~~~~~~
 
-* Figure out why the player avatars remain in a seated position, even after getting off the sled, 
-if they flew while on the sled. 'default.player_set_animation', where is a better explanation 
+* Figure out why the player avatars remain in a seated position, even after getting off the sled,
+if they flew while on the sled. 'default.player_set_animation', where is a better explanation
 for this and what are it's available options?
 
-* Go through, clean-up my notes and get them better sorted. Some are in the code, some are 
-scattered in my note-taking program. This "Oh, I'll just make a little tweak here and a 
-little tweak there" project has evolved into something much bigger and more complex 
+* Go through, clean-up my notes and get them better sorted. Some are in the code, some are
+scattered in my note-taking program. This "Oh, I'll just make a little tweak here and a
+little tweak there" project has evolved into something much bigger and more complex
 than I originally planned. :p  ~ LazyJ
 
 
@@ -68,7 +68,7 @@ local sled = {
 	mesh = "sled.x",
 	textures = {"sled.png"},
 	nil,
-	
+
 	driver = nil,
 	sliding = false,
 }
@@ -87,7 +87,7 @@ function sled:on_rightclick(clicker)
 			gravity = 1
 		  })
 --[[
-		local HUD = 
+		local HUD =
 			{
 				hud_elem_type = "text", -- see HUD element types
 				position = {x=0.5, y=0.89},
@@ -96,7 +96,7 @@ function sled:on_rightclick(clicker)
 				text = "You are sledding, hold sneak to stop.",
 				direction = 0,
 			}
-			
+
 		clicker:hud_add(HUD)
 --]]
 
@@ -109,7 +109,7 @@ function sled:on_rightclick(clicker)
 				text = "You are on the sled! Press the sneak key to get off the sled.", -- LazyJ
 				direction = 0,
 			})
--- End part 1	
+-- End part 1
 	end
 end
 
@@ -190,7 +190,7 @@ minetest.register_craftitem("snow:sled", {
 	wield_scale = {x=2, y=2, z=1},
 	liquids_pointable = true,
 	stack_max = 1,
-	
+
 	on_use = function(itemstack, placer)
 		if players_sled[placer:get_player_name()] then
 			return

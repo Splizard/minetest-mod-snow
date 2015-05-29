@@ -48,11 +48,11 @@ minetest.register_craft({
 -- 2. Cooking
 
 --[[
-"Cooks_into_ice" is a custom group I assigned to full-sized, snow-stuff nodes 
+"Cooks_into_ice" is a custom group I assigned to full-sized, snow-stuff nodes
 (snow bricks, snow cobble, snow blocks, etc.) so I wouldn't have to write an individual cooking
 recipe for each one.
 
-~ LazyJ  
+~ LazyJ
 --]]
 
 minetest.register_craft({

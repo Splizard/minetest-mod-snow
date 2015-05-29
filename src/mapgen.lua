@@ -1,8 +1,8 @@
 --[[
-If you want to run PlantLife and mods that depend on it, i.e. MoreTrees, Disable the mapgen by 
+If you want to run PlantLife and mods that depend on it, i.e. MoreTrees, Disable the mapgen by
 commenting-out the lines starting with "local mgname = " through "end" (I left a note were to start
-and stop) Disabling "Snow's" mapgen allows MoreTrees and PlantLife to do their thing until the 
-issue is figured out. However, the pine and xmas tree code is still needed for when those 
+and stop) Disabling "Snow's" mapgen allows MoreTrees and PlantLife to do their thing until the
+issue is figured out. However, the pine and xmas tree code is still needed for when those
 saplings grow into trees. --]]
 --The *starting* comment looks like this:  --[[
 --The *closing* comment looks like this:  --]]
@@ -120,7 +120,7 @@ function snow.voxelmanip_pine(pos,a,data)
 	local c_pinetree = minetest.get_content_id("default:pinetree")
 	local c_air = minetest.get_content_id("air")
 
-	local perlin1 = minetest.get_perlin(112,3, 0.5, 150) 
+	local perlin1 = minetest.get_perlin(112,3, 0.5, 150)
 	for z = -1,1 do
 		local z = pos.z + z
 		for x = -1,1 do

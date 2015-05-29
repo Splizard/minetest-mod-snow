@@ -41,7 +41,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local z0 = minp.z
 	local x1 = maxp.x
 	local z1 = maxp.z
-			
+
 	local spawn_pine = snow.voxelmanip_pine
 	local smooth = snow.smooth_biomes
 
@@ -125,7 +125,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 				if ground_y then
 					local vi = area:index(x, ground_y, z)
-					if data[vi] == c_leaves or data[vi] == c_jungleleaves then						
+					if data[vi] == c_leaves or data[vi] == c_jungleleaves then
 						for y = ground_y, -16, -1 do
 							local vi = area:index(x, y, z)
 							local id = data[vi]
@@ -141,9 +141,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								end
 							end
 						end
-					end			
-				end	
-			end					
+					end
+				end
+			end
 		elseif in_biome then
 			write_to_map = true
 	        	local icetype = nvals_ice[ni]
@@ -161,7 +161,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					break
 				end
 			end
-				
+
 			if ground_y then
 				local node = area:index(x, ground_y, z)
 				local abovenode = area:index(x, ground_y+1, z)

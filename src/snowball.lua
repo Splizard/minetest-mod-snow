@@ -3,7 +3,7 @@
 --============
 
 -- Snowballs were destroying nodes if the snowballs landed just right.
--- Quite a bit of trial-and-error learning here and it boiled down to a 
+-- Quite a bit of trial-and-error learning here and it boiled down to a
 -- small handful of code lines making the difference. ~ LazyJ
 
 local snowball_GRAVITY=9
@@ -47,20 +47,20 @@ snow_snowball_ENTITY.on_step = function(self, dtime)
 		local findwhatisabove = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z}).name
 		-- If the node above is air, then it's OK to go on to the next step. ~ LazyJ, 2014_04_08
 		if findwhatisabove == "air" then
-			-- If the node where the snow is going is anything except air, then it's OK to put 
-			-- the snow on it. ~ Original line of code by Splizard, comment by LazyJ so I can 
+			-- If the node where the snow is going is anything except air, then it's OK to put
+			-- the snow on it. ~ Original line of code by Splizard, comment by LazyJ so I can
 			-- keep track of what this code does. ~ LazyJ, 2014_04_07
 			if node.name ~= "air" then
-				snow.place(pos) -- this is the original code, I replaced it with 
-				-- minetest.place_node and bumped the y position up by 2 (make the snow drop 
+				snow.place(pos) -- this is the original code, I replaced it with
+				-- minetest.place_node and bumped the y position up by 2 (make the snow drop
 				-- from a node above and pile up). ~ LazyJ, 2014_04_07
 				--minetest.place_node({x=pos.x, y=pos.y+2, z=pos.z}, {name="default:snow"})
 				self.object:remove()
-			end	
-		else -- If findwhatisabove is not equal to "air" then cancel the snowball 
+			end
+		else -- If findwhatisabove is not equal to "air" then cancel the snowball
 			-- with self.object:remove() ~ LazyJ, 2014_04_08
 			self.object:remove()
-		end	
+		end
 	end
 	self.lastpos = vector.new(pos)
 end
@@ -73,8 +73,8 @@ minetest.register_entity("snow:snowball_entity", snow_snowball_ENTITY)
 
 -- Snowball and Default Snowball Merged
 
--- They both look the same, they do basically the same thing (except one is a leftclick throw 
--- and the other is a rightclick drop),... Why not combine snow:snowball with default:snow and 
+-- They both look the same, they do basically the same thing (except one is a leftclick throw
+-- and the other is a rightclick drop),... Why not combine snow:snowball with default:snow and
 -- benefit from both? ~ LazyJ, 2014_04_08
 
 --[[ Save this for reference and occasionally compare to the default code for any updates.
@@ -184,15 +184,15 @@ minetest.override_item("default:snow", {
 		local under = pointed_thing.under
 		local oldnode_under = minetest.get_node_or_nil(under)
 		local above = pointed_thing.above
-		
+
 		if not oldnode_under
 		or not above then
 			return
 		end
-		
+
 		local olddef_under = ItemStack({name=oldnode_under.name}):get_definition()
 		olddef_under = olddef_under or minetest.nodedef_default
-		
+
 		local place_to
 		-- If node under is buildable_to, place into it instead (eg. snow)
 		if olddef_under.buildable_to then
@@ -201,24 +201,24 @@ minetest.override_item("default:snow", {
 			-- Place above pointed node
 			place_to = above
 		end
-		
+
 		local level = minetest.get_node_level(place_to)
 		if level == 63 then
 			minetest.set_node(place_to, {name="default:snowblock"})
 		else
 			minetest.set_node_level(place_to, level+7)
 		end
-		
+
 		if minetest.get_node(place_to).name ~= "default:snow" then
 			local itemstack, placed = minetest.item_place_node(itemstack, placer, pointed_thing)
 			return itemstack, placed
 		end
-		
+
 		itemstack:take_item()
-		
+
 		return itemstack
 	end,
-	on_use = snow_shoot_snowball  -- This line is from the 'Snow' mod, 
+	on_use = snow_shoot_snowball  -- This line is from the 'Snow' mod,
 								-- the reset is default Minetest. ~ LazyJ
 })
 
@@ -231,16 +231,16 @@ On servers where buckets are disabled, snow and ice stuff is used to set water f
 water stuff like fountains, pools, ponds, ect.. It is a common practice to set a default torch on
 the snow placed where the players want water to be.
 
-If you place a default torch *on* default snow to melt it, instead of melting the snow is 
-*replaced* by the torch. Using "buildable_to = false" would fix this but then the snow would no 
+If you place a default torch *on* default snow to melt it, instead of melting the snow is
+*replaced* by the torch. Using "buildable_to = false" would fix this but then the snow would no
 longer pile-up in layers; the snow would stack like thin shelves in a vertical column.
 
-I tinkered with the default torch's code (see below) to check for snow at the position and one 
-node above (layered snow logs as the next y position above) but default snow's 
-"buildable_to = true" always happened first. An interesting exercise to better learn how Minetest 
-works, but otherwise not worth it. If you set a regular torch near snow, the snow will melt 
-and disappear leaving you with nearly the same end result anyway. I say "nearly the same" 
-because if you set a default torch on layered snow, the torch will replace the snow and be 
+I tinkered with the default torch's code (see below) to check for snow at the position and one
+node above (layered snow logs as the next y position above) but default snow's
+"buildable_to = true" always happened first. An interesting exercise to better learn how Minetest
+works, but otherwise not worth it. If you set a regular torch near snow, the snow will melt
+and disappear leaving you with nearly the same end result anyway. I say "nearly the same"
+because if you set a default torch on layered snow, the torch will replace the snow and be
 lit on the ground. If you were able to set a default torch *on* layered snow, the snow would
 melt and the torch would become a dropped item.
 
@@ -256,7 +256,7 @@ local can_place_torch_on_top = function(pos)
 			or minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z}).name == "default:snow" then
 				minetest.override_item("default:snow", {buildable_to = false,})
 			end
-		end 
+		end
 --]]
 
 

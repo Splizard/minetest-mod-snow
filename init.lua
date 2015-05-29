@@ -24,12 +24,12 @@ http://github.com/Splizard/minetest-mod-snow/
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
@@ -57,7 +57,7 @@ dofile(minetest.get_modpath("snow").."/src/snowball.lua")
 
 -- The formspec menu didn't work when util.lua was the very first "dofile" so I moved
 -- it and all the other original "dofiles", in order, to the bottom of the list. ~ LazyJ
--- Minetest would crash if the mapgen was called upon before the rest of other snow lua files so 
+-- Minetest would crash if the mapgen was called upon before the rest of other snow lua files so
 -- I put it lower on the list and that seems to do the trick. ~ LazyJ
 dofile(minetest.get_modpath("snow").."/src/util.lua")
 -- To get Xmas tree saplings, the "christmas_content", true or false, in "util.lua" has to be determined first.
@@ -81,7 +81,7 @@ end
 --This also takes into account sourrounding snow and makes snow even.
 function snow.place(pos)
 	local node = minetest.get_node_or_nil(pos)
-	
+
 	--Oops, maybe there is no node?
 	if not node
 	or not minetest.registered_nodes[node.name] then
