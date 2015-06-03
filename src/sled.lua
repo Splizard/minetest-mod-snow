@@ -39,6 +39,7 @@ scattered in my note-taking program. This "Oh, I'll just make a little tweak her
 little tweak there" project has evolved into something much bigger and more complex
 than I originally planned. :p  ~ LazyJ
 
+* find out why the sled disappears after rightclicking it ~ HybridDog
 
 --]]
 
@@ -51,6 +52,8 @@ than I originally planned. :p  ~ LazyJ
 --
 -- Helper functions
 --
+
+vector.zero = vector.zero or {x=0, y=0, z=0}
 
 local function table_find(t, v)
 	for i = 1,#t do
@@ -71,13 +74,11 @@ end
 --
 
 local sled = {
-	physical = false,
+	physical = true,
 	collisionbox = {-0.6,-0.25,-0.6, 0.6,0.3,0.6},
 	visual = "mesh",
 	mesh = "sled.x",
 	textures = {"sled.png"},
-
-	sliding = false,
 }
 
 local players_sled = {}
@@ -92,25 +93,12 @@ function sled:on_rightclick(player)
 	local pname = player:get_player_name()
 	players_sled[pname] = true
 	self.driver = pname
-	self.object:set_attach(player, "", {x=0,y=-9,z=0}, {x=0,y=90,z=0})
+	self.object:set_attach(player, "", vector.zero, vector.zero)
+	self.object:setyaw(player:get_look_yaw())-- - math.pi/2)
 	player:set_physics_override({
 		speed = 2, -- multiplier to default value
 		jump = 0, -- multiplier to default value
-		gravity = 1
 	})
---[[
-	local HUD =
-		{
-			hud_elem_type = "text", -- see HUD element types
-			position = {x=0.5, y=0.89},
-			name = "sled",
-			scale = {x=2, y=2},
-			text = "You are sledding, hold sneak to stop.",
-			direction = 0,
-		}
-
-	clicker:hud_add(HUD)
---]]
 
 -- Here is part 1 of the fix. ~ LazyJ
 	self.HUD = player:hud_add({
@@ -126,13 +114,14 @@ end
 
 function sled:on_activate(staticdata, dtime_s)
 	self.object:set_armor_groups({immortal=1})
+	self.object:setacceleration({x=0, y=-10, z=0})
 	if staticdata then
 		self.v = tonumber(staticdata)
 	end
 end
 
 function sled:get_staticdata()
-	return tostring(v)
+	return tostring(self.v)
 end
 
 function sled:on_punch(puncher)
@@ -183,12 +172,12 @@ function sled:on_step(dtime)
 	if not player then
 		return
 	end
+	player:setpos(self.object:getpos())
 	if player:get_player_control().sneak
-	or not accelerating_possible(vector.round(self.object:getpos())) then  -- LazyJ
+	or not accelerating_possible(vector.round(self.object:getpos())) then
 		player:set_physics_override({
 			speed = 1, -- multiplier to default value
 			jump = 1, -- multiplier to default value
-			gravity = 1
 		})
 
 		players_sled[player:get_player_name()] = false
@@ -210,12 +199,13 @@ minetest.register_craftitem("snow:sled", {
 	liquids_pointable = true,
 	stack_max = 1,
 
-	on_use = function(itemstack, placer)
+	on_use = function(_, placer)
 		if players_sled[placer:get_player_name()] then
 			return
 		end
 		local pos = placer:getpos()
 		if accelerating_possible(vector.round(pos)) then
+			pos.y = pos.y+0.5
 			minetest.add_entity(pos, "snow:sled")
 		end
 	end,
