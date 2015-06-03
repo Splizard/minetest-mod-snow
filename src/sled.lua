@@ -82,19 +82,33 @@ local sled = {
 }
 
 local players_sled = {}
+local function join_sled(self, player)
+	local pos = self.object:getpos()
+	player:setpos(pos)
+	local name = player:get_player_name()
+	players_sled[name] = true
+	default.player_attached[name] = true
+	default.player_set_animation(player, "sit" , 30)
+	self.driver = name
+	self.object:set_attach(player, "", vector.zero, vector.zero)
+	self.object:setyaw(player:get_look_yaw())-- - math.pi/2)
+end
+
+local function leave_sled(self, player)
+	local name = player:get_player_name()
+	players_sled[name] = false
+	self.driver = nil
+	player:set_detach()
+	default.player_attached[name] = false
+	default.player_set_animation(player, "stand" , 30)
+end
 
 function sled:on_rightclick(player)
 	if self.driver
 	or not snow.sleds then
 		return
 	end
-	local pos = self.object:getpos()
-	player:setpos(pos)
-	local pname = player:get_player_name()
-	players_sled[pname] = true
-	self.driver = pname
-	self.object:set_attach(player, "", vector.zero, vector.zero)
-	self.object:setyaw(player:get_look_yaw())-- - math.pi/2)
+	join_sled(self, player)
 	player:set_physics_override({
 		speed = 2, -- multiplier to default value
 		jump = 0, -- multiplier to default value
@@ -132,21 +146,6 @@ function sled:on_punch(puncher)
 	end
 end
 
-
-local timer = 0
-minetest.register_globalstep(function(dtime)
-	timer = timer+dtime
-	if timer < 1 then
-		return
-	end
-	timer = 0
-	for _, player in pairs(minetest.get_connected_players()) do
-		if players_sled[player:get_player_name()] then
-			default.player_set_animation(player, "sit", 0)
-		end
-	end
-end)
-
 local driveable_nodes = {"default:snow","default:snowblock","default:ice","default:dirt_with_snow", "group:icemaker"}
 local function accelerating_possible(pos)
 	if is_water(pos) then
@@ -172,17 +171,13 @@ function sled:on_step(dtime)
 	if not player then
 		return
 	end
-	player:setpos(self.object:getpos())
 	if player:get_player_control().sneak
 	or not accelerating_possible(vector.round(self.object:getpos())) then
+		leave_sled(self, player)
 		player:set_physics_override({
-			speed = 1, -- multiplier to default value
-			jump = 1, -- multiplier to default value
+			speed = 1,
+			jump = 1,
 		})
-
-		players_sled[player:get_player_name()] = false
-		player:set_detach()
-		--self.driver:hud_remove("sled")
 		player:hud_remove(self.HUD) -- And here is part 2. ~ LazyJ
 		self.object:remove()
 	end
