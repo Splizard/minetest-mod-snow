@@ -94,27 +94,39 @@ function snow.place(pos)
 		if level < 63 then
 			if minetest.get_item_group(bnode.name, "leafdecay") == 0
 			and not snow.is_uneven(pos) then
+				minetest.sound_play("default_snow_footstep", {pos=pos})
 				minetest.add_node_level(pos, 7)
 			end
 		elseif level == 63 then
 			local p = minetest.find_node_near(pos, 10, "default:dirt_with_grass")
 			if p
 			and minetest.get_node_light(p, 0.5) == 15 then
+				minetest.sound_play("default_grass_footstep", {pos=pos})
 				minetest.place_node({x=pos.x, y=pos.y+1, z=pos.z}, {name="default:snow"})
 			else
-				minetest.add_node(pos,{name="default:snowblock"})
+				minetest.sound_play("default_snow_footstep", {pos=pos})
+				minetest.add_node(pos, {name="default:snowblock"})
 			end
 		end
 	elseif node.name ~= "default:ice"
 	and bnode.name ~= "air" then
-		local drawtype = minetest.registered_nodes[node.name].drawtype
+		local data = minetest.registered_nodes[node.name]
+		local drawtype = data.drawtype
 		if drawtype == "normal"
 		or drawtype == "allfaces_optional" then
 			pos.y = pos.y+1
+			local sound = data.sounds
+			if sound then
+				sound = sound.footstep
+				if sound then
+					minetest.sound_play(sound.name, {pos=pos, gain=sound.gain})
+				end
+			end
 			minetest.place_node(pos, {name="default:snow"})
 		elseif drawtype == "plantlike" then
 			pos.y = pos.y - 1
 			if minetest.get_node(pos).name == "default:dirt_with_grass" then
+				minetest.sound_play("default_grass_footstep", {pos=pos})
 				minetest.add_node(pos, {name="default:dirt_with_snow"})
 			end
 		end
@@ -164,7 +176,7 @@ local function is_uneven(pos)
 	end
 	if found then
 		local p = {x=pos.x+foundx, y=pos.y, z=pos.z+foundz}
-		if snow.is_uneven(p) ~= true then
+		if is_uneven(p) ~= true then
 			minetest.add_node_level(p, 7)
 		end
 		return true

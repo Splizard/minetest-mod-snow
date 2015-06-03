@@ -1,5 +1,7 @@
 --Global config and function table.
 snow = {
+	snowball_gravity = 100/109,
+	snowball_velocity = 19,
 	sleds = true,
 	enable_snowfall = true,
 	lighter_snowfall = false,
@@ -12,6 +14,8 @@ snow = {
 
 --Config documentation.
 local doc = {
+	snowball_gravity = "The gravity of thrown snowballs",
+	snowball_velocity = "How fast players throw snowballs",
 	sleds = "Disable this to prevent sleds from being riden.",
 	enable_snowfall = "Enables falling snow.",
 	lighter_snowfall = "Reduces the amount of resources and fps used by snowfall.",
