@@ -90,7 +90,7 @@ local function join_sled(self, player)
 	default.player_attached[name] = true
 	default.player_set_animation(player, "sit" , 30)
 	self.driver = name
-	self.object:set_attach(player, "", vector.zero, vector.zero)
+	self.object:set_attach(player, "", {x=0,y=-9,z=0}, {x=0,y=90,z=0})
 	self.object:setyaw(player:get_look_yaw())-- - math.pi/2)
 end
 
