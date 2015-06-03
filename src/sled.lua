@@ -52,6 +52,15 @@ than I originally planned. :p  ~ LazyJ
 -- Helper functions
 --
 
+local function table_find(t, v)
+	for i = 1,#t do
+		if t[i] == v then
+			return true
+		end
+	end
+	return false
+end
+
 local function is_water(pos)
 	return minetest.get_item_group(minetest.get_node(pos).name, "water") ~= 0
 end
@@ -67,50 +76,52 @@ local sled = {
 	visual = "mesh",
 	mesh = "sled.x",
 	textures = {"sled.png"},
-	nil,
 
-	driver = nil,
 	sliding = false,
 }
 
 local players_sled = {}
 
-function sled:on_rightclick(clicker)
-	if not self.driver
-	and snow.sleds then
-		players_sled[clicker:get_player_name()] = true
-		self.driver = clicker
-		self.object:set_attach(clicker, "", {x=0,y=-9,z=0}, {x=0,y=90,z=0})
-		clicker:set_physics_override({
-			speed = 2, -- multiplier to default value
-			jump = 0, -- multiplier to default value
-			gravity = 1
-		  })
+function sled:on_rightclick(player)
+	if self.driver
+	or not snow.sleds then
+		return
+	end
+	local pos = self.object:getpos()
+	player:setpos(pos)
+	local pname = player:get_player_name()
+	players_sled[pname] = true
+	self.driver = pname
+	self.object:set_attach(player, "", {x=0,y=-9,z=0}, {x=0,y=90,z=0})
+	player:set_physics_override({
+		speed = 2, -- multiplier to default value
+		jump = 0, -- multiplier to default value
+		gravity = 1
+	})
 --[[
-		local HUD =
-			{
-				hud_elem_type = "text", -- see HUD element types
-				position = {x=0.5, y=0.89},
-				name = "sled",
-				scale = {x=2, y=2},
-				text = "You are sledding, hold sneak to stop.",
-				direction = 0,
-			}
+	local HUD =
+		{
+			hud_elem_type = "text", -- see HUD element types
+			position = {x=0.5, y=0.89},
+			name = "sled",
+			scale = {x=2, y=2},
+			text = "You are sledding, hold sneak to stop.",
+			direction = 0,
+		}
 
-		clicker:hud_add(HUD)
+	clicker:hud_add(HUD)
 --]]
 
 -- Here is part 1 of the fix. ~ LazyJ
-		self.HUD = clicker:hud_add({
-				hud_elem_type = "text",
-				position = {x=0.5, y=0.89},
-				name = "sled",
-				scale = {x=2, y=2},
-				text = "You are on the sled! Press the sneak key to get off the sled.", -- LazyJ
-				direction = 0,
-			})
+	self.HUD = player:hud_add({
+		hud_elem_type = "text",
+		position = {x=0.5, y=0.89},
+		name = "sled",
+		scale = {x=2, y=2},
+		text = "You are on the sled! Press the sneak key to get off the sled.", -- LazyJ
+		direction = 0,
+	})
 -- End part 1
-	end
 end
 
 function sled:on_activate(staticdata, dtime_s)
@@ -124,7 +135,7 @@ function sled:get_staticdata()
 	return tostring(v)
 end
 
-function sled:on_punch(puncher, time_from_last_punch, tool_capabilities, direction)
+function sled:on_punch(puncher)
 	self.object:remove()
 	if puncher
 	and puncher:is_player() then
@@ -147,6 +158,17 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
+local driveable_nodes = {"default:snow","default:snowblock","default:ice","default:dirt_with_snow", "group:icemaker"}
+local function accelerating_possible(pos)
+	if is_water(pos) then
+		return false
+	end
+	if table_find(driveable_nodes, minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name) then
+		return true
+	end
+	return false
+end
+
 local timer = 0
 function sled:on_step(dtime)
 	if not self.driver then
@@ -157,26 +179,23 @@ function sled:on_step(dtime)
 		return
 	end
 	timer = 0
-	local p = self.object:getpos()
-	p.y = p.y+0.4
-	local s = self.object:getpos()
-	s.y = s.y -0.5
-	if self.driver:get_player_control().sneak
-	or is_water(p)
-	or not minetest.find_node_near(s, 1, {"default:snow","default:snowblock","default:ice","default:dirt_with_snow", "group:icemaker"}) then  -- LazyJ
-		self.driver:set_physics_override({
+	local player = minetest.get_player_by_name(self.driver)
+	if not player then
+		return
+	end
+	if player:get_player_control().sneak
+	or not accelerating_possible(vector.round(self.object:getpos())) then  -- LazyJ
+		player:set_physics_override({
 			speed = 1, -- multiplier to default value
 			jump = 1, -- multiplier to default value
 			gravity = 1
 		})
 
-		players_sled[self.driver:get_player_name()] = false
+		players_sled[player:get_player_name()] = false
 		self.object:set_detach()
 		--self.driver:hud_remove("sled")
-		self.driver:hud_remove(self.HUD) -- And here is part 2. ~ LazyJ
-		self.driver = nil
+		player:hud_remove(self.HUD) -- And here is part 2. ~ LazyJ
 		self.object:remove()
-
 	end
 end
 
@@ -195,9 +214,9 @@ minetest.register_craftitem("snow:sled", {
 		if players_sled[placer:get_player_name()] then
 			return
 		end
-		if minetest.get_node(placer:getpos()).name == "default:snow" then
-			local sled = minetest.add_entity({x=0,y=-1000, z=0}, "snow:sled")
-			sled:get_luaentity():on_rightclick(placer)
+		local pos = placer:getpos()
+		if accelerating_possible(vector.round(pos)) then
+			minetest.add_entity(pos, "snow:sled")
 		end
 	end,
 })
