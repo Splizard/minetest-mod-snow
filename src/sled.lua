@@ -192,7 +192,7 @@ function sled:on_step(dtime)
 		})
 
 		players_sled[player:get_player_name()] = false
-		self.object:set_detach()
+		player:set_detach()
 		--self.driver:hud_remove("sled")
 		player:hud_remove(self.HUD) -- And here is part 2. ~ LazyJ
 		self.object:remove()
