@@ -78,11 +78,11 @@ end
 local snow_snowball_ENTITY = {
 	physical = false,
 	timer = 0,
-	textures = {"default_snowball.png"},
-	collisionbox = {-5/16,-5/16,-5/16,5/16,5/16,5/16},
+	collisionbox = {-5/16,-5/16,-5/16, 5/16,5/16,5/16},
 }
 
 function snow_snowball_ENTITY.on_activate(self)
+	self.object:set_properties({textures = {"default_snowball.png^[transform"..math.random(0,7)}})
 	self.object:setacceleration({x=0, y=-get_gravity(), z=0})
 	self.lastpos = self.object:getpos()
 	minetest.after(0.1, function(obj)
