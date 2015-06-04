@@ -13,63 +13,66 @@ local function get_gravity()
 	return grav*snow.snowball_gravity
 end
 
---[[local someone_digging
-local timer = 0]]
+local someone_throwing
+local timer = 0
 
 --Shoot snowball
 local function snow_shoot_snowball(item, player)
-	local pos = player:getpos()
-	pos.y = pos.y+1.625
-	local obj = minetest.add_entity(pos, "snow:snowball_entity")
+	local addp = {y = 1.625} -- + (math.random()-0.5)/5}
 	local dir = player:get_look_dir()
+	local dif = 2*math.sqrt(dir.z*dir.z+dir.x*dir.x)
+	addp.x = dir.z/dif -- + (math.random()-0.5)/5
+	addp.z = -dir.x/dif -- + (math.random()-0.5)/5
+	local pos = vector.add(player:getpos(), addp)
+	local obj = minetest.add_entity(pos, "snow:snowball_entity")
 	obj:setvelocity(vector.multiply(dir, snow.snowball_velocity))
 	obj:setacceleration({x=dir.x*-3, y=-get_gravity(), z=dir.z*-3})
 	if creative_mode then
+		if not someone_throwing then
+			someone_throwing = true
+			timer = -0.5
+		end
 		return
 	end
 	item:take_item()
 	return item
 end
 
---[[ simulate the players digging with it using a globalstep
-minetest.register_globalstep(function(dtime)
-	-- abort if noone uses a drill
-	if not someone_digging then
-		return
-	end
+if creative_mode then
+	local function update_step(dtime)
+		timer = timer+dtime
+		if timer < 0.006 then
+			return
+		end
+		timer = 0
 
-	-- abort that it doesn't dig too fast
-	timer = timer+dtime
-	if timer < speed then
-		return
-	end
-	timer = 0
-
-	local active
-	for _,player in pairs(minetest.get_connected_players()) do
-		if player:get_player_control().LMB then
-			local item = player:get_wielded_item()
-			local itemname = item:get_name()
-			for name,func in pairs(drills) do
-				if name == itemname then
-					-- player has a mk3 drill as wielditem and holds left mouse button
-					local pt = get_pointed_thing(player, ranges[itemname])
-					if pt then
-						-- simulate the function
-						player:set_wielded_item(func(item, player, pt))
-					end
+		local active
+		for _,player in pairs(minetest.get_connected_players()) do
+			if player:get_player_control().LMB then
+				local item = player:get_wielded_item()
+				local itemname = item:get_name()
+				if itemname == "default:snow" then
+					snow_shoot_snowball(nil, player)
 					active = true
 					break
 				end
 			end
 		end
+
+		-- disable the function if noone currently throws them
+		if not active then
+			someone_throwing = false
+		end
 	end
 
-	-- disable the function if noone currently uses a mk3 drill to reduce lag
-	if not active then
-		someone_digging = false
-	end
-end)--]]
+	-- do automatic throwing using a globalstep
+	minetest.register_globalstep(function(dtime)
+		-- only if one holds left click
+		if someone_throwing then
+			update_step(dtime)
+		end
+	end)
+end
 
 --The snowball Entity
 local snow_snowball_ENTITY = {
@@ -80,15 +83,24 @@ local snow_snowball_ENTITY = {
 }
 
 function snow_snowball_ENTITY.on_activate(self)
+	self.object:setacceleration({x=0, y=-get_gravity(), z=0})
 	self.lastpos = self.object:getpos()
-	minetest.after(0, function(obj)
-		if not obj
-		or obj:getvelocity().y ~= 0 then
+	minetest.after(0.1, function(obj)
+		if not obj then
+			return
+		end
+		local vel = obj:getvelocity()
+		if vel
+		and vel.y ~= 0 then
 			return
 		end
 		minetest.after(0, function(obj)
-			if obj
-			and obj:getvelocity().y == 0 then
+			if not obj then
+				return
+			end
+			local vel = obj:getvelocity()
+			if not vel
+			or vel.y == 0 then
 				obj:remove()
 			end
 		end, obj)
