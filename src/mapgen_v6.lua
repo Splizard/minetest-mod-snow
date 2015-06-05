@@ -31,6 +31,31 @@ local function biome_to_string(num,num2)
 	return biome
 end
 
+local function do_ws_func(a, x)
+	local n = x/(16000)
+	local y = 0
+	for k=1,1000 do
+		y = y + 1000*(math.sin(math.pi * k^a * n)/(math.pi * k^a))
+	end
+	return y
+end
+
+local ws_lists = {}
+local function get_ws_list(a,x)
+        ws_lists[a] = ws_lists[a] or {}
+        local v = ws_lists[a][x]
+        if v then
+                return v
+        end
+        v = {}
+        for x=x,x + (80 - 1) do
+		local y = do_ws_func(a, x)
+                v[x] = y
+        end
+        ws_lists[a][x] = v
+        return v
+end
+
 -- On generated function
 
 minetest.register_on_generated(function(minp, maxp, seed)
@@ -67,6 +92,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local emin, emax = vm:read_from_map(minp, maxp)
 	local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
 	local data = vm:get_data()
+
+	local snow_tab,num = {},1
 
 	local sidelen = x1 - x0 + 1
 	local chulens = {x=sidelen, y=sidelen, z=sidelen}
@@ -157,7 +184,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 				if ground_y and data[node] == c_dirt_with_grass then
 					if alpine and test > 0.53 then
-						data[abovenode] = c_snow
+						snow_tab[num] = {abovenode, z, x, test}
+						num = num+1
 						for y = ground_y, -6, -1 do
 							local vi = area:index(x, y, z)
 							if data[vi] == c_stone then
@@ -176,18 +204,21 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						data[abovenode] = c_snow_block
 					else
 						data[node] = c_dirt_with_snow
-						data[abovenode] = c_snow
+						snow_tab[num] = {abovenode, z, x, test}
+						num = num+1
 					end
 				elseif ground_y and data[node] == c_sand then
 					if not icy then
-						data[abovenode] = c_snow
+						snow_tab[num] = {abovenode, z, x, test}
+						num = num+1
 					else
 						data[node] = c_ice
 					end
 				elseif ground_y and data[node] == c_leaves
 				or data[node] == c_jungleleaves or data[node] == c_apple then
 					if alpine then
-						data[abovenode] = c_snow
+						snow_tab[num] = {abovenode, z, x, test}
+						num = num+1
 						for y = ground_y, -6, -1 do
 							local stone = area:index(x, y, z)
 							if data[stone] ==  c_stone then
@@ -197,7 +228,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 						end
 					else
-						data[abovenode] = c_snow
+						snow_tab[num] = {abovenode, z, x, test}
+						num = num+1
 					end
 				elseif ground_y
 				and data[node] == c_junglegrass then
@@ -207,8 +239,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					for y = ground_y, ground_y-4, -1 do
 						local vi = area:index(x, y, z)
 						if data[vi] == c_papyrus then
-							local via = area:index(x, ground_y, z)
-							data[via] = c_snow
+							snow_tab[num] = {area:index(x, ground_y, z), z, x, test}
+							num = num+1
 							data[vi] = c_snow_block
 						end
 					end
@@ -274,7 +306,32 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	end
 
+	local param2s
+	if num ~= 1 then
+		local wsz, wsx
+		for _,i in pairs(snow_tab) do
+			data[i[1]] = c_snow
+			if i[4] > 0.75 then
+				if not wsz then
+					wsz = get_ws_list(5, z0)
+					wsx = get_ws_list(2, x0)
+					param2s = vm:get_param2_data()
+				end
+				local id = math.floor(wsx[i[3]]+wsz[i[2]]*5)%9+1
+				if id ~= 1 then
+					if id == 9 then
+						id = 4
+					end
+					param2s[i[1]] = id*7
+				end
+			end
+		end
+	end
+
 	vm:set_data(data)
+	if param2s then
+		vm:set_param2_data(param2s)
+	end
 	vm:set_lighting({day=0, night=0})
 	vm:calc_lighting()
 	vm:write_to_map()
