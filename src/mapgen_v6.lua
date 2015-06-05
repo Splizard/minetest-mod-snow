@@ -310,19 +310,24 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	if num ~= 1 then
 		local wsz, wsx
 		for _,i in pairs(snow_tab) do
-			data[i[1]] = c_snow
-			if i[4] > 0.75 then
-				if not wsz then
-					wsz = get_ws_list(5, z0)
-					wsx = get_ws_list(2, x0)
-					param2s = vm:get_param2_data()
-				end
-				local id = math.floor(wsx[i[3]]+wsz[i[2]]*5)%9+1
-				if id ~= 1 then
-					if id == 9 then
-						id = 4
+			local p,z,x,test = unpack(i)
+			data[p] = c_snow
+			test = test-0.73
+			if test > 0 then
+				local minh = math.floor(test*4*9)%9+1
+				if minh ~= 1 then
+					if not wsz then
+						wsz = get_ws_list(5, z0)
+						wsx = get_ws_list(2, x0)
+						param2s = vm:get_param2_data()
 					end
-					param2s[i[1]] = id*7
+					local h = math.min(minh, math.floor(wsx[x]+wsz[z]*5)%9+1)
+					if h ~= 1 then
+						if h == 9 then
+							h = 4
+						end
+						param2s[p] = h*7
+					end
 				end
 			end
 		end
