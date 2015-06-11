@@ -88,8 +88,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_papyrus = minetest.get_content_id("default:papyrus")
 	local c_sand = minetest.get_content_id("default:sand")
 
-	local vm = minetest.get_voxel_manip()
-	local emin, emax = vm:read_from_map(minp, maxp)
+	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
 	local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
 	local data = vm:get_data()
 
@@ -119,7 +118,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	for z = z0, z1 do
 	for x = x0, x1 do
 	        local in_biome = false
-	        local test = nvals_cold[ni]
+	        local test = math.min(nvals_cold[ni], 1)
 	        if smooth and (not snowy)
 		and (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
 	            in_biome = true
@@ -312,20 +311,21 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		for _,i in pairs(snow_tab) do
 			local p,z,x,test = unpack(i)
 			data[p] = c_snow
-			test = test-0.73
+			test = (test-0.73)/0.27 -- /(1-0.73)
 			if test > 0 then
-				local minh = math.floor(test*4*9)%9+1
-				if minh ~= 1 then
+				local maxh = math.floor(test*9)%9+1
+				if maxh ~= 1 then
 					if not wsz then
 						wsz = get_ws_list(5, z0)
 						wsx = get_ws_list(2, x0)
 						param2s = vm:get_param2_data()
 					end
-					local h = math.min(minh, math.floor(wsx[x]+wsz[z]*5)%9+1)
+					local h = math.floor(wsx[x]+wsz[z]*5)%9+1
 					if h ~= 1 then
 						if h == 9 then
 							h = 4
 						end
+						h = math.min(maxh, h)
 						param2s[p] = h*7
 					end
 				end
