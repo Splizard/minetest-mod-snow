@@ -171,12 +171,13 @@ end
 
 
 
--- Snow Brick
-minetest.register_node("snow:snow_brick", {
+-- Bricks
+
+nodedef = {
 	description = "Snow Brick",
 	tiles = {"snow_snow_brick.png"},
 	is_ground_content = true,
-	freezemelt = "default:water_source",
+	--freezemelt = "default:water_source", -- deprecated
 	liquidtype = "none",
 	paramtype = "light",
 	sunlight_propagates = true,
@@ -195,33 +196,31 @@ minetest.register_node("snow:snow_brick", {
  	-- The "on_construct" part below, thinking in terms of layers, dirt_with_snow could also
  	-- double as dirt_with_frost which adds subtlety to the winterscape. ~ LazyJ
 	on_construct = snow_onto_dirt
+}
+
+-- Snow Brick
+minetest.register_node("snow:snow_brick", table.copy(nodedef))
+
+
+-- hard Ice Brick, original texture from LazyJ
+local ibdef = table.copy(nodedef)
+ibdef.description = "Ice Brick"
+ibdef.tiles = {"snow_ice_brick.png"}
+ibdef.use_texture_alpha = true
+ibdef.groups = {cracky=1, crumbly=1, choppy=1, melts=1}
+ibdef.sounds = default.node_sound_glass_defaults({
+	dug = {name="default_hard_footstep", gain=1}
 })
 
+minetest.register_node("snow:ice_brick", ibdef)
 
 
 -- Snow Cobble  ~ LazyJ
 -- Described as Icy Snow
-minetest.register_node("snow:snow_cobble", {
-	description = "Icy Snow",
-	tiles = {"snow_snow_cobble.png"},
-	is_ground_content = true,
-	liquidtype = "none",
-	paramtype = "light",
-	sunlight_propagates = true,
-	paramtype2 = "facedir",
-	 -- I made this a little harder to dig than snow blocks because
-	 -- I imagine snow brick as being much more dense and solid than fluffy snow. ~ LazyJ
-	groups = {cracky=2, crumbly=2, choppy=2, oddly_breakable_by_hand=2, melts=1, icemaker=1, cooks_into_ice=1},
-	sounds = default.node_sound_dirt_defaults({
-		footstep = {name="default_snow_footstep", gain=0.25},
-		dig = {name="default_dig_crumbly", gain=0.4},
-		dug = {name="default_snow_footstep", gain=0.75},
-		place = {name="default_place_node", gain=1.0}
-	}),
- 	-- The "on_construct" part below, thinking in terms of layers, dirt_with_snow could also
- 	-- double as dirt_with_frost which adds subtlety to the winterscape. ~ LazyJ
-	on_construct = snow_onto_dirt
-})
+nodedef.description = "Icy Snow"
+nodedef.tiles = {"snow_snow_cobble.png"}
+
+minetest.register_node("snow:snow_cobble", nodedef)
 
 
 
