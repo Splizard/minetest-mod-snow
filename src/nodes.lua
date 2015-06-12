@@ -207,6 +207,7 @@ local ibdef = table.copy(nodedef)
 ibdef.description = "Ice Brick"
 ibdef.tiles = {"snow_ice_brick.png"}
 ibdef.use_texture_alpha = true
+ibdef.drawtype = "glasslike"
 ibdef.groups = {cracky=1, crumbly=1, choppy=1, melts=1}
 ibdef.sounds = default.node_sound_glass_defaults({
 	dug = {name="default_hard_footstep", gain=1}
