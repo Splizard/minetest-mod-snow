@@ -1,51 +1,17 @@
 --[[
 
 Crafting Sections (in order, top to bottom):
-	1. Fuel
-	2. Cooking
-	3. Crafting and Recycling
+	1. Cooking
+	2. Crafting and Recycling
 
 The crafting recipe for the sled is in the sled.lua file.
 
 ~ LazyJ
 
---]]
-
--- 1. Fuel
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "snow:needles",
-	burntime = 1,
-})
+]]
 
 
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "snow:sapling_pine",
-	burntime = 10,
-})
-
-
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "snow:needles_decorated",
-	burntime = 1,
-})
-
-
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "snow:xmas_tree",
-	burntime = 10,
-})
-
-
-
--- 2. Cooking
+-- 1. Cooking
 
 --[[
 "Cooks_into_ice" is a custom group I assigned to full-sized, snow-stuff nodes
@@ -53,7 +19,7 @@ minetest.register_craft({
 recipe for each one.
 
 ~ LazyJ
---]]
+]]
 
 minetest.register_craft({
 	type = "cooking",
@@ -67,17 +33,17 @@ minetest.register_craft({
 
 
 
--- 3. Crafting and Recycling
+-- 2. Crafting and Recycling
 
 -- Let's make moss craftable so players can more easily create mossycobble and
 -- gives another useful purpose to pine needles. ~ LazyJ
 
 minetest.register_craft({
-    output = 'snow:moss',
-    recipe = {
-        {'snow:needles', 'snow:needles'},
-        {'snow:needles', 'snow:needles'},
-    },
+	output = 'snow:moss',
+	recipe = {
+		{'snow:needles', 'snow:needles'},
+		{'snow:needles', 'snow:needles'},
+	},
 })
 
 
@@ -99,7 +65,7 @@ minetest.register_craft({
 	recipe = {
 		'snow:snow_cobble',
 		'snow:snow_cobble'
-		}
+	}
 })
 
 
@@ -110,17 +76,17 @@ minetest.register_craft({
 	recipe = {
 		'default:snowblock',
 		'default:snowblock'
-		}
+	}
 })]]
 
 
 
 minetest.register_craft({
-    output = 'snow:snow_brick',
-    recipe = {
-        {'default:snowblock', 'default:snowblock'},
-        {'default:snowblock', 'default:snowblock'}
-    }
+	output = 'snow:snow_brick',
+	recipe = {
+		{'default:snowblock', 'default:snowblock'},
+		{'default:snowblock', 'default:snowblock'}
+	}
 })
 
 --Craft icy snow.
@@ -137,7 +103,7 @@ minetest.register_craft({
 		'default:ice',
 		'default:ice',
 		'default:ice'
-		}
+	}
 })
 
 
@@ -151,7 +117,7 @@ minetest.register_craft({
 		'default:snow',
 		'default:ice',
 		'default:ice'
-		}
+	}
 })
 
 minetest.register_craft({
@@ -161,7 +127,7 @@ minetest.register_craft({
 		'default:snow',
 		'default:snow',
 		'default:ice'
-		}
+	}
 })
 
 minetest.register_craft({
@@ -170,16 +136,16 @@ minetest.register_craft({
 	recipe = {
 		'default:snow',
 		'default:ice'
-		}
+	}
 })
 
 
 -- Why not recycle snow_bricks back into snowblocks? ~ LazyJ
 minetest.register_craft({
-    output = 'default:snowblock 4',
-    recipe = {
-        {'snow:snow_brick'}
-    }
+	output = 'default:snowblock 4',
+	recipe = {
+		{'snow:snow_brick'}
+	}
 })
 
 
