@@ -31,6 +31,7 @@ local function biome_to_string(num,num2)
 	return biome
 end
 
+
 local function do_ws_func(a, x)
 	local n = x/(16000)
 	local y = 0
@@ -55,6 +56,28 @@ local function get_ws_list(a,x)
         ws_lists[a][x] = v
         return v
 end
+
+
+local plantlike_ids = {}
+local function is_plantlike(id)
+	if plantlike_ids[id] ~= nil then
+		return plantlike_ids[id]
+	end
+	local node = minetest.registered_nodes[minetest.get_name_from_content_id(id)]
+	if not node then
+		plantlike_ids[id] = false
+		return false
+	end
+	local drawtype = node.drawtype
+	if not drawtype
+	or drawtype ~= "plantlike" then
+		plantlike_ids[id] = false
+		return false
+	end
+	plantlike_ids[id] = true
+	return true
+end
+
 
 -- On generated function
 
@@ -183,12 +206,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			if ground_y then
 				local node = area:index(x, ground_y, z)
 				local c_ground = data[node]
-				local abovenode = area:index(x, ground_y+1, z)
 
 				if c_ground == c_dirt_with_grass then
 					if alpine
 					and test > 0.53 then
-						snow_tab[num] = {abovenode, z, x, test}
+						snow_tab[num] = {ground_y, z, x, test}
 						num = num+1
 						-- generate stone ground
 						for y = ground_y, math.max(-6, minp.y-6), -1 do
@@ -201,56 +223,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					elseif shrubs
 					and pr:next(1,28) == 1 then
 						data[node] = c_dirt_with_snow
-						data[abovenode] = c_dry_shrub
+						data[area:index(x, ground_y+1, z)] = c_dry_shrub
 					elseif pines
 					and pr:next(1,36) == 1 then
 						data[node] = c_dirt_with_snow
 						spawn_pine({x=x, y=ground_y+1, z=z}, area, data)
 					else
 						data[node] = c_dirt_with_snow
-						snow_tab[num] = {abovenode, z, x, test}
+						snow_tab[num] = {ground_y, z, x, test}
 						num = num+1
-					end
-				elseif c_ground == c_sand then
-					if icy then
-						data[node] = c_ice
-					end
-					snow_tab[num] = {abovenode, z, x, test}
-					num = num+1
-				elseif c_ground == c_leaves
-				or c_ground == c_jungleleaves
-				or c_ground == c_apple then
-					if alpine then
-						snow_tab[num] = {abovenode, z, x, test}
-						num = num+1
-						-- make stone pillars out of trees
-						for y = ground_y, math.max(-6, minp.y-6), -1 do
-							local stone = area:index(x, y, z)
-							if data[stone] == c_stone then
-								break
-							end
-							data[stone] = c_stone
-						end
-					else
-						-- put snow onto leaves
-						snow_tab[num] = {abovenode, z, x, test}
-						num = num+1
-					end
-				elseif c_ground == c_junglegrass then
-					data[node] = c_dry_shrub
-				elseif c_ground == c_papyrus then
-					snow_tab[num] = {abovenode, z, x, test}
-					num = num+1
-					-- replace papyrus plants with snowblocks
-					local y = ground_y
-					for _ = 1,7 do
-						local vi = area:index(x, y, z)
-						if data[vi] == c_papyrus then
-							data[vi] = c_snow_block
-							y = y-1
-						else
-							break
-						end
 					end
 				elseif c_ground == c_water then
 					if not icesheet
@@ -308,9 +289,55 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end
 						if icesheet then
 							-- put snow onto icesheets
-							snow_tab[num] = {abovenode, z, x, test}
+							snow_tab[num] = {ground_y, z, x, test}
 							num = num+1
 						end
+					end
+				elseif c_ground == c_leaves
+				or c_ground == c_jungleleaves
+				or c_ground == c_apple then
+					if alpine then
+						snow_tab[num] = {ground_y, z, x, test}
+						num = num+1
+						-- make stone pillars out of trees
+						for y = ground_y, math.max(-6, minp.y-6), -1 do
+							local stone = area:index(x, y, z)
+							if data[stone] == c_stone then
+								break
+							end
+							data[stone] = c_stone
+						end
+					else
+						-- put snow onto leaves
+						snow_tab[num] = {ground_y, z, x, test}
+						num = num+1
+					end
+				elseif c_ground == c_sand then
+					if icy then
+						data[node] = c_ice
+					end
+					snow_tab[num] = {ground_y, z, x, test}
+					num = num+1
+				elseif c_ground == c_papyrus then
+					snow_tab[num] = {ground_y, z, x, test}
+					num = num+1
+					-- replace papyrus plants with snowblocks
+					local y = ground_y
+					for _ = 1,7 do
+						local vi = area:index(x, y, z)
+						if data[vi] == c_papyrus then
+							data[vi] = c_snow_block
+							y = y-1
+						else
+							break
+						end
+					end
+				elseif is_plantlike(c_ground) then
+					local vi = area:index(x, ground_y-1, z)
+					if data[vi] == c_dirt_with_grass then
+						-- replace other plants with dry shrubs
+						data[vi] = c_dirt_with_snow
+						data[node] = c_dry_shrub
 					end
 				end
 			end
@@ -321,11 +348,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	local param2s
 	if num ~= 1 then
+		for _,i in pairs(snow_tab) do
+			-- set snow
+			data[area:index(i[3], i[1]+1, i[2])] = c_snow
+		end
 		local wsz, wsx
 		for _,i in pairs(snow_tab) do
-			local p,z,x,test = unpack(i)
-			-- snow is set
-			data[p] = c_snow
+			local y,z,x,test = unpack(i)
 			test = (test-0.73)/0.27 -- /(1-0.73)
 			if test > 0 then
 				local maxh = math.floor(test*10)%10+1
@@ -336,20 +365,35 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					end
 					local h = math.floor(wsx[x]+wsz[z]*5)%10+1
 					if h ~= 1 then
-						if h == 10 then
-							-- make snowdrifts walkable
-							h = 5
-						end
-						h = math.min(maxh, h)
-						if h == 9 then
-							-- replace the snow with a snowblock because its a full node
-							data[p] = c_snow_block
-						else
-							-- set a specific snow height
-							if not param2s then
-								param2s = vm:get_param2_data()
+						-- search for nearby snow
+						y = y+1
+						for i = -1,1,2 do
+							for _,cord in pairs({{x+i,z}, {x,z+i}}) do
+								local nd = data[area:index(cord[1], y, cord[2])]
+								if nd == c_air
+								or nd == c_dry_shrub then
+									h = h/2
+								end
 							end
-							param2s[p] = h*7
+						end
+						h = math.floor(h+0.5)
+						if h > 1 then
+							-- make snowdrifts walkable
+							if h == 10 then
+								h = 5
+							end
+							h = math.min(maxh, h)
+							local vi = area:index(x, y, z)
+							if h == 9 then
+								-- replace the snow with a snowblock because its a full node
+								data[vi] = c_snow_block
+							else
+								-- set a specific snow height
+								if not param2s then
+									param2s = vm:get_param2_data()
+								end
+								param2s[vi] = h*7
+							end
 						end
 					end
 				end
