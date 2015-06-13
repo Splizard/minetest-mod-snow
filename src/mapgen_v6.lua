@@ -78,7 +78,7 @@ local function is_plantlike(id)
 	return true
 end
 
-local c
+local c, known_plants
 local function define_contents()
 	c = {
 		dirt_with_grass = minetest.get_content_id("default:dirt_with_grass"),
@@ -100,6 +100,7 @@ local function define_contents()
 		papyrus = minetest.get_content_id("default:papyrus"),
 		sand = minetest.get_content_id("default:sand"),
 	}
+	known_plants = snow.known_plants or {}
 end
 
 minetest.register_on_generated(function(minp, maxp, seed)
@@ -343,7 +344,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					if data[vi] == c.dirt_with_grass then
 						-- replace other plants with dry shrubs
 						data[vi] = c.dirt_with_snow
-						data[node] = c.dry_shrub
+						data[node] = known_plants[c_ground] or c.dry_shrub
 					end
 				end
 			end
@@ -361,7 +362,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local wsz, wsx
 		for _,i in pairs(snow_tab) do
 			local y,z,x,test = unpack(i)
-			test = (test-0.73)/0.27 -- /(1-0.73)
+			test = (test-0.53)/0.47 -- /(1-0.53)
 			if test > 0 then
 				local maxh = math.floor(test*10)%10+1
 				if maxh ~= 1 then
@@ -377,7 +378,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							for _,cord in pairs({{x+i,z}, {x,z+i}}) do
 								local nd = data[area:index(cord[1], y, cord[2])]
 								if nd == c.air
-								or nd == c.dry_shrub then
+								or is_plantlike(nd) then
 									h = h/2
 								end
 							end
