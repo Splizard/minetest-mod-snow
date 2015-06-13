@@ -78,8 +78,29 @@ local function is_plantlike(id)
 	return true
 end
 
-
--- On generated function
+local c
+local function define_contents()
+	c = {
+		dirt_with_grass = minetest.get_content_id("default:dirt_with_grass"),
+		dirt = minetest.get_content_id("default:dirt"),
+		tree = minetest.get_content_id("default:tree"),
+		apple = minetest.get_content_id("default:apple"),
+		snow = minetest.get_content_id("default:snow"),
+		snow_block = minetest.get_content_id("default:snowblock"),
+		dirt_with_snow = minetest.get_content_id("default:dirt_with_snow"),
+		air = minetest.get_content_id("air"),
+		ignore = minetest.get_content_id("ignore"),
+		stone = minetest.get_content_id("default:stone"),
+		dry_shrub = minetest.get_content_id("default:dry_shrub"),
+		leaves = minetest.get_content_id("default:leaves"),
+		jungleleaves = minetest.get_content_id("default:jungleleaves"),
+		junglegrass = minetest.get_content_id("default:junglegrass"),
+		ice = minetest.get_content_id("default:ice"),
+		water = minetest.get_content_id("default:water_source"),
+		papyrus = minetest.get_content_id("default:papyrus"),
+		sand = minetest.get_content_id("default:sand"),
+	}
+end
 
 minetest.register_on_generated(function(minp, maxp, seed)
 	local t1 = os.clock()
@@ -92,24 +113,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local spawn_pine = snow.voxelmanip_pine
 	local smooth = snow.smooth_biomes
 
-	local c_dirt_with_grass = minetest.get_content_id("default:dirt_with_grass")
-	local c_dirt = minetest.get_content_id("default:dirt")
-	local c_tree = minetest.get_content_id("default:tree")
-	local c_apple = minetest.get_content_id("default:apple")
-	local c_snow = minetest.get_content_id("default:snow")
-	local c_snow_block = minetest.get_content_id("default:snowblock")
-	local c_dirt_with_snow = minetest.get_content_id("default:dirt_with_snow")
-	local c_air = minetest.get_content_id("air")
-	local c_ignore = minetest.get_content_id("ignore")
-	local c_stone = minetest.get_content_id("default:stone")
-	local c_dry_shrub = minetest.get_content_id("default:dry_shrub")
-	local c_leaves = minetest.get_content_id("default:leaves")
-	local c_jungleleaves = minetest.get_content_id("default:jungleleaves")
-	local c_junglegrass = minetest.get_content_id("default:junglegrass")
-	local c_ice = minetest.get_content_id("default:ice")
-	local c_water = minetest.get_content_id("default:water_source")
-	local c_papyrus = minetest.get_content_id("default:papyrus")
-	local c_sand = minetest.get_content_id("default:sand")
+	if not c then
+		define_contents()
+	end
 
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
 	local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
@@ -157,8 +163,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local ground_y = nil
 				for y = maxp.y, minp.y, -1 do
 					local nodid = data[area:index(x, y, z)]
-					if nodid ~= c_air
-					and nodid ~= c_ignore then
+					if nodid ~= c.air
+					and nodid ~= c.ignore then
 						ground_y = y
 						break
 					end
@@ -166,17 +172,17 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 				if ground_y then
 					local vi = area:index(x, ground_y, z)
-					if data[vi] == c_leaves
-					or data[vi] == c_jungleleaves then
+					if data[vi] == c.leaves
+					or data[vi] == c.jungleleaves then
 						for y = ground_y, -16, -1 do
 							local vi = area:index(x, y, z)
 							local id = data[vi]
-							if id ~= c_air then
-								if id == c_leaves
-								or id == c_jungleleaves
-								or id == c_tree
-								or id == c_apple then
-									data[vi] = c_air
+							if id ~= c.air then
+								if id == c.leaves
+								or id == c.jungleleaves
+								or id == c.tree
+								or id == c.apple then
+									data[vi] = c.air
 								else
 									break
 								end
@@ -197,7 +203,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local ground_y
 			for y = maxp.y, minp.y, -1 do
 				local nodid = data[area:index(x, y, z)]
-				if nodid ~= c_air and nodid ~= c_ignore then
+				if nodid ~= c.air and nodid ~= c.ignore then
 					ground_y = y
 					break
 				end
@@ -207,7 +213,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local node = area:index(x, ground_y, z)
 				local c_ground = data[node]
 
-				if c_ground == c_dirt_with_grass then
+				if c_ground == c.dirt_with_grass then
 					if alpine
 					and test > 0.53 then
 						snow_tab[num] = {ground_y, z, x, test}
@@ -215,25 +221,25 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						-- generate stone ground
 						for y = ground_y, math.max(-6, minp.y-6), -1 do
 							local vi = area:index(x, y, z)
-							if data[vi] == c_stone then
+							if data[vi] == c.stone then
 								break
 							end
-							data[vi] = c_stone
+							data[vi] = c.stone
 						end
 					elseif shrubs
 					and pr:next(1,28) == 1 then
-						data[node] = c_dirt_with_snow
-						data[area:index(x, ground_y+1, z)] = c_dry_shrub
+						data[node] = c.dirt_with_snow
+						data[area:index(x, ground_y+1, z)] = c.dry_shrub
 					elseif pines
 					and pr:next(1,36) == 1 then
-						data[node] = c_dirt_with_snow
+						data[node] = c.dirt_with_snow
 						spawn_pine({x=x, y=ground_y+1, z=z}, area, data)
 					else
-						data[node] = c_dirt_with_snow
+						data[node] = c.dirt_with_snow
 						snow_tab[num] = {ground_y, z, x, test}
 						num = num+1
 					end
-				elseif c_ground == c_water then
+				elseif c_ground == c.water then
 					if not icesheet
 					and not icecave
 					and not icehole then
@@ -249,7 +255,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						if pr:next(1,4) == 1
 						and (cool or icebergs) then
 							for _,i in ipairs(nds) do
-								if i == c_ice then
+								if i == c.ice then
 									ice = true
 									break
 								end
@@ -257,10 +263,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end
 						if not ice then
 							for _,i in ipairs(nds) do
-								if i ~= c_water
-								and i ~= c_ice
-								and i ~= c_air
-								and i ~= c_ignore then
+								if i ~= c.water
+								and i ~= c.ice
+								and i ~= c.air
+								and i ~= c.ignore then
 									ice = true
 									break
 								end
@@ -268,23 +274,23 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end
 						local y = data[area:index(x, ground_y-1, z)]
 						if ice
-						or (y ~= c_water and y ~= c_ice) -- and y ~= "air") …I don't think y can be a string here ~HybridDog
+						or (y ~= c.water and y ~= c.ice) -- and y ~= "air") …I don't think y can be a string here ~HybridDog
 						or (icebergs and pr:next(1,6) == 1) then
-							data[node] = c_ice
+							data[node] = c.ice
 						end
 					else
 						if icesheet
 						or icecave
 						or (icehole and pr:next(1,10) > 1) then
-							data[node] = c_ice
+							data[node] = c.ice
 						end
 						if icecave then
 							for y = ground_y-1, -33, -1 do
 								local vi = area:index(x, y, z)
-								if data[vi] ~= c_water then
+								if data[vi] ~= c.water then
 									break
 								end
-								data[vi] = c_air
+								data[vi] = c.air
 							end
 						end
 						if icesheet then
@@ -293,40 +299,40 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							num = num+1
 						end
 					end
-				elseif c_ground == c_leaves
-				or c_ground == c_jungleleaves
-				or c_ground == c_apple then
+				elseif c_ground == c.leaves
+				or c_ground == c.jungleleaves
+				or c_ground == c.apple then
 					if alpine then
 						snow_tab[num] = {ground_y, z, x, test}
 						num = num+1
 						-- make stone pillars out of trees
 						for y = ground_y, math.max(-6, minp.y-6), -1 do
 							local stone = area:index(x, y, z)
-							if data[stone] == c_stone then
+							if data[stone] == c.stone then
 								break
 							end
-							data[stone] = c_stone
+							data[stone] = c.stone
 						end
 					else
 						-- put snow onto leaves
 						snow_tab[num] = {ground_y, z, x, test}
 						num = num+1
 					end
-				elseif c_ground == c_sand then
+				elseif c_ground == c.sand then
 					if icy then
-						data[node] = c_ice
+						data[node] = c.ice
 					end
 					snow_tab[num] = {ground_y, z, x, test}
 					num = num+1
-				elseif c_ground == c_papyrus then
+				elseif c_ground == c.papyrus then
 					snow_tab[num] = {ground_y, z, x, test}
 					num = num+1
 					-- replace papyrus plants with snowblocks
 					local y = ground_y
 					for _ = 1,7 do
 						local vi = area:index(x, y, z)
-						if data[vi] == c_papyrus then
-							data[vi] = c_snow_block
+						if data[vi] == c.papyrus then
+							data[vi] = c.snow_block
 							y = y-1
 						else
 							break
@@ -334,10 +340,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					end
 				elseif is_plantlike(c_ground) then
 					local vi = area:index(x, ground_y-1, z)
-					if data[vi] == c_dirt_with_grass then
+					if data[vi] == c.dirt_with_grass then
 						-- replace other plants with dry shrubs
-						data[vi] = c_dirt_with_snow
-						data[node] = c_dry_shrub
+						data[vi] = c.dirt_with_snow
+						data[node] = c.dry_shrub
 					end
 				end
 			end
@@ -350,7 +356,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	if num ~= 1 then
 		for _,i in pairs(snow_tab) do
 			-- set snow
-			data[area:index(i[3], i[1]+1, i[2])] = c_snow
+			data[area:index(i[3], i[1]+1, i[2])] = c.snow
 		end
 		local wsz, wsx
 		for _,i in pairs(snow_tab) do
@@ -370,8 +376,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						for i = -1,1,2 do
 							for _,cord in pairs({{x+i,z}, {x,z+i}}) do
 								local nd = data[area:index(cord[1], y, cord[2])]
-								if nd == c_air
-								or nd == c_dry_shrub then
+								if nd == c.air
+								or nd == c.dry_shrub then
 									h = h/2
 								end
 							end
@@ -386,7 +392,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							local vi = area:index(x, y, z)
 							if h == 9 then
 								-- replace the snow with a snowblock because its a full node
-								data[vi] = c_snow_block
+								data[vi] = c.snow_block
 							else
 								-- set a specific snow height
 								if not param2s then
