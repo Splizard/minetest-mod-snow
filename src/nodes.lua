@@ -141,6 +141,8 @@ minetest.register_node("snow:star_lit", nodedef)
 
 
 
+-- Plants
+
 -- Moss
 minetest.register_node("snow:moss", {
 	description = "Moss",
@@ -156,6 +158,28 @@ minetest.register_node("snow:moss", {
 	is_ground_content = true,
 	groups = {crumbly=3, attached_node=1},
 })
+
+-- Shrub
+minetest.register_node("snow:shrub", {
+	description = "Snow Shrub",
+	tiles = {"snow_shrub.png"},
+	inventory_image = "snow_shrub.png",
+	wield_image = "snow_shrub.png",
+	drawtype = "plantlike",
+	paramtype = "light",
+	waving = 1,
+	sunlight_propagates = true,
+	walkable = false,
+	is_ground_content = true,
+	buildable_to = true,
+	groups = {snappy=3,flammable=3,attached_node=1},
+	sounds = default.node_sound_leaves_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.3, -0.5, -0.3, 0.3, -5/16, 0.3},
+	},
+})
+
 
 
 if rawget(_G, "flowers") then

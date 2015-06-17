@@ -92,6 +92,7 @@ local function define_contents()
 		ignore = minetest.get_content_id("ignore"),
 		stone = minetest.get_content_id("default:stone"),
 		dry_shrub = minetest.get_content_id("default:dry_shrub"),
+		snow_shrub = minetest.get_content_id("snow:shrub"),
 		leaves = minetest.get_content_id("default:leaves"),
 		jungleleaves = minetest.get_content_id("default:jungleleaves"),
 		junglegrass = minetest.get_content_id("default:junglegrass"),
@@ -227,14 +228,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 							data[vi] = c.stone
 						end
-					elseif shrubs
-					and pr:next(1,28) == 1 then
-						data[node] = c.dirt_with_snow
-						data[area:index(x, ground_y+1, z)] = c.dry_shrub
 					elseif pines
 					and pr:next(1,36) == 1 then
 						data[node] = c.dirt_with_snow
 						spawn_pine({x=x, y=ground_y+1, z=z}, area, data)
+					elseif shrubs
+					and pr:next(1,928) == 1 then
+						data[node] = c.dirt_with_snow
+						data[area:index(x, ground_y+1, z)] = c.dry_shrub
 					else
 						data[node] = c.dirt_with_snow
 						snow_tab[num] = {ground_y, z, x, test}
@@ -304,8 +305,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				or c_ground == c.jungleleaves
 				or c_ground == c.apple then
 					if alpine then
-						snow_tab[num] = {ground_y, z, x, test}
-						num = num+1
 						-- make stone pillars out of trees
 						for y = ground_y, math.max(-6, minp.y-6), -1 do
 							local stone = area:index(x, y, z)
@@ -314,11 +313,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 							data[stone] = c.stone
 						end
-					else
-						-- put snow onto leaves
-						snow_tab[num] = {ground_y, z, x, test}
-						num = num+1
 					end
+					-- put snow onto it
+					snow_tab[num] = {ground_y, z, x, test}
+					num = num+1
 				elseif c_ground == c.sand then
 					if icy then
 						data[node] = c.ice
@@ -342,9 +340,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				elseif is_plantlike(c_ground) then
 					local vi = area:index(x, ground_y-1, z)
 					if data[vi] == c.dirt_with_grass then
-						-- replace other plants with dry shrubs
+						-- replace other plants with shrubs
 						data[vi] = c.dirt_with_snow
-						data[node] = known_plants[c_ground] or c.dry_shrub
+						data[node] = known_plants[c_ground] or c.snow_shrub
 					end
 				end
 			end
