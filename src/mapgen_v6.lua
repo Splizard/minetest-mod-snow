@@ -355,9 +355,21 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	local param2s
 	if num ~= 1 then
-		for _,i in pairs(snow_tab) do
-			-- set snow
-			data[area:index(i[3], i[1]+1, i[2])] = c.snow
+		local unwanteds,u = {},1
+		for n,i in pairs(snow_tab) do
+			local p = area:index(i[3], i[1]+1, i[2])
+			if data[p] == c.air then
+				-- set snow
+				data[p] = c.snow
+			else
+				unwanteds[u] = n
+				u = u+1
+			end
+		end
+		if u ~= 1 then
+			for _,n in pairs(unwanteds) do
+				snow_tab[n] = nil
+			end
 		end
 		local wsz, wsx
 		for _,i in pairs(snow_tab) do
