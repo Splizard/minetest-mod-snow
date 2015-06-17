@@ -92,7 +92,7 @@ local function define_contents()
 		ignore = minetest.get_content_id("ignore"),
 		stone = minetest.get_content_id("default:stone"),
 		dry_shrub = minetest.get_content_id("default:dry_shrub"),
-		snow_shrub = minetest.get_content_id("snow:shrub"),
+		snow_shrub = minetest.get_content_id("snow:shrub_covered"),
 		leaves = minetest.get_content_id("default:leaves"),
 		jungleleaves = minetest.get_content_id("default:jungleleaves"),
 		junglegrass = minetest.get_content_id("default:junglegrass"),
@@ -122,6 +122,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
 	local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
 	local data = vm:get_data()
+	local param2s = vm:get_param2_data()
 
 	local snow_tab,num = {},1
 
@@ -343,6 +344,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						-- replace other plants with shrubs
 						data[vi] = c.dirt_with_snow
 						data[node] = known_plants[c_ground] or c.snow_shrub
+						param2s[node] = pr:next(0,179)
 					end
 				end
 			end
@@ -351,7 +353,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	end
 
-	local param2s
 	if num ~= 1 then
 		for _,i in pairs(snow_tab) do
 			-- set snow
@@ -394,9 +395,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								data[vi] = c.snow_block
 							else
 								-- set a specific snow height
-								if not param2s then
-									param2s = vm:get_param2_data()
-								end
 								param2s[vi] = h*7
 							end
 						end
@@ -407,9 +405,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	vm:set_data(data)
-	if param2s then
-		vm:set_param2_data(param2s)
-	end
+	vm:set_param2_data(param2s)
 	vm:set_lighting({day=0, night=0})
 	vm:calc_lighting()
 	vm:write_to_map()

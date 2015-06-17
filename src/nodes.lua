@@ -159,8 +159,8 @@ minetest.register_node("snow:moss", {
 	groups = {crumbly=3, attached_node=1},
 })
 
--- Shrub
-minetest.register_node("snow:shrub", {
+-- Shrub(s)
+nodedef = {
 	description = "Snow Shrub",
 	tiles = {"snow_shrub.png"},
 	inventory_image = "snow_shrub.png",
@@ -178,7 +178,14 @@ minetest.register_node("snow:shrub", {
 		type = "fixed",
 		fixed = {-0.3, -0.5, -0.3, 0.3, -5/16, 0.3},
 	},
-})
+}
+minetest.register_node("snow:shrub", table.copy(nodedef))
+
+nodedef.tiles = {"snow_shrub.png^snow_shrub_covering.png"}
+nodedef.inventory_image = "snow_shrub.png^snow_shrub_covering.png"
+nodedef.wield_image = "snow_shrub.png^snow_shrub_covering.png"
+nodedef.drop = "snow:shrub"
+minetest.register_node("snow:shrub_covered", nodedef)
 
 
 
