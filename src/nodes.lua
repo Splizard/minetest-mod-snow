@@ -231,8 +231,25 @@ nodedef.groups.flammable = 1
 minetest.register_node("snow:leaves", nodedef)
 snow.known_plants[minetest.get_content_id("default:leaves")] = minetest.get_content_id("snow:leaves")
 
+local apple = minetest.registered_nodes["default:apple"]
+nodedef = {
+	description = "Snow Apple",
+	drawtype = "plantlike",
+	tiles = {"snow_apple.png"},
+	paramtype = "light",
+	walkable = false,
+	sunlight_propagates = apple.sunlight_propagates,
+	selection_box = apple.selection_box,
+	groups = apple.groups,
+	sounds = apple.sounds,
+	drop = apple.drop,
+}
+nodedef.groups.flammable = 1
+
+minetest.register_node("snow:apple", nodedef)
+snow.known_plants[minetest.get_content_id("default:apple")] = minetest.get_content_id("snow:apple")
+
 -- TODO
-snow.known_plants[minetest.get_content_id("default:apple")] = minetest.get_content_id("default:apple")
 snow.known_plants[minetest.get_content_id("default:jungleleaves")] = minetest.get_content_id("default:jungleleaves")
 
 

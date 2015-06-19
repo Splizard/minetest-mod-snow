@@ -117,6 +117,7 @@ local function define_contents()
 		water = minetest.get_content_id("default:water_source"),
 		papyrus = minetest.get_content_id("default:papyrus"),
 		sand = minetest.get_content_id("default:sand"),
+		desert_sand = minetest.get_content_id("default:desert_sand"),
 	}
 	replacements = snow.known_plants or {}
 end
@@ -167,8 +168,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	for z = z0, z1 do
 	for x = x0, x1 do
 	        local in_biome = false
-	        local test = nvals_default[ni]
-	        if test < 0.35 then
+	        local test
+	        if nvals_default[ni] < 0.35 then
 			if not nvals_cold then
 				nvals_cold = minetest.get_perlin_map(np_cold, chulens):get2dMap_flat({x=x0, y=z0})
 			end
@@ -184,7 +185,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 
 		if not in_biome then
-			if alpine and test > 0.43 then
+			if alpine
+			and test
+			and test > 0.43 then
 				-- remove trees near alpine
 				local ground_y = nil
 				for y = maxp.y, minp.y, -1 do
@@ -264,7 +267,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						data[node] = c.dirt_with_snow
 						data[area:index(x, ground_y+1, z)] = c.dry_shrub
 					else
-						data[node] = c.dirt_with_snow
+						if snowy
+						or test > 0.8 then
+							-- more, deeper snow
+							data[node] = c.snow_block
+						else
+							data[node] = c.dirt_with_snow
+						end
 						snow_tab[num] = {ground_y, z, x, test}
 						num = num+1
 					end
@@ -360,7 +369,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					-- put snow onto it
 					snow_tab[num] = {ground_y, z, x, test}
 					num = num+1
-				else
+				elseif c_ground ~= c.desert_sand then
 					if is_snowable(c_ground) then
 						-- put snow onto it
 						snow_tab[num] = {ground_y, z, x, test}
