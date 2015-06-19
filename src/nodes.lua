@@ -190,8 +190,7 @@ nodedef.drop = "snow:shrub"
 nodedef.furnace_burntime = 3
 minetest.register_node("snow:shrub_covered", nodedef)
 
-
-
+-- Flowers
 if rawget(_G, "flowers") then
 	-- broken flowers
 	snow.known_plants = {}
@@ -213,6 +212,28 @@ if rawget(_G, "flowers") then
 		snow.known_plants[minetest.get_content_id(flowername)] = minetest.get_content_id(newname)
 	end
 end
+
+-- Leaves
+local leaves = minetest.registered_nodes["default:leaves"]
+nodedef = {
+	description = "Snow Leaves",
+	tiles = {"snow_leaves.png"},
+	waving = 1,
+	visual_scale = leaves.visual_scale,
+	drawtype = leaves.drawtype,
+	paramtype = leaves.paramtype,
+	groups = leaves.groups,
+	drop = leaves.drop,
+	sounds = leaves.sounds,
+}
+nodedef.groups.flammable = 1
+
+minetest.register_node("snow:leaves", nodedef)
+snow.known_plants[minetest.get_content_id("default:leaves")] = minetest.get_content_id("snow:leaves")
+
+-- TODO
+snow.known_plants[minetest.get_content_id("default:apple")] = minetest.get_content_id("default:apple")
+snow.known_plants[minetest.get_content_id("default:jungleleaves")] = minetest.get_content_id("default:jungleleaves")
 
 
 

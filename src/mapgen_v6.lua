@@ -1,3 +1,14 @@
+-- https://github.com/paramat/meru/blob/master/init.lua#L52
+-- Parameters must match mgv6 biome noise
+local np_default = {
+	offset = 0,
+	scale = 1,
+	spread = {x=250, y=250, z=250},
+	seed = 9130,
+	octaves = 3,
+	persist = 0.5
+}
+
 -- 2D noise for coldness
 
 local np_cold = {
@@ -62,7 +73,29 @@ local function is_plantlike(id)
 	return true
 end
 
-local c, known_plants
+local snowable_ids = {}
+local function is_snowable(id)
+	if snowable_ids[id] ~= nil then
+		return snowable_ids[id]
+	end
+	local node = minetest.registered_nodes[minetest.get_name_from_content_id(id)]
+	if not node then
+		snowable_ids[id] = false
+		return false
+	end
+	local drawtype = node.drawtype
+	if drawtype
+	and drawtype ~= "normal"
+	and drawtype ~= "allfaces_optional"
+	and drawtype ~= "glasslike" then
+		snowable_ids[id] = false
+		return false
+	end
+	snowable_ids[id] = true
+	return true
+end
+
+local c, replacements
 local function define_contents()
 	c = {
 		dirt_with_grass = minetest.get_content_id("default:dirt_with_grass"),
@@ -85,7 +118,7 @@ local function define_contents()
 		papyrus = minetest.get_content_id("default:papyrus"),
 		sand = minetest.get_content_id("default:sand"),
 	}
-	known_plants = snow.known_plants or {}
+	replacements = snow.known_plants or {}
 end
 
 minetest.register_on_generated(function(minp, maxp, seed)
@@ -112,8 +145,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	local sidelen = x1 - x0 + 1
 	local chulens = {x=sidelen, y=sidelen, z=sidelen}
-	local nvals_cold = minetest.get_perlin_map(np_cold, chulens):get2dMap_flat({x=x0, y=z0})
-	local nvals_ice = minetest.get_perlin_map(np_ice, chulens):get2dMap_flat({x=x0, y=z0})
+	local nvals_default = minetest.get_perlin_map(np_default, chulens):get2dMap_flat({x=x0+150, y=z0+50})
+	local nvals_cold, nvals_ice
 
 	-- Choose biomes
 	local pr = PseudoRandom(seed+57)
@@ -134,15 +167,21 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	for z = z0, z1 do
 	for x = x0, x1 do
 	        local in_biome = false
-	        local test = math.min(nvals_cold[ni], 1)
-	        if smooth
-		and not snowy then
-			if (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
+	        local test = nvals_default[ni]
+	        if test < 0.35 then
+			if not nvals_cold then
+				nvals_cold = minetest.get_perlin_map(np_cold, chulens):get2dMap_flat({x=x0, y=z0})
+			end
+			test = math.min(nvals_cold[ni], 1)
+			if smooth
+			and not snowy then
+				if (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
+					in_biome = true
+				end
+			elseif test > 0.53 then
 				in_biome = true
 			end
-	        elseif test > 0.53 then
-			in_biome = true
-	        end
+		end
 
 		if not in_biome then
 			if alpine and test > 0.43 then
@@ -180,6 +219,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 		else
 			write_to_map = true
+			if not nvals_ice then
+				nvals_ice = minetest.get_perlin_map(np_ice, chulens):get2dMap_flat({x=x0, y=z0})
+			end
 	        	local icetype = nvals_ice[ni]
 			local cool = icetype > 0 -- only spawns ice on edge of water
 			local icebergs = icetype > -0.2 and icetype <= 0
@@ -286,22 +328,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							num = num+1
 						end
 					end
-				elseif c_ground == c.leaves
-				or c_ground == c.jungleleaves
-				or c_ground == c.apple then
-					if alpine then
-						-- make stone pillars out of trees
-						for y = ground_y, math.max(-6, minp.y-6), -1 do
-							local stone = area:index(x, y, z)
-							if data[stone] == c.stone then
-								break
-							end
-							data[stone] = c.stone
-						end
-					end
-					-- put snow onto it
-					snow_tab[num] = {ground_y, z, x, test}
-					num = num+1
 				elseif c_ground == c.sand then
 					if icy then
 						data[node] = c.ice
@@ -322,13 +348,49 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							break
 						end
 					end
-				elseif is_plantlike(c_ground) then
-					local vi = area:index(x, ground_y-1, z)
-					if data[vi] == c.dirt_with_grass then
-						-- replace other plants with shrubs
-						data[vi] = c.dirt_with_snow
-						data[node] = known_plants[c_ground] or c.snow_shrub
-						param2s[node] = pr:next(0,179)
+				elseif alpine then
+					-- make stone pillars out of trees and other stuff
+					for y = ground_y, math.max(-6, minp.y-6), -1 do
+						local stone = area:index(x, y, z)
+						if data[stone] == c.stone then
+							break
+						end
+						data[stone] = c.stone
+					end
+					-- put snow onto it
+					snow_tab[num] = {ground_y, z, x, test}
+					num = num+1
+				else
+					if is_snowable(c_ground) then
+						-- put snow onto it
+						snow_tab[num] = {ground_y, z, x, test}
+						num = num+1
+					end
+					for y = 0, 12 do
+						y = ground_y-y
+						local vi = area:index(x, y, z)
+						local nd = data[vi]
+						local plantlike = is_plantlike(nd)
+						if replacements[nd] then
+							data[vi] = replacements[nd]
+							if plantlike then
+								param2s[vi] = pr:next(0,179)
+							end
+						elseif nd == c.dirt_with_grass then
+							data[vi] = c.dirt_with_snow
+							break
+						elseif plantlike then
+							local under = area:index(x, y-1, z)
+							if data[under] == c.dirt_with_grass then
+								-- replace other plants with shrubs
+								data[vi] = c.snow_shrub
+								param2s[vi] = pr:next(0,179)
+								data[under] = c.dirt_with_snow
+								break
+							end
+						elseif nd == c.stone then
+							break
+						end
 					end
 				end
 			end
