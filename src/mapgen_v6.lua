@@ -96,7 +96,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local x1 = maxp.x
 	local z1 = maxp.z
 
-	local spawn_pine = snow.voxelmanip_pine
 	local smooth = snow.smooth_biomes
 
 	if not c then
@@ -109,6 +108,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local param2s = vm:get_param2_data()
 
 	local snow_tab,num = {},1
+	local pines_tab,pnum = {},1
 
 	local sidelen = x1 - x0 + 1
 	local chulens = {x=sidelen, y=sidelen, z=sidelen}
@@ -215,8 +215,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end
 					elseif pines
 					and pr:next(1,36) == 1 then
-						data[node] = c.dirt_with_snow
-						spawn_pine({x=x, y=ground_y+1, z=z}, area, data)
+						pines_tab[pnum] = {x=x, y=ground_y+1, z=z}
+						pnum = pnum+1
 					elseif shrubs
 					and pr:next(1,928) == 1 then
 						data[node] = c.dirt_with_snow
@@ -381,6 +381,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					end
 				end
 			end
+		end
+	end
+
+	-- spawn pines
+	if pines
+	and pnum ~= 1 then
+		local spawn_pine = snow.voxelmanip_pine
+		for _,pos in pairs(pines_tab) do
+			spawn_pine(pos, area, data)
 		end
 	end
 
