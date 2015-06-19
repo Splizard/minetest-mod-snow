@@ -36,25 +36,9 @@ local function do_ws_func(a, x)
 	local n = x/(16000)
 	local y = 0
 	for k=1,1000 do
-		y = y + 1000*(math.sin(math.pi * k^a * n)/(math.pi * k^a))
+		y = y + 1000*math.sin(math.pi * k^a * n)/(math.pi * k^a)
 	end
 	return y
-end
-
-local ws_lists = {}
-local function get_ws_list(a,x)
-        ws_lists[a] = ws_lists[a] or {}
-        local v = ws_lists[a][x]
-        if v then
-                return v
-        end
-        v = {}
-        for x=x,x + (80 - 1) do
-		local y = do_ws_func(a, x)
-                v[x] = y
-        end
-        ws_lists[a][x] = v
-        return v
 end
 
 
@@ -365,11 +349,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			if test > 0 then
 				local maxh = math.floor(test*10)%10+1
 				if maxh ~= 1 then
-					if not wsz then
-						wsz = get_ws_list(5, z0)
-						wsx = get_ws_list(2, x0)
-					end
-					local h = math.floor(wsx[x]+wsz[z]*5)%10+1
+					local h = math.floor( do_ws_func(2, x) + do_ws_func(5, z)*5)%10+1
 					if h ~= 1 then
 						-- search for nearby snow
 						y = y+1
