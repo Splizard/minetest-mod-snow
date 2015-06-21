@@ -14,7 +14,6 @@ local np_default = {
 local np_cold = {
 	offset = 0,
 	scale = 1,
-	spread = {x=150, y=150, z=150},
 	seed = 112,
 	octaves = 3,
 	persist = 0.5
@@ -122,6 +121,27 @@ local function define_contents()
 	replacements = snow.known_plants or {}
 end
 
+-- perlin noise "hills" are not peaks but looking like sinus curve
+local function upper_rarity(rarity)
+	return math.sign(rarity)*math.sin(math.abs(rarity)*math.pi/2)
+end
+
+local rarity = 18 --snow.mapgen_rarity
+local size = 210 --snow.mapgen_size
+
+local nosmooth_rarity = 1-rarity/50
+local perlin_scale = size*100/rarity
+np_cold.spread = {x=perlin_scale, y=perlin_scale, z=perlin_scale}
+local smooth_rarity_max, smooth_rarity_min, smooth_rarity_dif
+local smooth = snow.smooth_biomes
+if smooth then
+	local smooth_trans_size = 4 --snow.smooth_trans_size
+	smooth_rarity_max = upper_rarity(nosmooth_rarity+smooth_trans_size*2/perlin_scale)
+	smooth_rarity_min = upper_rarity(nosmooth_rarity-smooth_trans_size/perlin_scale)
+	smooth_rarity_dif = smooth_rarity_max-smooth_rarity_min
+end
+nosmooth_rarity = upper_rarity(nosmooth_rarity)
+
 minetest.register_on_generated(function(minp, maxp, seed)
 	local t1 = os.clock()
 
@@ -129,8 +149,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local z0 = minp.z
 	local x1 = maxp.x
 	local z1 = maxp.z
-
-	local smooth = snow.smooth_biomes
 
 	if not c then
 		define_contents()
@@ -163,23 +181,27 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	pr = PseudoRandom(seed+68)
 
 	-- Loop through columns in chunk
+	local smooth = smooth and not snowy
 	local write_to_map = false
 	local ni = 1
 	for z = z0, z1 do
 	for x = x0, x1 do
-	        local in_biome = false
-	        local test
-	        if nvals_default[ni] < 0.35 then
+		local in_biome = false
+		local test
+		if nvals_default[ni] < 0.35 then
 			if not nvals_cold then
 				nvals_cold = minetest.get_perlin_map(np_cold, chulens):get2dMap_flat({x=x0, y=z0})
 			end
 			test = math.min(nvals_cold[ni], 1)
-			if smooth
-			and not snowy then
-				if (test > 0.73 or (test > 0.43 and pr:next(0,29) > (0.73 - test) * 100 )) then
+			if smooth then
+				if test >= smooth_rarity_max
+				or (
+					test > smooth_rarity_min
+					and pr:next(1, 1000) <= ((test-smooth_rarity_min)/smooth_rarity_dif)*1000
+				) then
 					in_biome = true
 				end
-			elseif test > 0.53 then
+			elseif test > nosmooth_rarity then
 				in_biome = true
 			end
 		end
@@ -187,7 +209,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		if not in_biome then
 			if alpine
 			and test
-			and test > 0.43 then
+			and test > smooth_rarity_min then
 				-- remove trees near alpine
 				local ground_y = nil
 				for y = maxp.y, minp.y, -1 do
@@ -235,7 +257,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local ground_y
 			for y = maxp.y, minp.y, -1 do
 				local nodid = data[area:index(x, y, z)]
-				if nodid ~= c.air and nodid ~= c.ignore then
+				if nodid ~= c.air then
 					ground_y = y
 					break
 				end
@@ -247,7 +269,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 				if c_ground == c.dirt_with_grass then
 					if alpine
-					and test > 0.53 then
+					and test > nosmooth_rarity then
 						snow_tab[num] = {ground_y, z, x, test}
 						num = num+1
 						-- generate stone ground
@@ -268,7 +290,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						data[area:index(x, ground_y+1, z)] = c.dry_shrub
 					else
 						if snowy
-						or test > 0.8 then
+						or test > smooth_rarity_max then
 							-- more, deeper snow
 							data[node] = c.snow_block
 						else
@@ -416,7 +438,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local wsz, wsx
 		for _,i in pairs(snow_tab) do
 			local y,z,x,test = unpack(i)
-			test = (test-0.53)/0.47 -- /(1-0.53)
+			test = (test-nosmooth_rarity)/(1-nosmooth_rarity) -- /(1-0.53)
 			if test > 0 then
 				local maxh = math.floor(test*10)%10+1
 				if maxh ~= 1 then
