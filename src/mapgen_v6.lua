@@ -11,9 +11,12 @@ local np_default = {
 
 -- 2D noise for coldness
 
+local mg = snow.mapgen
+local scale = mg.perlin_scale
 local np_cold = {
 	offset = 0,
 	scale = 1,
+	spread = {x=scale, y=scale, z=scale},
 	seed = 112,
 	octaves = 3,
 	persist = 0.5
@@ -121,26 +124,11 @@ local function define_contents()
 	replacements = snow.known_plants or {}
 end
 
--- perlin noise "hills" are not peaks but looking like sinus curve
-local function upper_rarity(rarity)
-	return math.sign(rarity)*math.sin(math.abs(rarity)*math.pi/2)
-end
-
-local rarity = 18 --snow.mapgen_rarity
-local size = 210 --snow.mapgen_size
-
-local nosmooth_rarity = 1-rarity/50
-local perlin_scale = size*100/rarity
-np_cold.spread = {x=perlin_scale, y=perlin_scale, z=perlin_scale}
-local smooth_rarity_max, smooth_rarity_min, smooth_rarity_dif
 local smooth = snow.smooth_biomes
-if smooth then
-	local smooth_trans_size = 4 --snow.smooth_trans_size
-	smooth_rarity_max = upper_rarity(nosmooth_rarity+smooth_trans_size*2/perlin_scale)
-	smooth_rarity_min = upper_rarity(nosmooth_rarity-smooth_trans_size/perlin_scale)
-	smooth_rarity_dif = smooth_rarity_max-smooth_rarity_min
-end
-nosmooth_rarity = upper_rarity(nosmooth_rarity)
+local smooth_rarity_max = mg.smooth_rarity_max
+local smooth_rarity_min = mg.smooth_rarity_min
+local smooth_rarity_dif = mg.smooth_rarity_dif
+local nosmooth_rarity = mg.nosmooth_rarity
 
 minetest.register_on_generated(function(minp, maxp, seed)
 	local t1 = os.clock()

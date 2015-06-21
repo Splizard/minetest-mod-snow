@@ -80,23 +80,28 @@ local PERSISTENCE3 = 0.5 -- 0.5
 local SCALE3 = 250 -- 250
 
 --Get snow at position.
+local rarity, perlin_scale
 local function get_snow(pos)
 	--Legacy support.
-	if weather_legacy == "snow" then
-		local perlin1 = minetest.get_perlin(112,3, 0.5, 150)
-		if perlin1:get2d({x=pos.x, y=pos.z}) <= 0.53 then
-			return false
-		end
-
-		-- disable falling snow in desert
-		local desert_perlin = minetest.get_perlin(SEEDDIFF3, OCTAVES3, PERSISTENCE3, SCALE3)
-		local noise3 = desert_perlin:get2d({x=pos.x+150,y=pos.z+50}) -- Offsets must match minetest mapgen desert perlin.
-		if noise3 > 0.35 then -- Smooth transition 0.35 to 0.45.
-			return false
-		end
-		return true
+	if weather_legacy ~= "snow" then
+		return false
 	end
-	return false
+	if not rarity then
+		rarity = snow.mapgen.smooth_rarity_min
+		perlin_scale = snow.mapgen.perlin_scale
+	end
+	local perlin1 = minetest.get_perlin(112,3, 0.5, perlin_scale)
+	if perlin1:get2d({x=pos.x, y=pos.z}) < rarity then
+		return false
+	end
+
+	-- disable falling snow in desert
+	local desert_perlin = minetest.get_perlin(SEEDDIFF3, OCTAVES3, PERSISTENCE3, SCALE3)
+	local noise3 = desert_perlin:get2d({x=pos.x+150,y=pos.z+50}) -- Offsets must match minetest mapgen desert perlin.
+	if noise3 > 0.35 then -- Smooth transition 0.35 to 0.45.
+		return false
+	end
+	return true
 end
 
 local addvectors = vector and vector.add
@@ -159,20 +164,21 @@ local function snow_fall(pos, player, animate)
 
 	pos = {x=pos.x, y=ground_y, z=pos.z}
 
-  	if get_snow(pos) then
-  		if animate then
-			local spos = {x=pos.x, y=ground_y+10, z=pos.z}
-			minetest.add_particlespawner(get_snow_particledef({
-				minpos = addvectors(spos, {x=-9, y=3, z=-9}),
-				maxpos = addvectors(spos, {x= 9, y=5, z= 9}),
-				vel = {x=0, y=-1, z=-1},
-				acc = {x=0, y=0, z=0},
-				playername = player:get_player_name()
-			}))
-		end
-		snow.place(pos, true)
-		--minetest.place_node({x=pos.x, y=pos.y+2, z=pos.z}, {name="default:snow"}) -- LazyJ
+  	if not get_snow(pos) then
+		return
 	end
+	if animate then
+		local spos = {x=pos.x, y=ground_y+10, z=pos.z}
+		minetest.add_particlespawner(get_snow_particledef({
+			minpos = addvectors(spos, {x=-9, y=3, z=-9}),
+			maxpos = addvectors(spos, {x= 9, y=5, z= 9}),
+			vel = {x=0, y=-1, z=-1},
+			acc = {x=0, y=0, z=0},
+			playername = player:get_player_name()
+		}))
+	end
+	snow.place(pos, true)
+	--minetest.place_node({x=pos.x, y=pos.y+2, z=pos.z}, {name="default:snow"}) -- LazyJ
 end
 
 -- Snow
