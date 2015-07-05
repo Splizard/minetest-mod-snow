@@ -49,9 +49,9 @@ local function do_ws_func(a, x)
 	local n = x/(16000)
 	local y = 0
 	for k=1,1000 do
-		y = y + 1000*math.sin(math.pi * k^a * n)/(math.pi * k^a)
+		y = y + 1000*math.sin(math.pi * k^a * n)/(k^a)
 	end
-	return y
+	return y/math.pi
 end
 
 
