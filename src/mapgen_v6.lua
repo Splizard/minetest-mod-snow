@@ -147,6 +147,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local data = vm:get_data()
 	local param2s = vm:get_param2_data()
 
+	local heightmap = minetest.get_mapgen_object("heightmap")
+
 	local snow_tab,num = {},1
 	local pines_tab,pnum = {},1
 
@@ -199,11 +201,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			and test
 			and test > smooth_rarity_min then
 				-- remove trees near alpine
-				local ground_y = nil
-				for y = maxp.y, minp.y, -1 do
-					local nodid = data[area:index(x, y, z)]
-					if nodid ~= c.air
-					and nodid ~= c.ignore then
+				local ground_y
+				for y = math.min(heightmap[ni]+20, maxp.y), math.max(minp.y, heightmap[ni]-5), -1 do
+					if data[area:index(x, y, z)] ~= c.air then
 						ground_y = y
 						break
 					end
@@ -242,8 +242,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local icesheet = icetype > -0.6 and icetype <= -0.4
 			local icecave = icetype <= -0.6
 
+
 			local ground_y
-			for y = maxp.y, minp.y, -1 do
+			for y = math.min(heightmap[ni]+20, maxp.y), math.max(minp.y, heightmap[ni]-5), -1 do
 				local nodid = data[area:index(x, y, z)]
 				if nodid ~= c.air then
 					ground_y = y
