@@ -186,6 +186,7 @@ minetest.register_node("snow:shrub", table.copy(nodedef))
 nodedef.tiles = {"snow_shrub.png^snow_shrub_covering.png"}
 nodedef.inventory_image = "snow_shrub.png^snow_shrub_covering.png"
 nodedef.wield_image = "snow_shrub.png^snow_shrub_covering.png"
+nodedef.paramtype2 = "degrotate"
 nodedef.drop = "snow:shrub"
 nodedef.furnace_burntime = 3
 minetest.register_node("snow:shrub_covered", nodedef)
@@ -203,6 +204,7 @@ if rawget(_G, "flowers") then
 			tiles = { "snow_" .. name .. ".png" },
 			sunlight_propagates = true,
 			paramtype = "light",
+			paramtype2 = "degrotate",
 			walkable = false,
 			drop = "",
 			groups = {snappy=3, attached_node = 1},
@@ -237,6 +239,7 @@ nodedef = {
 	drawtype = "plantlike",
 	tiles = {"snow_apple.png"},
 	paramtype = "light",
+	paramtype2 = "degrotate",
 	walkable = false,
 	sunlight_propagates = apple.sunlight_propagates,
 	selection_box = apple.selection_box,
