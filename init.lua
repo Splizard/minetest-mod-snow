@@ -39,41 +39,43 @@ http://github.com/Splizard/minetest-mod-snow/
 
 
 -- Original Lua Files
---dofile(minetest.get_modpath("snow").."/util.lua")
---dofile(minetest.get_modpath("snow").."/mapgen.lua")
---dofile(minetest.get_modpath("snow").."/sled.lua")
+--dofile(modpath.."/util.lua")
+--dofile(modpath.."/mapgen.lua")
+--dofile(modpath.."/sled.lua")
 -- "falling_snow.lua" disabled since weather functions minetest.get_heat(pos) and minetest.get_humidity(pos)
 -- have been removed from Minetest.
 --  Until something else can be figured out, use paramat's "Snowdrift" mod instead.
--- dofile(minetest.get_modpath("snow").."/falling_snow.lua")
+-- dofile(modpath.."/falling_snow.lua")
 
 -- Original init.lua File Broken into Smaller Files
-dofile(minetest.get_modpath("snow").."/src/abms.lua")
-dofile(minetest.get_modpath("snow").."/src/aliases.lua")
-dofile(minetest.get_modpath("snow").."/src/crafting.lua")
-dofile(minetest.get_modpath("snow").."/src/snowball.lua")
+local modpath = minetest.get_modpath("snow")
+dofile(modpath.."/src/abms.lua")
+dofile(modpath.."/src/aliases.lua")
+dofile(modpath.."/src/crafting.lua")
+dofile(modpath.."/src/snowball.lua")
 
 
 -- The formspec menu didn't work when util.lua was the very first "dofile" so I moved
 -- it and all the other original "dofiles", in order, to the bottom of the list. ~ LazyJ
 -- Minetest would crash if the mapgen was called upon before the rest of other snow lua files so
 -- I put it lower on the list and that seems to do the trick. ~ LazyJ
-dofile(minetest.get_modpath("snow").."/src/util.lua")
+dofile(modpath.."/src/util.lua")
 -- To get Xmas tree saplings, the "christmas_content", true or false, in "util.lua" has to be determined first.
 -- That means "nodes.lua", where the saplings are controlled, has to come after "util.lua". ~ LazyJ
-dofile(minetest.get_modpath("snow").."/src/nodes.lua")
-dofile(minetest.get_modpath("snow").."/src/basic_stairs_slabs.lua")
-dofile(minetest.get_modpath("snow").."/src/mapgen.lua")
-dofile(minetest.get_modpath("snow").."/src/sled.lua")
-dofile(minetest.get_modpath("snow").."/src/falling_snow.lua")
+dofile(modpath.."/src/nodes.lua")
+dofile(modpath.."/src/basic_stairs_slabs.lua")
+dofile(modpath.."/src/mapgen.lua")
+dofile(modpath.."/src/sled.lua")
+dofile(modpath.."/src/falling_snow.lua")
 
 
 
 -- Check for "MoreBlocks". If not found, skip this next "dofile".
 
-if minetest.get_modpath("moreblocks") then
+if rawget(_G, "stairsplus")
+and minetest.get_modpath("moreblocks") then
 
-	dofile(minetest.get_modpath("snow").."/src/stairsplus.lua")
+	dofile(modpath.."/src/stairsplus.lua")
 
 end
 
@@ -138,9 +140,7 @@ local function is_uneven(pos)
 	local num = minetest.get_node_level(pos)
 	local get_node = minetest.get_node
 	local add_node = minetest.add_node
-	local found
 	local foundx
-	local foundy
 	local foundz
 	for z = -1,1 do
 		for x = -1,1 do
@@ -161,7 +161,6 @@ local function is_uneven(pos)
 			if not (x == 0 and z == 0)
 			and node.name == "default:snow"
 			and minetest.get_node_level(p) < num then
-				found = true
 				foundx = x
 				foundz = z
 			elseif node.name == "air"
@@ -173,9 +172,9 @@ local function is_uneven(pos)
 			end
 		end
 	end
-	if found then
+	if foundx then
 		local p = {x=pos.x+foundx, y=pos.y, z=pos.z+foundz}
-		if is_uneven(p) ~= true then
+		if not is_uneven(p) then
 			minetest.add_node_level(p, 7)
 		end
 		return true

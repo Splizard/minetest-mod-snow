@@ -10,6 +10,8 @@ snow = {
 	christmas_content = true,
 	smooth_snow = true,
 	min_height = 3,
+	mapgen_rarity = 18,
+	mapgen_size = 210,
 }
 
 --Config documentation.
@@ -24,74 +26,88 @@ local doc = {
 	smooth_snow = "Disable this to stop snow from being smoothed.",
 	christmas_content = "Disable this to remove christmas saplings from being found.",
 	min_height = "The minumum height a snow biome will generate (mgv7)",
+	mapgen_rarity = "mapgen rarity in %",
+	mapgen_size = "size of the generated… (has an effect to the rarity, too)",
 }
+
+local function value_from_string(v)
+	if v == "true" then
+		v = true
+	elseif v == "false" then
+		v = false
+	else
+		local a_number = tonumber(v)
+		if a_number then
+			v = a_number
+		end
+	end
+	return v
+end
+
+local allowed_types = {string = true, number = true, boolean = true}
 
 --Manage config.
 --Saves contents of config to file.
 local function saveConfig(path, config, doc)
 	local file = io.open(path,"w")
-	if file then
-		for i,v in pairs(config) do
-			local t = type(v)
-			if t == "string" or t == "number" or t == "boolean" then
-				if doc and doc[i] then
-					file:write("# "..doc[i].."\n")
-				end
-				file:write(i.." = "..tostring(v).."\n")
+	if not file then
+		minetest.log("error", "[snow] could not open config file for writing at "..path)
+		return
+	end
+	for i,v in pairs(config) do
+		if allowed_types[type(v)] then
+			if doc and doc[i] then
+				file:write("# "..doc[i].."\n")
 			end
+			file:write(i.." = "..tostring(v).."\n")
 		end
 	end
+	file:close()
 end
 --Loads config and returns config values inside table.
 local function loadConfig(path)
-	local config = {}
 	local file = io.open(path,"r")
-  	if file then
-  		io.close(file)
-		for line in io.lines(path) do
-			if line:sub(1,1) ~= "#" then
-				local i, v = line:match("^(%S*) = (%S*)")
-				if i and v then
-					if v == "true" then v = true end
-					if v == "false" then v = false end
-					if tonumber(v) then v = tonumber(v) end
-					config[i] = v
-				end
+  	if not file then
+ 		--Create config file.
+		return
+	end
+	io.close(file)
+ 	local config = {}
+	for line in io.lines(path) do
+		if line:sub(1,1) ~= "#" then
+			local i, v = line:match("^(%S*) = (%S*)")
+			if i and v then
+				config[i] = value_from_string(v)
 			end
 		end
-		return config
-	else
-		--Create config file.
-		return nil
 	end
+	return config
 end
 
+local modpath = minetest.get_modpath("snow")
+
 minetest.register_on_shutdown(function()
-	saveConfig(minetest.get_modpath("snow").."/config.txt", snow, doc)
+	saveConfig(modpath.."/config.txt", snow, doc)
 end)
 
-local config = loadConfig(minetest.get_modpath("snow").."/config.txt")
+local config = loadConfig(modpath.."/config.txt")
 if config then
 	for i,v in pairs(config) do
 		if type(snow[i]) == type(v) then
 			snow[i] = v
+		else
+			minetest.log("error", "[snow] wrong type of setting "..i)
 		end
 	end
 else
-	saveConfig(minetest.get_modpath("snow").."/config.txt", snow, doc)
+	saveConfig(modpath.."/config.txt", snow, doc)
 end
 
 for i,v in pairs(snow) do
-	local t = type(v)
-	if t == "string"
-	or t == "number"
-	or t == "boolean" then
+	if allowed_types[type(v)] then
 		local v = minetest.setting_get("snow_"..i)
 		if v ~= nil then
-			if v == "true" then v = true end
-			if v == "false" then v = false end
-			if tonumber(v) then v = tonumber(v) end
-			snow[i] = v
+			snow[i] = value_from_string(v)
 		end
 	end
 end
@@ -99,7 +115,7 @@ end
 
 --MENU
 
-local get_formspec = function()
+local function get_formspec()
 	local p = -0.5
 	local formspec = "label[0,-0.3;Settings:]"
 	for i,v in pairs(snow) do
@@ -118,22 +134,32 @@ local get_formspec = function()
 	return formspec
 end
 
+minetest.register_chatcommand("snow", {
+	description = "Show a menu for various actions",
+	privs = {server=true},
+	func = function(name)
+		minetest.chat_send_player(name, "Showing snow menu…")
+		minetest.show_formspec(name, "snow:menu", get_formspec())
+	end,
+})
+
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname ~= "snow:menu" then
 		return
 	end
 	for i,v in pairs(snow) do
 		local t = type(v)
-		if t == "string" or t == "number" or t == "boolean" then
+		if allowed_types[t] then
 			local field = fields["snow:"..i]
 			if field then
 				if t == "string" then
 					snow[i] = field
-				end
-				if t == "number" then
-					snow[i] = tonumber(field)
-				end
-				if t == "boolean" then
+				elseif t == "number" then
+					local valid_number = tonumber(field)
+					if valid_number then
+						snow[i] = valid_number
+					end
+				elseif t == "boolean" then
 					if field == "true" then
 						snow[i] = true
 					elseif field == "false" then
@@ -144,13 +170,3 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		end
 	end
 end)
-
-
-minetest.register_chatcommand("snow", {
-	description = "Show a menu for various actions",
-	privs = {server=true},
-	func = function(name)
-		minetest.chat_send_player(name, "Showing snow menu…")
-		minetest.show_formspec(name, "snow:menu", get_formspec())
-	end,
-})

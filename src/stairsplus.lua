@@ -50,12 +50,9 @@ There is one in each of the "stairsplus.register_all" sections.
 -- First, let's run a check to see if MoreBlocks is installed; we're going to need it for the
 -- next section of stairsplus stuff. ~LazyJ
 
-if (minetest.get_modpath("moreblocks"))
-and rawget(_G, "stairsplus")
 
 -- 'If' MoreBlocks was found and stairsplus is available, well, 'then' go ahead with this next part:
 
-then
 
 --[[  Leave commented out - For reference only. ~ LazyJ
 function stairsplus.register_all(modname, subname, recipeitem, fields)
@@ -336,7 +333,7 @@ for _, name in pairs(snow_nodes) do
 	})
 end
 
-else  -- from clear up at the top, the MoreBlocks check. "Else", if MoreBlocks wasn't found, skip
+  -- from clear up at the top, the MoreBlocks check. "Else", if MoreBlocks wasn't found, skip
 		-- down to here, "return" nothing and "end" this script. ~ LazyJ
-return
-end
+
+

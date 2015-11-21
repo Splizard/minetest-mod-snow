@@ -21,8 +21,8 @@ local function upper_rarity(rarity)
 	return math.sign(rarity)*math.sin(math.abs(rarity)*math.pi/2)
 end
 
-local rarity = 18 --snow.mapgen_rarity
-local size = 210 --snow.mapgen_size
+local rarity = snow.mapgen_rarity
+local size = snow.mapgen_size
 
 local nosmooth_rarity = 1-rarity/50
 local perlin_scale = size*100/rarity
