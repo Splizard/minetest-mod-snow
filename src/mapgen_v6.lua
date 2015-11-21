@@ -1,5 +1,6 @@
 -- https://github.com/paramat/meru/blob/master/init.lua#L52
 -- Parameters must match mgv6 biome noise
+
 local np_default = {
 	offset = 0,
 	scale = 1,
@@ -8,6 +9,7 @@ local np_default = {
 	octaves = 3,
 	persist = 0.5
 }
+
 
 -- 2D noise for coldness
 
@@ -22,6 +24,7 @@ local np_cold = {
 	persist = 0.5
 }
 
+
 -- 2D noise for icetype
 
 local np_ice = {
@@ -32,6 +35,7 @@ local np_ice = {
 	octaves = 3,
 	persist = 0.5
 }
+
 
 -- Debugging function
 
@@ -54,6 +58,24 @@ local function do_ws_func(a, x)
 	return y/math.pi
 end
 
+
+-- caching functions
+
+local ws_lists = {}
+local function get_ws_list(a,x)
+	ws_lists[a] = ws_lists[a] or {}
+	local v = ws_lists[a][x]
+	if v then
+		return v
+	end
+	v = {}
+	for x=x,x + (80 - 1) do
+		local y = do_ws_func(a, x)
+		v[x] = y
+	end
+	ws_lists[a][x] = v
+	return v
+end
 
 local plantlike_ids = {}
 local function is_plantlike(id)
@@ -96,6 +118,7 @@ local function is_snowable(id)
 	snowable_ids[id] = true
 	return true
 end
+
 
 local c, replacements
 local function define_contents()
@@ -235,7 +258,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			if not nvals_ice then
 				nvals_ice = minetest.get_perlin_map(np_ice, chulens):get2dMap_flat({x=x0, y=z0})
 			end
-	        	local icetype = nvals_ice[ni]
+			local icetype = nvals_ice[ni]
 			local cool = icetype > 0 -- only spawns ice on edge of water
 			local icebergs = icetype > -0.2 and icetype <= 0
 			local icehole = icetype > -0.4 and icetype <= -0.2 -- icesheet with holes
@@ -431,7 +454,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			if test > 0 then
 				local maxh = math.floor(test*10)%10+1
 				if maxh ~= 1 then
-					local h = math.floor( do_ws_func(2, x) + do_ws_func(5, z)*5)%10+1
+					if not wsz then
+						wsz = get_ws_list(5, z0)
+						wsx = get_ws_list(2, x0)
+					end
+					local h = math.floor(wsx[x]+wsz[z]*5)%10+1
 					if h ~= 1 then
 						-- search for nearby snow
 						y = y+1
@@ -488,4 +515,3 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		print("[snow] "..biome_string.." x "..minp.x.." z "..minp.z.." time "..chugent.." ms")
 	end
 end)
-
