@@ -88,11 +88,10 @@ function snow.place(pos)
 		return
 	end
 
-	local bnode = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
 	if node.name == "default:snow" then
 		local level = minetest.get_node_level(pos)
 		if level < 63 then
-			if minetest.get_item_group(bnode.name, "leafdecay") == 0
+			if minetest.get_item_group(minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name, "leafdecay") == 0
 			and not snow.is_uneven(pos) then
 				minetest.sound_play("default_snow_footstep", {pos=pos})
 				minetest.add_node_level(pos, 7)
@@ -109,7 +108,7 @@ function snow.place(pos)
 			end
 		end
 	elseif node.name ~= "default:ice"
-	and bnode.name ~= "air" then
+	and minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name ~= "air" then
 		local data = minetest.registered_nodes[node.name]
 		local drawtype = data.drawtype
 		if drawtype == "normal"

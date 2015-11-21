@@ -31,6 +31,7 @@ near torches and lava.
 * Add code to prevent snowfall from depositing snow on
 'walkable = false' defined nodes.
 
+both are already fixed -- Hybrid Dog
 --]]
 
 
@@ -42,8 +43,9 @@ near torches and lava.
 
 local weather_legacy
 
+local worldpath = minetest.get_worldpath()
 local read_weather_legacy = function ()
-	local file = io.open(minetest.get_worldpath().."/weather_v6", "r")
+	local file = io.open(worldpath.."/weather_v6", "r")
 	if not file then return end
 	local readweather = file:read()
 	file:close()
@@ -52,26 +54,30 @@ end
 
 --Weather for legacy versions of minetest.
 local save_weather_legacy = function ()
-	local file = io.open(minetest.get_worldpath().."/weather_v6", "w+")
+	local file = io.open(worldpath.."/weather_v6", "w+")
 	file:write(weather_legacy)
 	file:close()
 end
 
-	weather_legacy = read_weather_legacy() or ""
+weather_legacy = read_weather_legacy() or ""
 
-	minetest.register_globalstep(function(dtime)
-		if weather_legacy == "snow" then
-			if math.random(1, 10000) == 1 then
-				weather_legacy = "none"
-				save_weather_legacy()
-			end
-		else
-			if math.random(1, 50000) == 2 then
-				weather_legacy = "snow"
-				save_weather_legacy()
-			end
+local timer = 0
+minetest.register_globalstep(function(dtime)
+	timer = timer+dtime
+	if timer < 2 then
+		return
+	end
+	timer = 0
+	if weather_legacy == "snow" then
+		if math.random(1000) == 1 then
+			weather_legacy = "none"
+			save_weather_legacy()
 		end
-	end)
+	elseif math.random(5000) == 2 then
+		weather_legacy = "snow"
+		save_weather_legacy()
+	end
+end)
 
 -- copied from meru mod
 local SEEDDIFF3 = 9130 -- 9130 -- Values should match minetest mapgen desert perlin.
@@ -151,7 +157,7 @@ local function snow_fall(pos, player, animate)
 			return
 		end
 	end
-	for y=pos.y+10,pos.y-15,-1 do
+	for y=pos.y+9,pos.y-15,-1 do
 		local n = minetest.get_node({x=pos.x,y=y,z=pos.z}).name
 		if n ~= "air" and n ~= "ignore" then
 			ground_y = y
