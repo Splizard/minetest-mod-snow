@@ -30,6 +30,28 @@ local doc = {
 	mapgen_size = "size of the generated… (has an effect to the rarity, too)",
 }
 
+
+-- functions for dynamically changing settings
+
+local on_configurings,n = {},1
+function snow.register_on_configuring(func)
+	on_configurings[n] = func
+	n = n+1
+end
+
+local function change_setting(name, value)
+	if snow[name] == value then
+		return
+	end
+	for i = 1,n-1 do
+		if on_configurings[i](name, value) == false then
+			return
+		end
+	end
+	snow[name] = value
+end
+
+
 local function value_from_string(v)
 	if v == "true" then
 		v = true
@@ -46,7 +68,6 @@ end
 
 local allowed_types = {string = true, number = true, boolean = true}
 
---Manage config.
 --Saves contents of config to file.
 local function saveConfig(path, config, doc)
 	local file = io.open(path,"w")
@@ -64,15 +85,26 @@ local function saveConfig(path, config, doc)
 	end
 	file:close()
 end
---Loads config and returns config values inside table.
-local function loadConfig(path)
+
+local modpath = minetest.get_modpath("snow")
+
+minetest.register_on_shutdown(function()
+	saveConfig(modpath.."/config.txt", snow, doc)
+end)
+
+
+-- load settings from config.txt
+
+local config
+do
+	local path = modpath.."/config.txt"
 	local file = io.open(path,"r")
-  	if not file then
- 		--Create config file.
+	if not file then
+		--Create config file.
 		return
 	end
 	io.close(file)
- 	local config = {}
+	config = {}
 	for line in io.lines(path) do
 		if line:sub(1,1) ~= "#" then
 			local i, v = line:match("^(%S*) = (%S*)")
@@ -81,16 +113,8 @@ local function loadConfig(path)
 			end
 		end
 	end
-	return config
 end
 
-local modpath = minetest.get_modpath("snow")
-
-minetest.register_on_shutdown(function()
-	saveConfig(modpath.."/config.txt", snow, doc)
-end)
-
-local config = loadConfig(modpath.."/config.txt")
 if config then
 	for i,v in pairs(config) do
 		if type(snow[i]) == type(v) then
@@ -102,6 +126,9 @@ if config then
 else
 	saveConfig(modpath.."/config.txt", snow, doc)
 end
+
+
+-- load settings from minetest.conf
 
 for i,v in pairs(snow) do
 	if allowed_types[type(v)] then
@@ -115,19 +142,46 @@ end
 
 --MENU
 
+local function form_sort_func(a,b)
+	return a[1] < b[1]
+end
+
+--[[
+local function form_sort_func_bool(a,b)
+	if a[2] == b[2] then
+		return a[1] < b[1]
+	else
+		return b[2]
+	end
+end--]]
+
 local function get_formspec()
-	local p = -0.5
-	local formspec = "label[0,-0.3;Settings:]"
+	local ids,n1,n2 = {{},{}},1,1
 	for i,v in pairs(snow) do
 		local t = type(v)
 		if t == "string"
 		or t == "number" then
-			p = p + 1.5
-			formspec = formspec.."field[0.3,"..p..";2,1;snow:"..i..";"..i..";"..v.."]"
+			ids[2][n2] = {i,v}
+			n2 = n2+1
 		elseif t == "boolean" then
-			p = p + 0.5
-			formspec = formspec.."checkbox[0,"..p..";snow:"..i..";"..i..";"..tostring(v).."]"
+			ids[1][n1] = {i,v}
+			n1 = n1+1
 		end
+	end
+	table.sort(ids[2], form_sort_func)
+	table.sort(ids[1], form_sort_func)
+
+	local p = -0.5
+	local formspec = "label[0,-0.3;Settings:]"
+	for n = 1,n1-1 do
+		local i,v = unpack(ids[1][n])
+		p = p + 0.5
+		formspec = formspec.."checkbox[0,"..p..";snow:"..i..";"..i..";"..tostring(v).."]"
+	end
+	for n = 1,n2-1 do
+		local i,v = unpack(ids[2][n])
+		p = p + 1.5
+		formspec = formspec.."field[0.3,"..p..";2,1;snow:"..i..";"..i..";"..v.."]"
 	end
 	p = p + 1
 	formspec = "size[4,"..p..";]\n"..formspec
@@ -152,19 +206,21 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		if allowed_types[t] then
 			local field = fields["snow:"..i]
 			if field then
-				if t == "string" then
-					snow[i] = field
-				elseif t == "number" then
-					local valid_number = tonumber(field)
-					if valid_number then
-						snow[i] = valid_number
-					end
+				if t == "number" then
+					field = tonumber(field)
 				elseif t == "boolean" then
 					if field == "true" then
-						snow[i] = true
+						field = true
 					elseif field == "false" then
-						snow[i] = false
+						field = false
+					else
+						field = nil
 					end
+				elseif t ~= "string" then
+					field = nil
+				end
+				if field ~= nil then
+					change_setting(i, field)
 				end
 			end
 		end
