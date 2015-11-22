@@ -37,18 +37,6 @@ local np_ice = {
 }
 
 
--- Debugging function
-
-local biome_strings = {
-	{"snowy", "plain", "alpine", "normal", "normal"},
-	{"cool", "icebergs", "icesheet", "icecave", "icehole"}
-}
-local function biome_to_string(num,num2)
-	local biome = biome_strings[1][num] or "unknown "..num
-	return biome
-end
-
-
 local function do_ws_func(a, x)
 	local n = x/(16000)
 	local y = 0
@@ -120,7 +108,7 @@ local function is_snowable(id)
 end
 
 
-local c, replacements
+local c, replacements, mg_debug, biome_to_string
 local function define_contents()
 	c = {
 		dirt_with_grass = minetest.get_content_id("default:dirt_with_grass"),
@@ -145,6 +133,8 @@ local function define_contents()
 		desert_sand = minetest.get_content_id("default:desert_sand"),
 	}
 	replacements = snow.known_plants or {}
+
+	mg_debug = snow.debug
 end
 
 local smooth = snow.smooth_biomes
@@ -152,6 +142,31 @@ local smooth_rarity_max = mg.smooth_rarity_max
 local smooth_rarity_min = mg.smooth_rarity_min
 local smooth_rarity_dif = mg.smooth_rarity_dif
 local nosmooth_rarity = mg.nosmooth_rarity
+
+snow.register_on_configuring(function(name, v)
+	if name == "debug" then
+		mg_debug = v
+	elseif name == "mapgen_rarity"
+	or name == "mapgen_size"
+	or name == "smooth_biomes" then
+		minetest.after(0, function()
+			smooth = snow.smooth_biomes
+			smooth_rarity_max = mg.smooth_rarity_max
+			smooth_rarity_min = mg.smooth_rarity_min
+			smooth_rarity_dif = mg.smooth_rarity_dif
+			nosmooth_rarity = mg.nosmooth_rarity
+			local scale = mg.perlin_scale
+			np_cold = {
+				offset = 0,
+				scale = 1,
+				spread = {x=scale, y=scale, z=scale},
+				seed = 112,
+				octaves = 3,
+				persist = 0.5
+			}
+		end)
+	end
+end)
 
 minetest.register_on_generated(function(minp, maxp, seed)
 	local t1 = os.clock()
@@ -509,9 +524,21 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	vm:write_to_map()
 
 	if write_to_map
-	and snow.debug then -- print if any column of mapchunk was snow biome
+	and mg_debug then -- print if any column of mapchunk was snow biome
 		local biome_string = biome_to_string(biome)
 		local chugent = math.ceil((os.clock() - t1) * 1000)
 		print("[snow] "..biome_string.." x "..minp.x.." z "..minp.z.." time "..chugent.." ms")
 	end
 end)
+
+
+-- Debugging function
+
+local biome_strings = {
+	{"snowy", "plain", "alpine", "normal", "normal"},
+	{"cool", "icebergs", "icesheet", "icecave", "icehole"}
+}
+function biome_to_string(num,num2)
+	local biome = biome_strings[1][num] or "unknown "..num
+	return biome
+end

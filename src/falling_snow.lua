@@ -188,6 +188,7 @@ local function snow_fall(pos, player, animate)
 end
 
 -- Snow
+local lighter_snowfall = snow.lighter_snowfall
 local function calc_snowfall()
 	for _, player in pairs(minetest.get_connected_players()) do
 		local ppos = player:getpos()
@@ -196,7 +197,7 @@ local function calc_snowfall()
 		if get_snow(ppos)
 		and minetest.get_node_light(ppos, 0.5) == 15 then
 			local animate
-			if not snow.lighter_snowfall then
+			if not lighter_snowfall then
 				local vel = {x=0, y=-1, z=-1}
 				local acc = {x=0, y=0, z=0}
 				minetest.add_particlespawner(get_snow_particledef({
@@ -239,8 +240,25 @@ local function calc_snowfall()
 	end
 end
 
-minetest.register_globalstep(function(dtime)
-	if snow.enable_snowfall then
-		calc_snowfall()
+local step_func
+minetest.register_globalstep(function()
+	step_func()
+end)
+
+if snow.enable_snowfall then
+	step_func = calc_snowfall
+else
+	step_func = function() end
+end
+
+snow.register_on_configuring(function(name, v)
+	if name == "enable_snowfall" then
+		if v then
+			step_func = calc_snowfall
+		else
+			step_func = function() end
+		end
+	elseif name == "lighter_snowfall" then
+		lighter_snowfall = v
 	end
 end)

@@ -8,9 +8,19 @@
 
 local creative_mode = minetest.setting_getbool("creative_mode")
 
+local snowball_velocity = snow.snowball_velocity
+local snowball_gravity = snow.snowball_gravity
+snow.register_on_configuring(function(name, v)
+	if name == "snowball_velocity" then
+		snowball_velocity = v
+	elseif name == "snowball_gravity" then
+		snowball_gravity = v
+	end
+end)
+
 local function get_gravity()
 	local grav = tonumber(minetest.setting_get("movement_gravity")) or 9.81
-	return grav*snow.snowball_gravity
+	return grav*snowball_gravity
 end
 
 local someone_throwing
@@ -25,7 +35,7 @@ local function snow_shoot_snowball(item, player)
 	addp.z = -dir.x/dif -- + (math.random()-0.5)/5
 	local pos = vector.add(player:getpos(), addp)
 	local obj = minetest.add_entity(pos, "snow:snowball_entity")
-	obj:setvelocity(vector.multiply(dir, snow.snowball_velocity))
+	obj:setvelocity(vector.multiply(dir, snowball_velocity))
 	obj:setacceleration({x=dir.x*-3, y=-get_gravity(), z=dir.z*-3})
 	if creative_mode then
 		if not someone_throwing then

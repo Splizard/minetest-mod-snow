@@ -36,14 +36,27 @@ The Xmas tree needles are registred and defined a farther down in this nodes.lua
 if snow.christmas_content then
 	table.insert(nodedef.drop.items, 1, {
 		-- player will get xmas tree with 1/120 chance
-		items = {'snow:xmas_tree'},
+		items = {"snow:xmas_tree"},
 		rarity = 120,
 	})
 end
 
 minetest.register_node("snow:needles", table.copy(nodedef))
 
-
+snow.register_on_configuring(function(name, v)
+	if name == "christmas_content" then
+		local drop = minetest.registered_nodes["snow:needles"].drop
+		if v then
+			table.insert(drop.items, 1, {
+				items = {"snow:xmas_tree"},
+				rarity = 120,
+			})
+		else
+			table.remove(drop.items, 1)
+		end
+		minetest.override_item("snow:needles", {drop = drop})
+	end
+end)
 
 
 

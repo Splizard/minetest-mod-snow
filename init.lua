@@ -52,7 +52,6 @@ local modpath = minetest.get_modpath("snow")
 dofile(modpath.."/src/abms.lua")
 dofile(modpath.."/src/aliases.lua")
 dofile(modpath.."/src/crafting.lua")
-dofile(modpath.."/src/snowball.lua")
 
 
 -- The formspec menu didn't work when util.lua was the very first "dofile" so I moved
@@ -60,6 +59,7 @@ dofile(modpath.."/src/snowball.lua")
 -- Minetest would crash if the mapgen was called upon before the rest of other snow lua files so
 -- I put it lower on the list and that seems to do the trick. ~ LazyJ
 dofile(modpath.."/src/util.lua")
+dofile(modpath.."/src/snowball.lua")
 -- To get Xmas tree saplings, the "christmas_content", true or false, in "util.lua" has to be determined first.
 -- That means "nodes.lua", where the saplings are controlled, has to come after "util.lua". ~ LazyJ
 dofile(modpath.."/src/nodes.lua")
@@ -79,6 +79,7 @@ and minetest.get_modpath("moreblocks") then
 
 end
 
+local is_uneven
 --This function places snow checking at the same time for snow level and increasing as needed.
 --This also takes into account sourrounding snow and makes snow even.
 function snow.place(pos)
@@ -94,7 +95,7 @@ function snow.place(pos)
 		local level = minetest.get_node_level(pos)
 		if level < 63 then
 			if minetest.get_item_group(minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z}).name, "leafdecay") == 0
-			and not snow.is_uneven(pos) then
+			and not is_uneven(pos) then
 				minetest.sound_play("default_snow_footstep", {pos=pos})
 				minetest.add_node_level(pos, 7)
 			end
@@ -136,7 +137,7 @@ end
 
 -- Checks if the snow level is even at any given pos.
 -- Smooth Snow
-local function is_uneven(pos)
+local function uneven(pos)
 	local num = minetest.get_node_level(pos)
 	local get_node = minetest.get_node
 	local add_node = minetest.add_node
@@ -181,8 +182,18 @@ local function is_uneven(pos)
 	end
 end
 
-function snow.is_uneven(pos)
-	if snow.smooth_snow then
-		return is_uneven(pos)
-	end
+if snow.smooth_snow then
+	is_uneven = uneven
+else
+	is_uneven = function() end
 end
+
+snow.register_on_configuring(function(name, v)
+	if name == "smooth_snow" then
+		if v then
+			is_uneven = uneven
+		else
+			is_uneven = function() end
+		end
+	end
+end)

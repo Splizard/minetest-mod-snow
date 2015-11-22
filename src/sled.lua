@@ -101,21 +101,20 @@ local function leave_sled(self, player)
 	self.object:set_detach()
 	default.player_attached[name] = false
 	default.player_set_animation(player, "stand" , 30)
-	
+
 	player:set_physics_override({
 		speed = 1,
 		jump = 1,
 	})
 	player:hud_remove(self.HUD) -- And here is part 2. ~ LazyJ
 	self.object:remove()
-	
+
 	--Give the sled back again
 	player:get_inventory():add_item("main", "snow:sled")
 end
 
-function sled:on_rightclick(player)
-	if self.driver
-	or not snow.sleds then
+local function sled_rightclick(player)
+	if self.driver then
 		return
 	end
 	join_sled(self, player)
@@ -134,6 +133,27 @@ function sled:on_rightclick(player)
 		direction = 0,
 	})
 -- End part 1
+end
+
+local on_sled_click
+if snow.sleds then
+	on_sled_click = sled_rightclick
+else
+	on_sled_click = function() end
+end
+
+snow.register_on_configuring(function(name, v)
+	if name == "sleds" then
+		if v then
+			on_sled_click = sled_rightclick
+		else
+			on_sled_click = function() end
+		end
+	end
+end)
+
+function sled:on_rightclick(player)
+	on_sled_click(player)
 end
 
 function sled:on_activate(staticdata, dtime_s)
@@ -205,7 +225,7 @@ minetest.register_craftitem("snow:sled", {
 		local pos = placer:getpos()
 		if accelerating_possible(vector.round(pos)) then
 			pos.y = pos.y+0.5
-			
+
 			--Get on the sled and remove it from inventory.
 			minetest.add_entity(pos, "snow:sled"):right_click(placer)
 			itemstack:take_item(); return itemstack
