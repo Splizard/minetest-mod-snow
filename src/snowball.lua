@@ -37,6 +37,7 @@ local function snow_shoot_snowball(item, player)
 	local obj = minetest.add_entity(pos, "snow:snowball_entity")
 	obj:setvelocity(vector.multiply(dir, snowball_velocity))
 	obj:setacceleration({x=dir.x*-3, y=-get_gravity(), z=dir.z*-3})
+	obj:get_luaentity().thrower = player:get_player_name()
 	if creative_mode then
 		if not someone_throwing then
 			someone_throwing = true
@@ -158,6 +159,24 @@ function snow_snowball_ENTITY.on_step(self, dtime)
 		return
 	end
 	self.lastpos = vector.new(pos)
+
+	if self.timer > 0.15 then
+		for _,v in pairs(minetest.get_objects_inside_radius(pos, 1.73)) do
+			if v ~= self.object then
+				local entity_name = v:get_entity_name()
+				if entity_name ~= "__builtin:item"
+				and entity_name ~= "__builtin:item"
+				and entity_name ~= "snow:snowball_entity" then
+					if self.thrower then
+						v:punch(minetest.get_player_by_name(self.thrower), 1, {full_punch_interval=1, damage_groups = {fleshy=1}})
+					end
+					spawn_falling_node(pos, {name = "default:snow"})
+					self.object:remove()
+					return
+				end
+			end
+		end
+	end
 end
 
 
