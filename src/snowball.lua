@@ -8,11 +8,19 @@
 
 local creative_mode = minetest.setting_getbool("creative_mode")
 
-local snowball_velocity = snow.snowball_velocity
+
+local snowball_velocity, entity_attack_delay
+local function update_snowball_vel(v)
+	snowball_velocity = v
+	local walkspeed = tonumber(minetest.setting_get("movement_speed_walk")) or 4
+	entity_attack_delay = (walkspeed+1)/v
+end
+update_snowball_vel(snow.snowball_velocity)
+
 local snowball_gravity = snow.snowball_gravity
 snow.register_on_configuring(function(name, v)
 	if name == "snowball_velocity" then
-		snowball_velocity = v
+		update_snowball_vel(v)
 	elseif name == "snowball_gravity" then
 		snowball_gravity = v
 	end
@@ -153,31 +161,38 @@ function snow_snowball_ENTITY.on_step(self, dtime)
 		--self.object:setvelocity({x=0, y=0, z=0})
 		pos = self.lastpos
 		self.object:setpos(pos)
-		local gain = vector.length(self.object:getvelocity())/30
-		minetest.sound_play("default_snow_footstep", {pos=pos, gain=gain})
+		minetest.sound_play("default_snow_footstep", {pos=pos, gain=vector.length(self.object:getvelocity())/30})
 		self.object:set_properties({physical = true})
 		self.physical = true
 		return
 	end
 	self.lastpos = vector.new(pos)
 
-	if self.timer > 0.15 then
-		for _,v in pairs(minetest.get_objects_inside_radius(pos, 1.73)) do
-			if v ~= self.object then
-				local entity_name = v:get_entity_name()
-				if entity_name ~= "snow:snowball_entity"
-				and entity_name ~= "__builtin:item"
-				and entity_name ~= "gauges:hp_bar" then
-					v:punch(
-						(self.thrower and minetest.get_player_by_name(self.thrower))
-							or self.object,
-						1,
-						{full_punch_interval=1, damage_groups = {fleshy=1}}
-					)
-					spawn_falling_node(pos, {name = "default:snow"})
-					self.object:remove()
-					return
+	if self.timer < entity_attack_delay then
+		return
+	end
+	for _,v in pairs(minetest.get_objects_inside_radius(pos, 1.73)) do
+		if v ~= self.object then
+			local entity_name = v:get_entity_name()
+			if entity_name ~= "snow:snowball_entity"
+			and entity_name ~= "__builtin:item"
+			and entity_name ~= "gauges:hp_bar" then
+				local vvel = v:getvelocity() or v:get_player_velocity()
+				local veldif = self.object:getvelocity()
+				if vvel then
+					veldif = vector.subtract(veldif, vvel)
 				end
+				local gain = vector.length(veldif)/20
+				v:punch(
+					(self.thrower and minetest.get_player_by_name(self.thrower))
+						or self.object,
+					1,
+					{full_punch_interval=1, damage_groups = {fleshy=math.ceil(gain)}}
+				)
+				minetest.sound_play("default_snow_footstep", {pos=pos, gain=gain})
+				spawn_falling_node(pos, {name = "default:snow"})
+				self.object:remove()
+				return
 			end
 		end
 	end
