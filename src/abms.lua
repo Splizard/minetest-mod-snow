@@ -1,16 +1,3 @@
---Backwards Compatability.
-minetest.register_abm({
-	nodenames = {"snow:snow1","snow:snow2","snow:snow3","gsnow4","snow:snow5","snow:snow6","snow:snow7","snow:snow8"},
-	interval = 1,
-	chance = 1,
-	action = function(pos, node)
-		minetest.add_node(pos, {name="default:snow"})
-		minetest.set_node_level(pos, 7*(tonumber(node.name:sub(-1))))
-	end,
-})
-
-
-
 -- Added to change dirt_with_snow to dirt if covered with blocks that don't let light through (sunlight_propagates) or have a light paramtype and liquidtype combination. ~ LazyJ, 2014_03_08
 
 minetest.register_abm({
@@ -108,27 +95,29 @@ minetest.register_abm({
 	interval = 20,
 	chance = 4,
 	action = function(pos, node)
-		if node.param2 > 0 then
-			for l = 0,1 do
-				for i = -1,1,2 do
-					for _,p in pairs({
-						{x=pos.x+i, z=pos.z-l*i},
-						{x=pos.x+l*i, z=pos.z+i}
-					}) do
-						if math.random(2) == 2 then
-							p.y = pos.y
-							if minetest.get_node(p).name == "default:water_source" then
-								minetest.add_node(p,{name="default:ice", param2 = math.random(0,node.param2-1)})
-							end
+		if node.param2 == 0 then
+			return
+		end
+		for l = 0,1 do
+			for i = -1,1,2 do
+				for _,p in pairs({
+					{x=pos.x+i, z=pos.z-l*i},
+					{x=pos.x+l*i, z=pos.z+i}
+				}) do
+					if math.random(2) == 2 then
+						p.y = pos.y
+						if minetest.get_node(p).name == "default:water_source" then
+							minetest.add_node(p,{name="default:ice", param2 = math.random(0,node.param2-1)})
 						end
 					end
 				end
 			end
-			if math.random(8) == 8 then
-				minetest.add_node(pos, {name="default:water_source"})
-			else
-				minetest.add_node(pos, {name="default:ice", param2 = 0})
-			end
+		end
+		if math.random(8) == 8 then
+			minetest.add_node(pos, {name="default:water_source"})
+		else
+			node.param2 = 0
+			minetest.add_node(pos, node)
 		end
 	end,
 })
@@ -141,6 +130,7 @@ minetest.register_abm({
 	neighbors = {"snow:moss"},
 	interval = 20,
 	chance = 6,
+	catch_up = false,
 	action = function(pos, node)
 		node.name = "default:mossycobble"
 		minetest.add_node(pos, node)
@@ -172,10 +162,10 @@ minetest.register_abm({
 		-- This finds the sapling under the grown tree. ~ LazyJ
 		if minetest.get_node(pos).name == "snow:sapling_pine" then
 			   -- This switches the sapling to a tree trunk. ~ LazyJ
-			   minetest.set_node(pos, {name="default:pinetree"})
+			minetest.set_node(pos, {name="default:pinetree"})
 			   -- This is more for testing but it may be useful info to some admins when
 			   -- grepping the server logs too. ~ LazyJ
-			   minetest.log("action", "A pine sapling grows into a tree at "..minetest.pos_to_string(pos))
+			minetest.log("action", "A pine sapling grows into a tree at "..minetest.pos_to_string(pos))
 		end
 	end
 })
@@ -205,4 +195,18 @@ minetest.register_abm({
 				-- ~ LazyJ, 2014_04_10
 		--end
 	end
+})
+
+
+
+
+--Backwards Compatability.
+minetest.register_abm({
+	nodenames = {"snow:snow1","snow:snow2","snow:snow3","gsnow4","snow:snow5","snow:snow6","snow:snow7","snow:snow8"},
+	interval = 1,
+	chance = 1,
+	action = function(pos, node)
+		minetest.add_node(pos, {name="default:snow"})
+		minetest.set_node_level(pos, 7*(tonumber(node.name:sub(-1))))
+	end,
 })

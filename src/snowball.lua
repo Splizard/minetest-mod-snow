@@ -124,6 +124,7 @@ function snow_snowball_ENTITY.on_step(self, dtime)
 	if self.timer > 600 then
 		-- 10 minutes are too long for a snowball to fly somewhere
 		self.object:remove()
+		return
 	end
 
 	if self.physical then
@@ -164,12 +165,15 @@ function snow_snowball_ENTITY.on_step(self, dtime)
 		for _,v in pairs(minetest.get_objects_inside_radius(pos, 1.73)) do
 			if v ~= self.object then
 				local entity_name = v:get_entity_name()
-				if entity_name ~= "__builtin:item"
+				if entity_name ~= "snow:snowball_entity"
 				and entity_name ~= "__builtin:item"
-				and entity_name ~= "snow:snowball_entity" then
-					if self.thrower then
-						v:punch(minetest.get_player_by_name(self.thrower), 1, {full_punch_interval=1, damage_groups = {fleshy=1}})
-					end
+				and entity_name ~= "gauges:hp_bar" then
+					v:punch(
+						(self.thrower and minetest.get_player_by_name(self.thrower))
+							or self.object,
+						1,
+						{full_punch_interval=1, damage_groups = {fleshy=1}}
+					)
 					spawn_falling_node(pos, {name = "default:snow"})
 					self.object:remove()
 					return
