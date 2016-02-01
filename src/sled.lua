@@ -113,7 +113,7 @@ local function leave_sled(self, player)
 	player:get_inventory():add_item("main", "snow:sled")
 end
 
-local function sled_rightclick(player)
+local function sled_rightclick(self, player)
 	if self.driver then
 		return
 	end
@@ -153,7 +153,7 @@ snow.register_on_configuring(function(name, v)
 end)
 
 function sled:on_rightclick(player)
-	on_sled_click(player)
+	on_sled_click(self, player)
 end
 
 function sled:on_activate(staticdata, dtime_s)
