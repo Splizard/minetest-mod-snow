@@ -49,6 +49,7 @@ end
 
 -- caching functions
 
+local default_sidelen = tonumber(minetest.setting_get("chunksize") or 5)*16-1
 local ws_lists = {}
 local function get_ws_list(a,x)
 	ws_lists[a] = ws_lists[a] or {}
@@ -57,9 +58,8 @@ local function get_ws_list(a,x)
 		return v
 	end
 	v = {}
-	for x=x,x + (80 - 1) do
-		local y = do_ws_func(a, x)
-		v[x] = y
+	for x = x, x + default_sidelen do
+		v[x] = do_ws_func(a, x)
 	end
 	ws_lists[a][x] = v
 	return v
