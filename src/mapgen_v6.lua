@@ -208,6 +208,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	-- Reseed random
 	pr = PseudoRandom(seed+68)
 
+	local nodes_added
+
 	-- Loop through columns in chunk
 	local smooth = smooth and not snowy
 	local write_to_map = false
@@ -251,6 +253,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					local vi = area:index(x, ground_y, z)
 					if data[vi] == c.leaves
 					or data[vi] == c.jungleleaves then
+						nodes_added = true
 						for y = ground_y, -16, -1 do
 							local vi = area:index(x, y, z)
 							local id = data[vi]
@@ -269,6 +272,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				end
 			end
 		else
+			nodes_added = true
 			write_to_map = true
 			if not nvals_ice then
 				nvals_ice = minetest.get_perlin_map(np_ice, chulens):get2dMap_flat({x=x0, y=z0})
@@ -456,6 +460,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		ni = ni + 1
 	end
 	end
+
+	-- abort if mapgen doesn't change sth
+	if not nodes_added then
+		return
+	end
+
+	-- try to fix oom memory crashes
+	minetest.after(0, collectgarbage)
 
 	if num ~= 1 then
 		for _,i in pairs(snow_tab) do
