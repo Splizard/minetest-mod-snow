@@ -38,10 +38,10 @@ local np_ice = {
 
 
 local function do_ws_func(a, x)
-	local n = x/(16000)
+	local n = math.pi * x / 16000
 	local y = 0
-	for k=1,1000 do
-		y = y + 1000*math.sin(math.pi * k^a * n)/(k^a)
+	for k = 1,1000 do
+		y = y + 1000*math.sin(k^a * n)/(k^a)
 	end
 	return y/math.pi
 end
@@ -49,7 +49,7 @@ end
 
 -- caching functions
 
-local default_sidelen = tonumber(minetest.setting_get("chunksize") or 5)*16-1
+local default_sidelen = (tonumber(minetest.setting_get("chunksize")) or 5)*16-1
 local ws_lists = {}
 local function get_ws_list(a,x)
 	ws_lists[a] = ws_lists[a] or {}
