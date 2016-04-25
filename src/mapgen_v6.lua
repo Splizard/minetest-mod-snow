@@ -49,19 +49,19 @@ end
 
 -- caching functions
 
-local default_sidelen = (tonumber(minetest.setting_get("chunksize")) or 5)*16-1
-local ws_lists = {}
-local function get_ws_list(a,x)
-	ws_lists[a] = ws_lists[a] or {}
-	local v = ws_lists[a][x]
+local ws_values = {}
+local function get_ws_value(a, x)
+	local v = ws_values[a]
 	if v then
-		return v
+		v = v[x]
+		if v then
+			return v
+		end
+	else
+		ws_values[a] = {}
 	end
-	v = {}
-	for x = x, x + default_sidelen do
-		v[x] = do_ws_func(a, x)
-	end
-	ws_lists[a][x] = v
+	v = do_ws_func(a, x)
+	ws_values[a][x] = v
 	return v
 end
 
@@ -474,18 +474,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			-- set snow
 			data[area:index(i[3], i[1]+1, i[2])] = c.snow
 		end
-		local wsz, wsx
 		for _,i in pairs(snow_tab) do
 			local y,z,x,test = unpack(i)
 			test = (test-nosmooth_rarity)/(1-nosmooth_rarity) -- /(1-0.53)
 			if test > 0 then
 				local maxh = math.floor(test*10)%10+1
 				if maxh ~= 1 then
-					if not wsz then
-						wsz = get_ws_list(5, z0)
-						wsx = get_ws_list(2, x0)
-					end
-					local h = math.floor(wsx[x]+wsz[z]*5)%10+1
+					local h = math.floor(get_ws_value(2, x) + get_ws_value(5, z)*5)%10+1
 					if h ~= 1 then
 						-- search for nearby snow
 						y = y+1
