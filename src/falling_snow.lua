@@ -79,6 +79,10 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
+local function infolog(msg)
+	minetest.log("info", "[snow] falling_snow: "..msg)
+end
+
 -- copied from meru mod
 local SEEDDIFF3 = 9130 -- 9130 -- Values should match minetest mapgen desert perlin.
 local OCTAVES3 = 3 -- 3
@@ -110,7 +114,7 @@ local function get_snow(pos)
 	return true
 end
 
-local addvectors = vector and vector.add
+local addvectors = vector.add
 
 --Returns a random position between minp and maxp.
 local function randpos(minp, maxp)
@@ -247,16 +251,20 @@ end)
 
 if snow.enable_snowfall then
 	step_func = calc_snowfall
+	infolog("step function set to calc_snowfall")
 else
 	step_func = function() end
+	infolog("step function set to empty function")
 end
 
 snow.register_on_configuring(function(name, v)
 	if name == "enable_snowfall" then
 		if v then
 			step_func = calc_snowfall
+			infolog("step function set to calc_snowfall")
 		else
 			step_func = function() end
+			infolog("step function set to empty function")
 		end
 	elseif name == "lighter_snowfall" then
 		lighter_snowfall = v

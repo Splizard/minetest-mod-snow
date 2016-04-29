@@ -59,6 +59,8 @@ local function get_ws_value(a, x)
 		end
 	else
 		ws_values[a] = {}
+		-- weak table, see https://www.lua.org/pil/17.1.html
+		setmetatable(ws_values[a], {__mode = "v"})
 	end
 	v = do_ws_func(a, x)
 	ws_values[a][x] = v
