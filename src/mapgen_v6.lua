@@ -60,7 +60,7 @@ local function get_ws_value(a, x)
 	else
 		ws_values[a] = {}
 		-- weak table, see https://www.lua.org/pil/17.1.html
-		setmetatable(ws_values[a], {__mode = "v"})
+		setmetatable(ws_values[a], {__mode = "kv"})
 	end
 	v = do_ws_func(a, x)
 	ws_values[a][x] = v
@@ -68,6 +68,7 @@ local function get_ws_value(a, x)
 end
 
 local plantlike_ids = {}
+setmetatable(plantlike_ids, {__mode = "kv"})
 local function is_plantlike(id)
 	if plantlike_ids[id] ~= nil then
 		return plantlike_ids[id]
@@ -88,6 +89,7 @@ local function is_plantlike(id)
 end
 
 local snowable_ids = {}
+setmetatable(snowable_ids, {__mode = "kv"})
 local function is_snowable(id)
 	if snowable_ids[id] ~= nil then
 		return snowable_ids[id]
