@@ -89,34 +89,63 @@ local OCTAVES3 = 3 -- 3
 local PERSISTENCE3 = 0.5 -- 0.5
 local SCALE3 = 250 -- 250
 
---Get snow at position.
-local rarity, perlin_scale
-local function get_snow(pos)
-	--Legacy support.
-	if weather_legacy ~= "snow" then
-		return false
+-- cache perlin noise tests
+local perlin_scale, rarity
+local cold_perl_values = {}
+setmetatable(cold_perl_values, {__mode = "kv"})
+local function cold_perlin_test(x, y)
+	if not cold_perl_values[y] then
+		cold_perl_values[y] = {}
+		setmetatable(cold_perl_values[y], {__mode = "kv"})
 	end
+
+	local v = cold_perl_values[y][x]
+	if v ~= nil then
+		return v
+	end
+
 	if not rarity then
 		rarity = snow.mapgen.smooth_rarity_min
 		perlin_scale = snow.mapgen.perlin_scale
 	end
-	local perlin1 = minetest.get_perlin(112,3, 0.5, perlin_scale)
-	if perlin1:get2d({x=pos.x, y=pos.z}) < rarity then
-		return false
+
+	v = minetest.get_perlin(112,3, 0.5, perlin_scale):get2d({x=x, y=y}) >= rarity
+	cold_perl_values[y][x] = v
+	return v
+end
+
+-- disable falling snow in desert
+local desert_perl_values = {}
+setmetatable(desert_perl_values, {__mode = "kv"})
+local function is_desert(x, y)
+	if not desert_perl_values[y] then
+		desert_perl_values[y] = {}
+		setmetatable(desert_perl_values[y], {__mode = "kv"})
 	end
 
-	-- disable falling snow in desert
-	local desert_perlin = minetest.get_perlin(SEEDDIFF3, OCTAVES3, PERSISTENCE3, SCALE3)
-	local noise3 = desert_perlin:get2d({x=pos.x+150,y=pos.z+50}) -- Offsets must match minetest mapgen desert perlin.
-	if noise3 > 0.35 then -- Smooth transition 0.35 to 0.45.
-		return false
+	local v = desert_perl_values[y][x]
+	if v ~= nil then
+		return v
 	end
-	return true
+
+	-- Offsets must match minetest mapgen desert perlin.
+	-- Smooth transition 0.35 to 0.45.
+	v = minetest.get_perlin(SEEDDIFF3, OCTAVES3, PERSISTENCE3, SCALE3):get2d({x=x+150,y=y+50}) <= 0.35
+	desert_perl_values[y][x] = v
+	return v
+end
+
+--Get snow at position.
+local function get_snow(pos)
+	return weather_legacy == "snow" --Legacy support.
+		and cold_perlin_test(pos.x, pos.z)
+		and not is_desert(pos.x, pos.z)
 end
 
 local addvectors = vector.add
 
 --Returns a random position between minp and maxp.
+-- TODO: make a fload random position
 local function randpos(minp, maxp)
 	local x,z
 	if minp.x > maxp.x then
