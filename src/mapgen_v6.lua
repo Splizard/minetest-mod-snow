@@ -41,9 +41,9 @@ local function do_ws_func(a, x)
 	local n = math.pi * x / 16000
 	local y = 0
 	for k = 1,1000 do
-		y = y + 1000*math.sin(k^a * n)/(k^a)
+		y = y + math.sin(k^a * n)/(k^a)
 	end
-	return y/math.pi
+	return 1000*y/math.pi
 end
 
 
@@ -184,19 +184,19 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		define_contents()
 	end
 
-	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-	local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
+	local vm, emin, emax = minetest.get_mapgen_object"voxelmanip"
+	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 	local data = vm:get_data()
 	local param2s = vm:get_param2_data()
 
-	local heightmap = minetest.get_mapgen_object("heightmap")
+	local heightmap = minetest.get_mapgen_object"heightmap"
 
 	local snow_tab,num = {},1
 	local pines_tab,pnum = {},1
 
 	local sidelen = x1 - x0 + 1
 	local chulens = {x=sidelen, y=sidelen, z=sidelen}
-	local nvals_default = minetest.get_perlin_map(np_default, chulens):get2dMap_flat({x=x0+150, y=z0+50})
+	local nvals_default = minetest.get_perlin_map(np_default, chulens):get2dMap_flat{x=x0+150, y=z0+50}
 	local nvals_cold, nvals_ice
 
 	-- Choose biomes
@@ -224,7 +224,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local test
 		if nvals_default[ni] < 0.35 then
 			if not nvals_cold then
-				nvals_cold = minetest.get_perlin_map(np_cold, chulens):get2dMap_flat({x=x0, y=z0})
+				nvals_cold = minetest.get_perlin_map(np_cold, chulens):get2dMap_flat{x=x0, y=z0}
 			end
 			test = math.min(nvals_cold[ni], 1)
 			if smooth then
@@ -246,10 +246,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			and test > smooth_rarity_min then
 				-- remove trees near alpine
 				local ground_y
-				for y = math.min(heightmap[ni]+20, maxp.y), math.max(minp.y, heightmap[ni]-5), -1 do
-					if data[area:index(x, y, z)] ~= c.air then
-						ground_y = y
-						break
+				if data[area:index(x, maxp.y, z)] == c.air then
+					for y = math.min(heightmap[ni]+20, maxp.y), math.max(minp.y, heightmap[ni]-5), -1 do
+						if data[area:index(x, y, z)] ~= c.air then
+							ground_y = y
+							break
+						end
 					end
 				end
 
@@ -279,7 +281,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			nodes_added = true
 			write_to_map = true
 			if not nvals_ice then
-				nvals_ice = minetest.get_perlin_map(np_ice, chulens):get2dMap_flat({x=x0, y=z0})
+				nvals_ice = minetest.get_perlin_map(np_ice, chulens):get2dMap_flat{x=x0, y=z0}
 			end
 			local icetype = nvals_ice[ni]
 			local cool = icetype > 0 -- only spawns ice on edge of water
@@ -290,11 +292,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 
 			local ground_y
-			for y = math.min(heightmap[ni]+20, maxp.y), math.max(minp.y, heightmap[ni]-5), -1 do
-				local nodid = data[area:index(x, y, z)]
-				if nodid ~= c.air then
-					ground_y = y
-					break
+			-- avoid generating underground
+			if data[area:index(x, maxp.y, z)] == c.air then
+				-- search for non air node from 20 m above ground down to 5 m below ground (confined by minp and maxp)
+				for y = math.min(heightmap[ni]+20, maxp.y), math.max(minp.y, heightmap[ni]-5), -1 do
+					if data[area:index(x, y, z)] ~= c.air then
+						ground_y = y
+						break
+					end
 				end
 			end
 

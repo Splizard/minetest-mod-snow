@@ -1,19 +1,19 @@
-   _____                       __  __           _ 
+   _____                       __  __           _
   / ____|                     |  \/  |         | |
  | (___  _ __   _____      __ | \  / | ___   __| |
   \___ \| '_ \ / _ \ \ /\ / / | |\/| |/ _ \ / _` |
   ____) | | | | (_) \ V  V /  | |  | | (_) | (_| |
  |_____/|_| |_|\___/ \_/\_/   |_|  |_|\___/ \__,_|
-				
+
 					Version 3.2
-				
+
 By Splizard and LazyJ.
 
 Minetest version:  0.4.9
 Depends: default
 License:  GPL v2
 
-Complimentary Mods: 
+Complimentary Mods:
 ---------------------
 *	"Snowdrift" by paramat
 *	"More Blocks" by Calinou (2014_05_11 or newer)
@@ -62,7 +62,7 @@ There are nine biome types:
 * Alpine
 * Snowy
 * Plain
-  
+
 Snow can be picked up and thrown as snowballs or stacked into snow blocks.
 Snow and ice melts when near warm blocks such as torches or igniters such as lava.
 Snow blocks freeze water source blocks around them.
@@ -101,3 +101,9 @@ As admin you can use the /snow command in-game to make various changes.
 UNINSTALL:
 ------------
 Simply delete the folder snow from the mods folder.
+
+
+
+TODO:
+— use the settingtypes.txt
+— test if the fixed ground_y search works correctly at chunkcorners at ground level
