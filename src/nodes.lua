@@ -60,13 +60,10 @@ end)
 
 
 
-	--Christmas easter egg
-	minetest.register_on_mapgen_init( function()
-		if rawget(_G, "skins") then
-			skins.add("character_snow_man")
-		end
+	-- Christmas egg
+	if minetest.global_exists"skins" then
+		skins.add"character_snow_man"
 	end
-	)
 
 
 -- Decorated Pine Leaves

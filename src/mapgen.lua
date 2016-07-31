@@ -58,19 +58,18 @@ end)
 
 
 --Identify the mapgen.
-minetest.register_on_mapgen_init(function(MapgenParams)
-	local mgname = MapgenParams.mgname
-	if not mgname then
-		io.write("[MOD] Snow Biomes: WARNING! mapgen could not be identifyed!\n")
-	end
-	if mgname == "v7" then
-		--Load mapgen_v7 compatibility.
-		dofile(minetest.get_modpath("snow").."/src/mapgen_v7.lua")
-	else
-		--Load mapgen_v6 compatibility.
-		dofile(minetest.get_modpath("snow").."/src/mapgen_v6.lua")
-	end
-end)
+local mgname = minetest.get_mapgen_setting"mg_name"
+if not mgname then
+	minetest.log("error", "[MOD] Snow Biomes: WARNING! mapgen could not be identifyed!")
+end
+local path = minetest.get_modpath"snow"
+if mgname == "v7" then
+	--Load mapgen_v7 compatibility.
+	dofile(path.."/src/mapgen_v7.lua")
+else
+	--Load mapgen_v6 compatibility.
+	dofile(path.."/src/mapgen_v6.lua")
+end
 
 -- To complete the commenting-out add the *closing* comment under this line.
 
