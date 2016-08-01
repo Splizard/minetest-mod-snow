@@ -61,13 +61,7 @@ end
 
 weather_legacy = read_weather_legacy() or ""
 
-local timer = 0
-minetest.register_globalstep(function(dtime)
-	timer = timer+dtime
-	if timer < 2 then
-		return
-	end
-	timer = 0
+local function leg_step()
 	if weather_legacy == "snow" then
 		if math.random(1000) == 1 then
 			weather_legacy = "none"
@@ -77,7 +71,9 @@ minetest.register_globalstep(function(dtime)
 		weather_legacy = "snow"
 		save_weather_legacy()
 	end
-end)
+	minetest.after(2, leg_step)
+end
+minetest.after(4, leg_step)
 
 local function infolog(msg)
 	minetest.log("info", "[snow] falling_snow: "..msg)

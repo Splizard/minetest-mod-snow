@@ -31,8 +31,7 @@ local function get_gravity()
 	return grav*snowball_gravity
 end
 
-local someone_throwing
-local timer = 0
+local someone_throwing, just_acitvated
 
 --Shoot snowball
 local function snow_shoot_snowball(item, player)
@@ -49,7 +48,7 @@ local function snow_shoot_snowball(item, player)
 	if creative_mode then
 		if not someone_throwing then
 			someone_throwing = true
-			timer = -0.5
+			just_acitvated = true
 		end
 		return
 	end
@@ -58,13 +57,7 @@ local function snow_shoot_snowball(item, player)
 end
 
 if creative_mode then
-	local function update_step(dtime)
-		timer = timer+dtime
-		if timer < 0.006 then
-			return
-		end
-		timer = 0
-
+	local function update_step()
 		local active
 		for _,player in pairs(minetest.get_connected_players()) do
 			if player:get_player_control().LMB then
@@ -84,13 +77,21 @@ if creative_mode then
 		end
 	end
 
-	-- do automatic throwing using a globalstep
-	minetest.register_globalstep(function(dtime)
+	-- do automatic throwing using minetest.after
+	local function do_step()
+		local timer
 		-- only if one holds left click
-		if someone_throwing then
-			update_step(dtime)
+		if someone_throwing
+		and not just_acitvated then
+			update_step()
+			timer = 0.006
+		else
+			timer = 0.5
+			just_acitvated = false
 		end
-	end)
+		minetest.after(timer, do_step)
+	end
+	minetest.after(3, do_step)
 end
 
 --The snowball Entity
