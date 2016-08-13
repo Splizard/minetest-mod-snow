@@ -63,21 +63,10 @@ dofile(modpath.."/src/snowball.lua")
 -- To get Xmas tree saplings, the "christmas_content", true or false, in "util.lua" has to be determined first.
 -- That means "nodes.lua", where the saplings are controlled, has to come after "util.lua". ~ LazyJ
 dofile(modpath.."/src/nodes.lua")
-dofile(modpath.."/src/basic_stairs_slabs.lua")
 dofile(modpath.."/src/mapgen.lua")
 dofile(modpath.."/src/sled.lua")
 dofile(modpath.."/src/falling_snow.lua")
 
-
-
--- Check for "MoreBlocks". If not found, skip this next "dofile".
-
-if rawget(_G, "stairsplus")
-and minetest.get_modpath("moreblocks") then
-
-	dofile(modpath.."/src/stairsplus.lua")
-
-end
 
 local is_uneven
 --This function places snow checking at the same time for snow level and increasing as needed.

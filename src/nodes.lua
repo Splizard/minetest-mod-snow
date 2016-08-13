@@ -462,3 +462,16 @@ minetest.override_item("default:snow", {
 	end,
 	on_use = snow.shoot_snowball
 })
+
+
+
+-- Do stairs files
+
+local path = minetest.get_modpath"snow".."/src/"
+
+dofile(path.."basic_stairs_slabs.lua")
+
+if minetest.global_exists"stairsplus"
+and minetest.get_modpath"moreblocks" then
+	dofile(path.."stairsplus.lua")
+end
