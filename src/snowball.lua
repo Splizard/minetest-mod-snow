@@ -64,7 +64,7 @@ if creative_mode then
 				local item = player:get_wielded_item()
 				local itemname = item:get_name()
 				if itemname == "default:snow" then
-					snow_shoot_snowball(nil, player)
+					snow.shoot_snowball(nil, player)
 					active = true
 					break
 				end
