@@ -174,10 +174,11 @@ function snow_snowball_ENTITY.on_step(self, dtime)
 	end
 	for _,v in pairs(minetest.get_objects_inside_radius(pos, 1.73)) do
 		if v ~= self.object then
-			local entity_name = v:get_entity_name()
-			if entity_name ~= "snow:snowball_entity"
+			local entity_name = v:get_luaentity().name
+			if v:is_player()
+			or (entity_name ~= "snow:snowball_entity"
 			and entity_name ~= "__builtin:item"
-			and entity_name ~= "gauges:hp_bar" then
+			and entity_name ~= "gauges:hp_bar") then
 				local vvel = v:getvelocity() or v:get_player_velocity()
 				local veldif = self.object:getvelocity()
 				if vvel then
@@ -268,6 +269,7 @@ minetest.override_item("default:snow", {
 	},
 	groups = {cracky=3, crumbly=3, choppy=3, oddly_breakable_by_hand=3, falling_node=1, melts=2, float=1},
 	sunlight_propagates = true,
+	walkable = true,
 	--Disable placement prediction for snow.
  	node_placement_prediction = "",
 	on_construct = function(pos)
