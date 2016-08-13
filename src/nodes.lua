@@ -335,16 +335,12 @@ minetest.register_node("snow:snow_cobble", nodedef)
 
 -- Override Default Nodes to Add Extra Functions
 
--- This adds code to the existing default ice. ~ LazyJ
 minetest.override_item("default:ice", {
-	-- The Lines: 1. Alpah to make semi-transparent ice, 2 to work with
-	-- the dirt_with_grass/snow/just dirt ABMs. ~ LazyJ, 2014_03_09
-	use_texture_alpha = true, -- 1
-	param2 = 0,
-	--param2 is reserved for how much ice will freezeover.
-	sunlight_propagates = true, -- 2
+	use_texture_alpha = true,
+	param2 = 0, --param2 is reserved for how much ice will freezeover.
+	sunlight_propagates = true, -- necessary for dirt_with_grass/snow/just dirt ABMs
 	drawtype = "glasslike",
-	inventory_image  = minetest.inventorycube("default_ice.png").."^[brighten",
+	inventory_image  = minetest.inventorycube"default_ice.png".."^[brighten",
 	liquidtype = "none",
 	 -- I made this a lot harder to dig than snow blocks because ice is much more dense
 	 -- and solid than fluffy snow. ~ LazyJ
@@ -358,12 +354,11 @@ minetest.override_item("default:ice", {
 })
 
 
-
--- This adds code to the existing, default snowblock. ~ LazyJ
 minetest.override_item("default:snowblock", {
-	liquidtype = "none", -- LazyJ to make dirt below change to dirt_with_snow (see default, nodes.lua, dirt ABM)
-	paramtype = "light",  -- LazyJ to make dirt below change to dirt_with_snow (see default, nodes.lua, dirt ABM)
-	sunlight_propagates = true, -- LazyJ to make dirt below change to dirt_with_snow (see default, nodes.lua, dirt ABM)
+	-- LazyJ to make dirt below change to dirt_with_snow (see default, nodes.lua, dirt ABM)
+	liquidtype = "none",
+	paramtype = "light",
+	sunlight_propagates = true,
 	 -- Snow blocks should be easy to dig because they are just fluffy snow. ~ LazyJ
 	groups = {cracky=3, crumbly=3, choppy=3, oddly_breakable_by_hand=3, melts=1, icemaker=1, cooks_into_ice=1, falling_node=1},
 	--drop = "snow:snow_cobble",
@@ -391,7 +386,6 @@ minetest.override_item("default:snow", {
 	groups = {cracky=3, crumbly=3, choppy=3, oddly_breakable_by_hand=3, falling_node=1, melts=2, float=1},
 	sunlight_propagates = true,
 	walkable = true,
-	--Disable placement prediction for snow.
 	node_placement_prediction = "",
 	on_construct = function(pos)
 		pos.y = pos.y-1
