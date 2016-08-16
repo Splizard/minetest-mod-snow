@@ -106,7 +106,9 @@ local function cold_perlin_test(x, y)
 	end
 
 	v = minetest.get_perlin(112,3, 0.5, perlin_scale):get2d({x=x, y=y}) >= rarity
-	cold_perl_values[y][x] = v
+	if cold_perl_values[y] then
+		cold_perl_values[y][x] = v
+	end
 	return v
 end
 
