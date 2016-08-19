@@ -106,6 +106,22 @@ local function cold_perlin_test(x, y)
 	end
 
 	v = minetest.get_perlin(112,3, 0.5, perlin_scale):get2d({x=x, y=y}) >= rarity
+
+	local em = ""
+	if type(x) ~= "number" then
+		em = em.. "x no number but "..type(y).." "
+	elseif x%1 ~= 0 then
+		em = em.. "x no integer but "..x.." "
+	end
+	if type(y) ~= "number" then
+		em = em.. "y no number but "..type(y).." "
+	elseif y%1 ~= 0 then
+		em = em.. "y no integer but "..y.." "
+	end
+	if em ~= "" then
+		error(em)
+	end
+
 	if cold_perl_values[y] then
 		cold_perl_values[y][x] = v
 	end
