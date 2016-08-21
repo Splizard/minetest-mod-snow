@@ -238,7 +238,7 @@ end
 local lighter_snowfall = snow.lighter_snowfall
 local function calc_snowfall()
 	for _, player in pairs(minetest.get_connected_players()) do
-		local ppos = player:getpos()
+		local ppos = vector.round(player:getpos())
 
 		-- Make sure player is not in a cave/house...
 		if get_snow(ppos)
