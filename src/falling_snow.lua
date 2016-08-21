@@ -109,7 +109,7 @@ local function cold_perlin_test(x, y)
 
 	local em = ""
 	if type(x) ~= "number" then
-		em = em.. "x no number but "..type(y).." "
+		em = em.. "x no number but "..type(x).." "
 	elseif x%1 ~= 0 then
 		em = em.. "x no integer but "..x.." "
 	end
