@@ -51,24 +51,24 @@ local load_time_start = minetest.get_us_time()
 
 
 -- Original init.lua File Broken into Smaller Files
-local modpath = minetest.get_modpath("snow")
-dofile(modpath.."/src/abms.lua")
-dofile(modpath.."/src/aliases.lua")
-dofile(modpath.."/src/crafting.lua")
+local srcpath = minetest.get_modpath"snow".."/src/"
+dofile(srcpath.."abms.lua")
+dofile(srcpath.."aliases.lua")
+dofile(srcpath.."crafting.lua")
 
 
 -- The formspec menu didn't work when util.lua was the very first "dofile" so I moved
 -- it and all the other original "dofiles", in order, to the bottom of the list. ~ LazyJ
 -- Minetest would crash if the mapgen was called upon before the rest of other snow lua files so
 -- I put it lower on the list and that seems to do the trick. ~ LazyJ
-dofile(modpath.."/src/util.lua")
-dofile(modpath.."/src/snowball.lua")
+dofile(srcpath.."util.lua")
+dofile(srcpath.."snowball.lua")
 -- To get Xmas tree saplings, the "christmas_content", true or false, in "util.lua" has to be determined first.
 -- That means "nodes.lua", where the saplings are controlled, has to come after "util.lua". ~ LazyJ
-dofile(modpath.."/src/nodes.lua")
-dofile(modpath.."/src/mapgen.lua")
-dofile(modpath.."/src/sled.lua")
-dofile(modpath.."/src/falling_snow.lua")
+dofile(srcpath.."nodes.lua")
+dofile(srcpath.."mapgen.lua")
+dofile(srcpath.."sled.lua")
+dofile(srcpath.."falling_snow.lua")
 
 
 local is_uneven
