@@ -47,6 +47,9 @@ http://github.com/Splizard/minetest-mod-snow/
 --  Until something else can be figured out, use paramat's "Snowdrift" mod instead.
 -- dofile(modpath.."/falling_snow.lua")
 
+local load_time_start = minetest.get_us_time()
+
+
 -- Original init.lua File Broken into Smaller Files
 local modpath = minetest.get_modpath("snow")
 dofile(modpath.."/src/abms.lua")
@@ -186,3 +189,12 @@ snow.register_on_configuring(function(name, v)
 		end
 	end
 end)
+
+
+local time = (minetest.get_us_time() - load_time_start) / 1000000
+local msg = "[snow] loaded after ca. " .. time .. " seconds."
+if time > 0.01 then
+	print(msg)
+else
+	minetest.log("info", msg)
+end
