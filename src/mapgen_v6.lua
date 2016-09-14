@@ -197,7 +197,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local sidelen = x1 - x0 + 1
 	local chulens = {x=sidelen, y=sidelen, z=sidelen}
 	local nvals_default = minetest.get_perlin_map(np_default, chulens):get2dMap_flat{x=x0+150, y=z0+50}
-	local nvals_cold, nvals_ice
+	local nvals_cold, nvals_ice, ndia
 
 	-- Choose biomes
 	local pr = PseudoRandom(seed+57)
@@ -278,9 +278,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		else
 			nodes_added = true
 			write_to_map = true
-			if not nvals_ice then
-				nvals_ice = minetest.get_perlin_map(np_ice, chulens):get2dMap_flat{x=x0, y=z0}
-			end
+			nvals_ice = nvals_ice or minetest.get_perlin_map(np_ice, chulens):get2dMap_flat{x=x0, y=z0}
 			local icetype = nvals_ice[ni]
 			local cool = icetype > 0 -- only spawns ice on edge of water
 			local icebergs = icetype > -0.2 and icetype <= 0
@@ -345,27 +343,21 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					if not icesheet
 					and not icecave
 					and not icehole then
-						local nds = {
-							data[area:index(x+1, ground_y, z)],
-							data[area:index(x, ground_y, z+1)],
-							data[area:index(x+1, ground_y, z+1)],
-							data[area:index(x-1, ground_y, z-1)],
-							data[area:index(x-1, ground_y, z)],
-							data[area:index(x, ground_y, z-1)],
-						}
-						local ice
-						if pr:next(1,4) == 1
-						and (cool or icebergs) then
-							for i = 1,#nds do
-								if nds[i] == c.ice then
-									ice = true
-									break
-								end
-							end
-						end
+						local y = data[node - area.ystride]
+						local ice = y ~= c.water and y ~= c.ice
+
 						if not ice then
-							for i = 1,#nds do
-								i = nds[i]
+							ndia = ndia or {
+								area.zstride - 1,
+								1,
+								-2*area.zstride - 2,
+								area.zstride,
+								1 - area.zstride,
+								0
+							}
+							local vi = node + 1
+							for n = 1,6 do
+								local i = data[vi]
 								if i ~= c.water
 								and i ~= c.ice
 								and i ~= c.air
@@ -373,11 +365,24 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									ice = true
 									break
 								end
+								vi = vi + ndia[n]
+							end
+
+							if not ice
+							and (cool or icebergs)
+							and pr:next(1,4) == 1 then
+
+								local vi = node + 1
+								for i = 1,6 do
+									if data[vi] == c.ice then
+										ice = true
+										break
+									end
+									vi = vi + ndia[i]
+								end
 							end
 						end
-						local y = data[area:index(x, ground_y-1, z)]
 						if ice
-						or (y ~= c.water and y ~= c.ice) -- and y ~= "air") …I don't think y can be a string here ~HybridDog
 						or (icebergs and pr:next(1,6) == 1) then
 							data[node] = c.ice
 						end
