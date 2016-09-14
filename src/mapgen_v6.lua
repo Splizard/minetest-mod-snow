@@ -247,33 +247,31 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				-- remove trees near alpine
 				local ground_y
 				if data[area:index(x, maxp.y, z)] == c.air then
-					for y = math.min(heightmap[ni]+20, maxp.y), math.max(minp.y, heightmap[ni]-5), -1 do
-						if data[area:index(x, y, z)] ~= c.air then
+					local ytop = math.min(heightmap[ni]+20, maxp.y)
+					local vi = area:index(x, ytop, z)
+					for y = ytop, math.max(minp.y, heightmap[ni]-5), -1 do
+						if data[vi] ~= c.air then
 							ground_y = y
 							break
 						end
+						vi = vi - area.ystride
 					end
 				end
 
 				if ground_y then
 					local vi = area:index(x, ground_y, z)
-					if data[vi] == c.leaves
-					or data[vi] == c.jungleleaves then
-						nodes_added = true
-						for y = ground_y, -16, -1 do
-							local vi = area:index(x, y, z)
-							local id = data[vi]
-							if id ~= c.air then
-								if id == c.leaves
-								or id == c.jungleleaves
-								or id == c.tree
-								or id == c.apple then
-									data[vi] = c.air
-								else
-									break
-								end
-							end
+					for _ = minp.y - 16, ground_y do
+						local id = data[vi]
+						if id == c.leaves
+						or id == c.jungleleaves
+						or id == c.tree
+						or id == c.apple then
+							data[vi] = c.air
+							nodes_added = true
+						else
+							break
 						end
+						vi = vi - area.ystride
 					end
 				end
 			end
@@ -295,11 +293,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			-- avoid generating underground
 			if data[area:index(x, maxp.y, z)] == c.air then
 				-- search for non air node from 20 m above ground down to 5 m below ground (confined by minp and maxp)
-				for y = math.min(heightmap[ni]+20, maxp.y), math.max(minp.y, heightmap[ni]-5), -1 do
-					if data[area:index(x, y, z)] ~= c.air then
+				local ytop = math.min(heightmap[ni]+20, maxp.y)
+				local vi = area:index(x, ytop, z)
+				for y = ytop, math.max(minp.y, heightmap[ni]-5), -1 do
+					if data[vi] ~= c.air then
 						ground_y = y
 						break
 					end
+					vi = vi - area.ystride
 				end
 			end
 
@@ -313,12 +314,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						snow_tab[num] = {ground_y, z, x, test}
 						num = num+1
 						-- generate stone ground
-						for y = ground_y, math.max(-6, minp.y-6), -1 do
-							local vi = area:index(x, y, z)
+						local vi = area:index(x, ground_y, z)
+						for _ = math.max(-6, minp.y-6), ground_y do
 							if data[vi] == c.stone then
 								break
 							end
 							data[vi] = c.stone
+							vi = vi - area.ystride
 						end
 					elseif pines
 					and pr:next(1,36) == 1 then
@@ -354,15 +356,16 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						local ice
 						if pr:next(1,4) == 1
 						and (cool or icebergs) then
-							for _,i in ipairs(nds) do
-								if i == c.ice then
+							for i = 1,#nds do
+								if nds[i] == c.ice then
 									ice = true
 									break
 								end
 							end
 						end
 						if not ice then
-							for _,i in ipairs(nds) do
+							for i = 1,#nds do
+								i = nds[i]
 								if i ~= c.water
 								and i ~= c.ice
 								and i ~= c.air
@@ -385,12 +388,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							data[node] = c.ice
 						end
 						if icecave then
-							for y = ground_y-1, -33, -1 do
-								local vi = area:index(x, y, z)
+							local vi = area:index(x, ground_y-1, z)
+							for _ = math.max(minp.y-16, -33), ground_y-1 do
 								if data[vi] ~= c.water then
 									break
 								end
 								data[vi] = c.air
+								vi = vi - area.ystride
 							end
 						end
 						if icesheet then
@@ -409,24 +413,23 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					snow_tab[num] = {ground_y, z, x, test}
 					num = num+1
 					-- replace papyrus plants with snowblocks
-					local y = ground_y
+					local vi = area:index(x, ground_y, z)
 					for _ = 1,7 do
-						local vi = area:index(x, y, z)
-						if data[vi] == c.papyrus then
-							data[vi] = c.snow_block
-							y = y-1
-						else
+						if data[vi] ~= c.papyrus then
 							break
 						end
+						data[vi] = c.snow_block
+						vi = vi - area.ystride
 					end
 				elseif alpine then
 					-- make stone pillars out of trees and other stuff
-					for y = ground_y, math.max(-6, minp.y-6), -1 do
-						local stone = area:index(x, y, z)
-						if data[stone] == c.stone then
+					local vi = area:index(x, ground_y, z)
+					for _ = 0, ground_y - math.max(-6, minp.y-6) do
+						if data[vi] == c.stone then
 							break
 						end
-						data[stone] = c.stone
+						data[vi] = c.stone
+						vi = vi - area.ystride
 					end
 					-- put snow onto it
 					snow_tab[num] = {ground_y, z, x, test}
@@ -437,9 +440,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						snow_tab[num] = {ground_y, z, x, test}
 						num = num+1
 					end
-					for y = 0, 12 do
-						y = ground_y-y
-						local vi = area:index(x, y, z)
+					local vi = area:index(x, ground_y, z)
+					for _ = 0, 12 do
 						local nd = data[vi]
 						local plantlike = is_plantlike(nd)
 						if replacements[nd] then
@@ -451,7 +453,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							data[vi] = c.dirt_with_snow
 							break
 						elseif plantlike then
-							local under = area:index(x, y-1, z)
+							local under = vi - area.ystride
 							if data[under] == c.dirt_with_grass then
 								-- replace other plants with shrubs
 								data[vi] = c.snow_shrub
@@ -462,6 +464,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						elseif nd == c.stone then
 							break
 						end
+						vi = vi - area.ystride
 					end
 				end
 			end
@@ -475,15 +478,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		return
 	end
 
-	-- try to fix oom memory crashes
-	minetest.after(0, collectgarbage)
-
 	if num ~= 1 then
-		for _,i in pairs(snow_tab) do
+		for i = 1, num-1 do
+			i = snow_tab[i]
 			-- set snow
 			data[area:index(i[3], i[1]+1, i[2])] = c.snow
 		end
-		for _,i in pairs(snow_tab) do
+		for i = 1, num-1 do
+			i = snow_tab[i]
 			local y,z,x,test = unpack(i)
 			test = (test-nosmooth_rarity)/(1-nosmooth_rarity) -- /(1-0.53)
 			if test > 0 then
@@ -528,8 +530,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	if pines
 	and pnum ~= 1 then
 		local spawn_pine = snow.voxelmanip_pine
-		for _,pos in pairs(pines_tab) do
-			spawn_pine(pos, area, data)
+		for i = 1, pnum-1 do
+			spawn_pine(pines_tab[i], area, data)
 		end
 	end
 
