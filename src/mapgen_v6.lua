@@ -178,7 +178,7 @@ local function get_perlins(sidelen)
 		return
 	end
 	perlins_chulen = sidelen
-	local chulens = {x=sidelen, y=sidelen, z=sidelen}
+	local chulens = {x=sidelen, y=sidelen}
 	perlin_objs = {
 		default = minetest.get_perlin_map(np_default, chulens),
 		cold = minetest.get_perlin_map(np_cold, chulens),
