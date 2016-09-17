@@ -172,6 +172,20 @@ snow.register_on_configuring(function(name, v)
 	end
 end)
 
+local perlin_objs, perlins_chulen
+local function get_perlins(sidelen)
+	if perlins_chulen == sidelen then
+		return
+	end
+	perlins_chulen = sidelen
+	local chulens = {x=sidelen, y=sidelen, z=sidelen}
+	perlin_objs = {
+		default = minetest.get_perlin_map(np_default, chulens),
+		cold = minetest.get_perlin_map(np_cold, chulens),
+		ice = minetest.get_perlin_map(np_ice, chulens),
+	}
+end
+
 minetest.register_on_generated(function(minp, maxp, seed)
 	local t1 = os.clock()
 
@@ -194,9 +208,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local snow_tab,num = {},1
 	local pines_tab,pnum = {},1
 
-	local sidelen = x1 - x0 + 1
-	local chulens = {x=sidelen, y=sidelen, z=sidelen}
-	local nvals_default = minetest.get_perlin_map(np_default, chulens):get2dMap_flat{x=x0+150, y=z0+50}
+	get_perlins(x1 - x0 + 1)
+	local nvals_default = perlin_objs.default:get2dMap_flat{x=x0+150, y=z0+50}
 	local nvals_cold, nvals_ice, ndia
 
 	-- Choose biomes
@@ -224,7 +237,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local test
 		if nvals_default[ni] < 0.35 then
 			if not nvals_cold then
-				nvals_cold = minetest.get_perlin_map(np_cold, chulens):get2dMap_flat{x=x0, y=z0}
+				nvals_cold = perlin_objs.cold:get2dMap_flat{x=x0, y=z0}
 			end
 			test = math.min(nvals_cold[ni], 1)
 			if smooth then
@@ -278,7 +291,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		else
 			nodes_added = true
 			write_to_map = true
-			nvals_ice = nvals_ice or minetest.get_perlin_map(np_ice, chulens):get2dMap_flat{x=x0, y=z0}
+			nvals_ice = nvals_ice or perlin_objs.ice:get2dMap_flat{x=x0, y=z0}
 			local icetype = nvals_ice[ni]
 			local cool = icetype > 0 -- only spawns ice on edge of water
 			local icebergs = icetype > -0.2 and icetype <= 0
