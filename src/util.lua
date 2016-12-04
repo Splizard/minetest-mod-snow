@@ -103,9 +103,8 @@ do
 		--Create config file.
 		return
 	end
-	io.close(file)
 	config = {}
-	for line in io.lines(path) do
+	for line in file:lines() do
 		if line:sub(1,1) ~= "#" then
 			local i, v = line:match("^(%S*) = (%S*)")
 			if i and v then
@@ -113,6 +112,7 @@ do
 			end
 		end
 	end
+	io.close(file)
 end
 
 if config then
