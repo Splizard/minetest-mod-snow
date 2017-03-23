@@ -208,4 +208,14 @@ if minetest.global_exists"treecapitator" then
 		range_down = 3,
 		stem_height_min = 1,
 	}
+
+	treecapitator.register_tree{
+		trees = {"default:pine_tree"},
+		leaves = {"snow:needles_decorated"},
+		fruits = {"snow:star_lit", "snow:star"},
+		range = 1,
+		range_up = 3,
+		range_down = 3,
+		stem_height_min = 1,
+	}
 end
