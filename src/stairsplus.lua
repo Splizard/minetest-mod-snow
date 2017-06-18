@@ -36,7 +36,7 @@ There is one in each of the "stairsplus.register_all" sections.
 
 -- Check for infinite stacks
 
---if minetest.get_modpath("unified_inventory") or not minetest.setting_getbool("creative_mode") then
+--if minetest.get_modpath("unified_inventory") or not minetest.settigetbool("creative_mode") then
 --	snow_stairsplus.expect_infinite_stacks = false
 --else
 --	snow_stairsplus.expect_infinite_stacks = true

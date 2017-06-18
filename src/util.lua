@@ -132,7 +132,7 @@ end
 
 for i,v in pairs(snow) do
 	if allowed_types[type(v)] then
-		local v = minetest.setting_get("snow_"..i)
+		local v = minetest.settings:get("snow_"..i)
 		if v ~= nil then
 			snow[i] = value_from_string(v)
 		end
