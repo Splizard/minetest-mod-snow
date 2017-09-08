@@ -174,7 +174,7 @@ function snow_snowball_ENTITY.on_step(self, dtime)
 	end
 	for _,v in pairs(minetest.get_objects_inside_radius(pos, 1.73)) do
 		if v ~= self.object then
-			local entity_name = v:get_luaentity().name
+			local entity_name = (v:get_luaentity() or {}).name
 			if v:is_player()
 			or (entity_name ~= "snow:snowball_entity"
 			and entity_name ~= "__builtin:item"
@@ -192,7 +192,7 @@ function snow_snowball_ENTITY.on_step(self, dtime)
 					{full_punch_interval=1, damage_groups = {fleshy=math.ceil(gain)}}
 				)
 				minetest.sound_play("default_snow_footstep", {pos=pos, gain=gain})
-				spawn_falling_node(pos, {name = "default:snow"})
+				minetest.spawn_falling_node(pos, {name = "default:snow"})
 				self.object:remove()
 				return
 			end
