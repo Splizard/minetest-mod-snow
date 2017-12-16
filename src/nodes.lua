@@ -241,6 +241,7 @@ nodedef = {
 	groups = leaves.groups,
 	drop = leaves.drop,
 	sounds = leaves.sounds,
+	on_timer = leaves.on_timer, -- timer from leafdecay
 }
 nodedef.groups.flammable = 1
 
@@ -265,6 +266,17 @@ nodedef.groups.flammable = 1
 
 minetest.register_node("snow:apple", nodedef)
 snow.known_plants[minetest.get_content_id("default:apple")] = minetest.get_content_id("snow:apple")
+
+local dec_func = leafdecay_after_destruct
+function leafdecay_after_destruct(pos, oldnode, def)
+	if def.trunks[1] ~= "default:tree" then
+		return dec_func(pos, oldnode, def)
+	end
+	def.leaves[#def.leaves+1] = "snow:leaves"
+	def.leaves[#def.leaves+1] = "snow:apple"
+	leafdecay_after_destruct = dec_func
+	return leafdecay_after_destruct(pos, oldnode, def)
+end
 
 -- TODO
 snow.known_plants[minetest.get_content_id("default:jungleleaves")] = minetest.get_content_id("default:jungleleaves")
