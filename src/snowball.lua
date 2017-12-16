@@ -173,8 +173,10 @@ function snow_snowball_ENTITY.on_step(self, dtime)
 		return
 	end
 	for _,v in pairs(minetest.get_objects_inside_radius(pos, 1.73)) do
-		if v ~= self.object then
-			local entity_name = v:get_luaentity().name
+		local entity = v:get_luaentity()
+		if v ~= self.object
+		and entity then
+			local entity_name = entity.name
 			if v:is_player()
 			or (entity_name ~= "snow:snowball_entity"
 			and entity_name ~= "__builtin:item"
