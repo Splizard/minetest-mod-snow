@@ -68,7 +68,6 @@ minetest.register_abm({
 	 	else
 			return
 		end
-		nodeupdate(pos)
 	end,
 })
 
