@@ -352,7 +352,7 @@ minetest.override_item("default:ice", {
 	param2 = 0, --param2 is reserved for how much ice will freezeover.
 	sunlight_propagates = true, -- necessary for dirt_with_grass/snow/just dirt ABMs
 	drawtype = "glasslike",
-	inventory_image  = minetest.inventorycube"default_ice.png".."^[brighten",
+	tiles = {"default_ice.png^[brighten"},
 	liquidtype = "none",
 	 -- I made this a lot harder to dig than snow blocks because ice is much more dense
 	 -- and solid than fluffy snow. ~ LazyJ
@@ -468,16 +468,3 @@ minetest.override_item("default:snow", {
 	end,
 	on_use = snow.shoot_snowball
 })
-
-
-
--- Do stairs files
-
-local path = minetest.get_modpath"snow".."/src/"
-
-dofile(path.."basic_stairs_slabs.lua")
-
-if minetest.global_exists"stairsplus"
-and minetest.get_modpath"moreblocks" then
-	dofile(path.."stairsplus.lua")
-end
