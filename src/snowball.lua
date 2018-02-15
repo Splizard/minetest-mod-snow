@@ -194,7 +194,15 @@ function snow_snowball_ENTITY.on_step(self, dtime)
 					{full_punch_interval=1, damage_groups = {fleshy=math.ceil(gain)}}
 				)
 				minetest.sound_play("default_snow_footstep", {pos=pos, gain=gain})
-				spawn_falling_node(pos, {name = "default:snow"})
+
+				-- spawn_falling_node
+				local obj = core.add_entity(pos, "__builtin:falling_node")
+				if obj then
+					obj:get_luaentity():set_node{name = "default:snow"}
+				else
+					minetest.log("error", "Couldn't spawn falling node")
+				end
+
 				self.object:remove()
 				return
 			end
