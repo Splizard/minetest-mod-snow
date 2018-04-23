@@ -15,6 +15,18 @@ snow = {
 	disable_mapgen =  minetest.settings:get_bool("disable_mapgen"),
 }
 
+if snow.sleds == nil then
+	snow.sleds = true
+end
+
+if snow.debug == nil then
+	snow.debug = false
+end
+
+if snow.disable_mapgen == nil then
+	snow.disable_mapgen = true
+end
+
 -- functions for dynamically changing settings
 
 local on_configurings,n = {},1
