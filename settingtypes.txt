@@ -33,3 +33,6 @@ mapgen_rarity (Snow Biome Rarity %) float 18
 
 #size of the generated… (has an effect to the rarity, too)
 mapgen_size (Snow Biome Size) float 210
+
+#Minetest finally has capable snow biomes by default, lets not mess it up with the old snowgen.
+disable_mapgen (Disable mod-generated biomes) bool true

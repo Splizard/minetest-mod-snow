@@ -12,6 +12,7 @@ snow = {
 	min_height = tonumber(minetest.settings:get("min_height")) or 3,
 	mapgen_rarity = tonumber(minetest.settings:get("mapgen_rarity")) or 18,
 	mapgen_size = tonumber(minetest.settings:get("mapgen_size")) or 210,
+	disable_mapgen =  minetest.settings:get_bool("disable_mapgen"),
 }
 
 -- functions for dynamically changing settings

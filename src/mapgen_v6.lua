@@ -142,10 +142,10 @@ local function define_contents()
 end
 
 local smooth = snow.smooth_biomes
-local smooth_rarity_max = mg.smooth_rarity_max
-local smooth_rarity_min = mg.smooth_rarity_min
-local smooth_rarity_dif = mg.smooth_rarity_dif
-local nosmooth_rarity = mg.nosmooth_rarity
+local smooth_rarity_max = mg.smooth_rarity_max or 0
+local smooth_rarity_min = mg.smooth_rarity_min or 0
+local smooth_rarity_dif = mg.smooth_rarity_dif or 0
+local nosmooth_rarity = mg.nosmooth_rarity or 0
 
 snow.register_on_configuring(function(name, v)
 	if name == "debug" then
@@ -235,7 +235,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	for z = z0, z1 do
 	for x = x0, x1 do
 		local in_biome = false
-		local test
+		local test = 0
 		if nvals_default[ni] < 0.35 then
 			nvals_cold = nvals_cold or perlin_objs.cold:get2dMap_flat({x=x0, y=z0}, nbuf_cold)
 			test = math.min(nvals_cold[ni], 1)
