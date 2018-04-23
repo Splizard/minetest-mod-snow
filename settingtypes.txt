@@ -1,0 +1,35 @@
+#The gravity of thrown snowballs.
+snowball_gravity (Snowball Gravity) float 0.91
+
+#How fast players throw snowballs.
+snowball_velocity (Snowball Velocity) float 19
+
+#Enable/Disable sleds.
+sleds (Enable Sleds) bool true
+
+#Enables falling snow.
+enable_snowfall (Enable Snowfall) bool true
+
+#Reduces the amount of resources and fps used by snowfall.
+lighter_snowfall (Use Light Snowfall) bool false
+
+#Enables debug output. Currently it only prints mgv6 info.
+debug (Debug Mode) bool false
+
+#Disable this to remove christmas saplings from being found.
+christmas_content (Enable Christmas Content) bool true
+
+#Enables debug output. Currently it only prints mgv6 info.
+smooth_biomes (Smooth Biome Transitions) bool true
+
+#The minumum height a snow biome will generate (mgv7)
+min_height (Minumum Height for Snow Biomes) int 3
+
+#Disable this to stop snow from being smoothed.
+smooth_snow (Multiple Snow Levels) bool true
+
+#mapgen rarity in %.
+mapgen_rarity (Snow Biome Rarity %) float 18
+
+#size of the generated… (has an effect to the rarity, too)
+mapgen_size (Snow Biome Size) float 210
