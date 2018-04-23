@@ -27,6 +27,10 @@ if snow.disable_mapgen == nil then
 	snow.disable_mapgen = true
 end
 
+if snow.enable_snowfall == nil then
+	snow.enable_snowfall = true
+end
+
 -- functions for dynamically changing settings
 
 local on_configurings,n = {},1

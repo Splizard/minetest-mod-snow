@@ -266,12 +266,14 @@ nodedef.groups.flammable = 1
 minetest.register_node("snow:apple", nodedef)
 snow.known_plants[minetest.get_content_id("default:apple")] = minetest.get_content_id("snow:apple")
 
--- decay from default/nodes.lua:2537
-default.register_leafdecay{
-	trunks = {"default:tree"},
-	leaves = {"snow:apple", "snow:leaves"},
-	radius = minetest.get_mapgen_setting"mg_name" == "v6" and 2 or 3,
-}
+if not snow.disable_mapgen then
+	-- decay from default/nodes.lua:2537
+	default.register_leafdecay{
+		trunks = {"default:tree"},
+		leaves = {"snow:apple", "snow:leaves"},
+		radius = minetest.get_mapgen_setting"mg_name" == "v6" and 2 or 3,
+	}
+end
 
 -- TODO
 snow.known_plants[minetest.get_content_id("default:jungleleaves")] = minetest.get_content_id("default:jungleleaves")
