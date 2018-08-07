@@ -396,6 +396,10 @@ minetest.override_item("default:snow", {
 		type = "leveled",
 		fixed = {-0.5, -0.5, -0.5, 0.5, -0.5, 0.5},
 	},
+	collision_box = {
+		type = "leveled",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -0.5, 0.5},
+	},
 	selection_box = {
 		type = "leveled",
 		fixed = {-0.5, -0.5, -0.5, 0.5, -0.5, 0.5},
