@@ -12,9 +12,10 @@ saplings grow into trees. --]]
 
 -- Part 1: To disable the mapgen, add the *starting* comment under this line.
 
+local perlin_scale, nosmooth_rarity
 if not snow.disable_mapgen then
 	print("[snow] Mapgen enabled!")
-	
+
 	snow.mapgen = snow.mapgen or {}
 	local mg = snow.mapgen
 
@@ -27,7 +28,6 @@ if not snow.disable_mapgen then
 	local size = snow.mapgen_size
 	local smooth = snow.smooth_biomes
 
-	local nosmooth_rarity, perlin_scale
 	local function calc_values()
 		nosmooth_rarity = 1-rarity/50
 		perlin_scale = size*100/rarity
