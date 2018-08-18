@@ -129,22 +129,40 @@ end
 
 --Snowball_entity.on_step()--> called when snowball is moving.
 function snow_snowball_ENTITY.on_step(self, dtime)
-	self.timer = self.timer+dtime
+	self.timer = self.timer + dtime
 	if self.timer > 10 then
-		-- 10 seconds is too long for a snowball to fly somewhere
+		-- 10 seconds are too long for a snowball to fly somewhere
 		self.object:remove()
 		return
 	end
 
 	if self.physical then
-		local fell = self.object:getvelocity().y == 0
+		local vel = self.object:getvelocity()
+		local fell = vel.y == 0
 		if not fell then
+			if self.probably_stuck then
+				self.probably_stuck = nil
+			end
+			return
+		end
+		if self.probably_stuck
+		and vel.x == 0
+		and vel.z == 0 then
+			-- add a small velocity to move it from the corner
+			vel.x = math.random() - 0.5
+			vel.z = math.random() - 0.5
+			self.object:set_velocity(vel)
+			self.probably_stuck = nil
 			return
 		end
 		local pos = vector.round(self.object:getpos())
 		if minetest.get_node(pos).name == "air" then
 			pos.y = pos.y-1
 			if minetest.get_node(pos).name == "air" then
+				if vel.x == 0
+				and vel.z == 0 then
+					self.probably_stuck = true
+				end
 				return
 			end
 		end
