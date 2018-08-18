@@ -130,8 +130,8 @@ end
 --Snowball_entity.on_step()--> called when snowball is moving.
 function snow_snowball_ENTITY.on_step(self, dtime)
 	self.timer = self.timer + dtime
-	if self.timer > 600 then
-		-- 10 minutes are too long for a snowball to fly somewhere
+	if self.timer > 10 then
+		-- 10 seconds is too long for a snowball to fly somewhere
 		self.object:remove()
 		return
 	end
