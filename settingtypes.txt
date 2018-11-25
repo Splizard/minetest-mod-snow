@@ -19,7 +19,7 @@ snow_debug (Debug Mode) bool false
 #Disable this to remove christmas saplings from being found.
 snow_christmas_content (Enable Christmas Content) bool true
 
-#Enables debug output. Currently it only prints mgv6 info.
+#Enables smooth biome transitions.
 snow_smooth_biomes (Smooth Biome Transitions) bool true
 
 #The minumum height a snow biome will generate (mgv7)
