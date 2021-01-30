@@ -1,6 +1,6 @@
 -- Parameters
 
-function snow_fall(pos)
+local function snow_fall(pos)
 	local ground_y = nil
 	for y=pos.y+10,pos.y+20,1 do
 		local n = minetest.get_node({x=pos.x,y=y,z=pos.z}).name
@@ -32,8 +32,8 @@ local PRECSPR = 6 -- Time scale for precipitation variation in minutes
 local PRECOFF = -0.4 -- Precipitation offset, higher = rains more often
 local GSCYCLE = 0.5 -- Globalstep cycle (seconds)
 local FLAKES = 32 -- Snowflakes per cycle
-local DROPS = 128 -- Raindrops per cycle
-local RAINGAIN = 0.2 -- Rain sound volume
+--~ local DROPS = 128 -- Raindrops per cycle
+--~ local RAINGAIN = 0.2 -- Rain sound volume
 local COLLIDE = false -- Whether particles collide with nodes
 local NISVAL = 39 -- Clouds RGB value at night
 local DASVAL = 175 -- Clouds RGB value in daytime
@@ -81,12 +81,6 @@ local grad = 14 / 95
 local yint = 1496 / 95
 
 
--- Initialise noise objects to nil
-
-local nobj_temp = nil
-local nobj_humid = nil
-local nobj_prec = nil
-
 
 -- Globalstep function
 local timer = 0
@@ -102,16 +96,16 @@ if snow.enable_snowfall then
 
 		for _, player in ipairs(minetest.get_connected_players()) do
 			local player_name = player:get_player_name()
-			local ppos = player:getpos()
-			local pposy = math.floor(ppos.y) + 2 -- Precipitation when swimming
+			local pos_player = player:getpos()
+			local pposy = math.floor(pos_player.y) + 2 -- Precipitation when swimming
 			if pposy >= YLIMIT - 2 then
-				local pposx = math.floor(ppos.x)
-				local pposz = math.floor(ppos.z)
+				local pposx = math.floor(pos_player.x)
+				local pposz = math.floor(pos_player.z)
 				local ppos = {x = pposx, y = pposy, z = pposz}
 
-				local nobj_temp = nobj_temp or minetest.get_perlin(np_temp)
-				local nobj_humid = nobj_humid or minetest.get_perlin(np_humid)
-				local nobj_prec = nobj_prec or minetest.get_perlin(np_prec)
+				local nobj_temp = minetest.get_perlin(np_temp)
+				local nobj_humid = minetest.get_perlin(np_humid)
+				local nobj_prec = minetest.get_perlin(np_prec)
 
 				local nval_temp = nobj_temp:get2d({x = pposx, y = pposz})
 				local nval_humid = nobj_humid:get2d({x = pposx, y = pposz})
@@ -207,7 +201,7 @@ if snow.enable_snowfall then
 								vertical = false,
 								texture = "snowdrift_snowflake" ..
 									math.random(1, 12) .. ".png",
-								playername = player:get_player_name()
+								playername = player_name
 							})
 						end
 					end

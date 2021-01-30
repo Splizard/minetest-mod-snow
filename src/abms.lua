@@ -1,4 +1,6 @@
--- Added to change dirt_with_snow to dirt if covered with blocks that don't let light through (sunlight_propagates) or have a light paramtype and liquidtype combination. ~ LazyJ, 2014_03_08
+-- Added to change dirt_with_snow to dirt if covered with blocks that don't let
+-- light through (sunlight_propagates) or have a light paramtype and
+-- liquidtype combination. ~ LazyJ, 2014_03_08
 
 minetest.register_abm({
 	nodenames = {"default:dirt_with_snow"},
@@ -106,7 +108,10 @@ minetest.register_abm({
 					if math.random(2) == 2 then
 						p.y = pos.y
 						if minetest.get_node(p).name == "default:water_source" then
-							minetest.add_node(p,{name="default:ice", param2 = math.random(0,node.param2-1)})
+							minetest.add_node(p, {
+								name = "default:ice",
+								param2 = math.random(0,node.param2-1)
+							})
 						end
 					end
 				end

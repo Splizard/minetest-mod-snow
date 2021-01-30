@@ -82,9 +82,11 @@ if snow.disable_deco_needle_ani then
 else
 	-- Animated, "blinking lights" version. ~ LazyJ
 	nodedef.inventory_image = minetest.inventorycube("snow_needles_decorated.png")
-	nodedef.tiles = {
-		{name="snow_needles_decorated_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=20.0}}
-	}
+	nodedef.tiles = {{
+		name="snow_needles_decorated_animated.png",
+		animation={type="vertical_frames", aspect_w=16, aspect_h=16,
+			length=20.0}
+	}}
 end
 nodedef.drop.items[#nodedef.drop.items] = {items = {'snow:needles_decorated'}}
 
@@ -129,9 +131,13 @@ nodedef = {
 	walkable = false,
 	-- Don't want the ornament breaking too easily because you have to punch it to turn it on and off. ~ LazyJ
 	groups = {cracky=1, crumbly=1, choppy=1, oddly_breakable_by_hand=1},
-	-- Breaking "glass" sound makes it sound like a real, broken, Xmas tree ornament (Sorry, Mom!).  ;)-  ~ LazyJ
-	sounds = default.node_sound_glass_defaults({dig = {name="default_glass_footstep", gain=0.2}}),
-	on_punch = function(pos, node) -- Added a "lit" star that can be punched on or off depending on your preference. ~ LazyJ
+	-- Breaking "glass" sound makes it sound like a real, broken, Xmas tree
+	-- ornament (Sorry, Mom!).  ;)-  ~ LazyJ
+	sounds = default.node_sound_glass_defaults(
+		{dig = {name="default_glass_footstep", gain=0.2}}),
+	-- Added a "lit" star that can be punched on or off depending on your
+	-- preference. ~ LazyJ
+	on_punch = function(pos, node)
 		node.name = "snow:star_lit"
 		minetest.set_node(pos, node)
 	end,
@@ -142,7 +148,7 @@ minetest.register_node("snow:star", table.copy(nodedef))
 
 -- Star (Lit Version) on Xmas Trees
 nodedef.description = nodedef.description.." Lighted"
-nodedef.light_source = LIGHT_MAX
+nodedef.light_source = minetest.LIGHT_MAX
 nodedef.tiles = {"snow_star_lit.png"}
 nodedef.drop = "snow:star"
 nodedef.groups.not_in_creative_inventory = 1
@@ -374,7 +380,8 @@ minetest.override_item("default:snowblock", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	 -- Snow blocks should be easy to dig because they are just fluffy snow. ~ LazyJ
-	groups = {cracky=3, crumbly=3, choppy=3, oddly_breakable_by_hand=3, melts=1, icemaker=1, cooks_into_ice=1, falling_node=1},
+	groups = {cracky=3, crumbly=3, choppy=3, oddly_breakable_by_hand=3, melts=1,
+		icemaker=1, cooks_into_ice=1, falling_node=1},
 	--drop = "snow:snow_cobble",
 	on_construct = snow_onto_dirt
 		-- Thinking in terms of layers, dirt_with_snow could also double as

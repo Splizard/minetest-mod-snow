@@ -53,8 +53,6 @@ than I originally planned. :p  ~ LazyJ
 -- Helper functions
 --
 
-vector.zero = vector.zero or {x=0, y=0, z=0}
-
 local function table_find(t, v)
 	for i = 1,#t do
 		if t[i] == v then
