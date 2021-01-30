@@ -1,6 +1,6 @@
 -- Parameters
 
-function snow_fall(pos, player, animate)
+function snow_fall(pos)
 	local ground_y = nil
 	for y=pos.y+10,pos.y+20,1 do
 		local n = minetest.get_node({x=pos.x,y=y,z=pos.z}).name
@@ -128,7 +128,7 @@ if snow.enable_snowfall then
 				local freeze = nval_temp < 35
 				local precip = nval_prec < (nval_humid - 50) / 50 + PRECOFF and
 					nval_humid - grad * nval_temp > yint
-				
+
 				if snow.debug then
 					precip = true
 				end
@@ -173,9 +173,9 @@ if snow.enable_snowfall then
 					if freeze then
 						-- Snowfall
 						local extime = math.min((pposy + 12 - YLIMIT) / 2, 9)
-						
+
 						local x, y, z = pposx - 24 + math.random(0, 48), pposy + 12, pposz - 24 + math.random(0, 48)
-						
+
 						if not snow.lighter_snowfall then
 							snow_fall({
 										x = x,
@@ -183,11 +183,11 @@ if snow.enable_snowfall then
 										z = z
 									}, true)
 						end
-						
-						for flake = 1, FLAKES do
-							
+
+						for _ = 1, FLAKES do
+
 							x, y, z = pposx - 24 + math.random(0, 48), pposy + 12, pposz - 24 + math.random(0, 48)
-							
+
 							minetest.add_particle({
 								pos = {
 									x = x,

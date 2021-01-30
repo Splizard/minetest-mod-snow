@@ -577,7 +577,7 @@ local biome_strings = {
 	{"snowy", "plain", "alpine", "normal", "normal"},
 	{"cool", "icebergs", "icesheet", "icecave", "icehole"}
 }
-function biome_to_string(num,num2)
+function biome_to_string(num)
 	local biome = biome_strings[1][num] or "unknown "..num
 	return biome
 end

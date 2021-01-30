@@ -4,7 +4,7 @@ minetest.register_abm({
 	nodenames = {"default:dirt_with_snow"},
 	interval = 2,
 	chance = 20,
-	action = function(pos, node)
+	action = function(pos)
 		local name = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z}).name
 		local nodedef = minetest.registered_nodes[name]
 		if name ~= "ignore"
@@ -37,9 +37,9 @@ minetest.register_abm({
 		if intensity == 1 then
 			minetest.set_node(pos, {name="default:water_source"})
 		elseif intensity == 2 then
-	 		minetest.set_node(pos, {name="default:water_flowing", param2=7})
+			minetest.set_node(pos, {name="default:water_flowing", param2=7})
 		elseif intensity == 3 then
-	 		minetest.set_node(pos, {name="default:water_flowing", param2=3})
+			minetest.set_node(pos, {name="default:water_flowing", param2=3})
 		--[[	LazyJ, you need to add param2, which defines the amount of the flowing water ~ HybridDog 2015_03_06
 			This was causing "melts=2" nodes to just disappear so I changed it to replace the
 			node with a water_source for a couple seconds and then replace the water_source with
@@ -61,11 +61,11 @@ minetest.register_abm({
 											-- the water to flow and spread before the
 											-- water_source is changed to air. ~ LazyJ
 					if minetest.get_node(pos).name == "default:water_source" then
-	 					minetest.add_node(pos,{name="air"})
-	 				end
-	 			end)
+						 minetest.add_node(pos,{name="air"})
+					 end
+				 end)
 		--]]
-	 	else
+		 else
 			return
 		end
 	end,
@@ -78,7 +78,7 @@ minetest.register_abm({
 --Water freezes when in contact with snow.
 minetest.register_abm({
 	nodenames = {"default:water_source"},
-	 -- Added "group:icemaker" and snowbrick. ~ LazyJ
+	-- Added "group:icemaker" and snowbrick. ~ LazyJ
 	neighbors = {"default:snow", "default:snowblock", "snow:snow_brick", "group:icemaker"},
 	interval = 20,
 	chance = 4,
@@ -144,7 +144,7 @@ minetest.register_abm({
 	nodenames = {"snow:sapling_pine"},
 	interval = 10,
 	chance = 50,
-	action = function(pos, node)
+	action = function(pos)
 
 -- Check if there is enough vertical-space for the sapling to grow without
 -- hitting anything else.  ~ LazyJ, 2014_04_10
@@ -177,7 +177,7 @@ minetest.register_abm({
 	nodenames = {"snow:xmas_tree"},
 	interval = 10,
 	chance = 50,
-	action = function(pos, node)
+	action = function(pos)
 
 		-- 'If' there is air in each of the 8 nodes dirctly above the sapling,... ~LazyJ
 		for i = 1,8 do
