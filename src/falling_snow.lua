@@ -96,7 +96,7 @@ if snow.enable_snowfall then
 
 		for _, player in ipairs(minetest.get_connected_players()) do
 			local player_name = player:get_player_name()
-			local pos_player = player:getpos()
+			local pos_player = player:get_pos()
 			local pposy = math.floor(pos_player.y) + 2 -- Precipitation when swimming
 			if pposy >= YLIMIT - 2 then
 				local pposx = math.floor(pos_player.x)
@@ -107,9 +107,9 @@ if snow.enable_snowfall then
 				local nobj_humid = minetest.get_perlin(np_humid)
 				local nobj_prec = minetest.get_perlin(np_prec)
 
-				local nval_temp = nobj_temp:get2d({x = pposx, y = pposz})
-				local nval_humid = nobj_humid:get2d({x = pposx, y = pposz})
-				local nval_prec = nobj_prec:get2d({x = os.clock() / 60, y = 0})
+				local nval_temp = nobj_temp:get_2d({x = pposx, y = pposz})
+				local nval_humid = nobj_humid:get_2d({x = pposx, y = pposz})
+				local nval_prec = nobj_prec:get_2d({x = os.clock() / 60, y = 0})
 
 				-- Biome system: Frozen biomes below heat 35,
 				-- deserts below line 14 * t - 95 * h = -1496
@@ -151,14 +151,13 @@ if snow.enable_snowfall then
 								((time - 0.1875) / 0.0521) * difsval)
 						end
 						-- Set sky to overcast bluish-grey
-						player:set_sky(
-							{r = sval, g = sval, b = sval + 16, a = 255},
-							"plain",
-							{}
-						)
+						player:set_sky({
+							base_color = {r = sval, g = sval, b = sval + 16, a = 255},
+							type = "plain",
+						})
 					else
 						-- Reset sky to normal
-						player:set_sky({}, "regular", {})
+						player:set_sky({type = "regular"})
 					end
 				end
 
