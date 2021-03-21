@@ -311,7 +311,8 @@ nodedef = {
 	-- by player position. ~ LazyJ
 	 -- I made this a little harder to dig than snow blocks because
 	 -- I imagine snow brick as being much more dense and solid than fluffy snow. ~ LazyJ
-	groups = {cracky=2, crumbly=2, choppy=2, oddly_breakable_by_hand=2, melts=1, icemaker=1, cooks_into_ice=1, cools_lava = 1, snowy = 1},
+	groups = {cracky=2, crumbly=2, choppy=2, oddly_breakable_by_hand=2, melts=1,
+		icemaker=1, cooks_into_ice=1, cools_lava = 1, snowy = 1},
 	 --Let's use the new snow sounds instead of the old grass sounds. ~ LazyJ
 	sounds = default.node_sound_snow_defaults(),
 	-- The "on_construct" part below, thinking in terms of layers,

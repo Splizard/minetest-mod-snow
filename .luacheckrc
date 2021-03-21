@@ -1,10 +1,19 @@
 read_globals = {
-	"dump", "vector", "minetest",
+	"dump", "vector",
 	"table", "math", "PseudoRandom", "VoxelArea",
 	"stairs", "stairsplus", "skins", "treecapitator",
 	default = {
 		fields = {
 			player_attached = {
+				read_only = false,
+				other_fields = true
+			}
+		},
+		other_fields = true
+	},
+	minetest = {
+		fields = {
+			registered_nodes = {
 				read_only = false,
 				other_fields = true
 			}
