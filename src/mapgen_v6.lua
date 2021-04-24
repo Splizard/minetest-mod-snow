@@ -212,7 +212,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local pines_tab,pnum = {},1
 
 	get_perlins(x1 - x0 + 1)
-	local nvals_default = perlin_objs.default:get2dMap_flat({x=x0+150, y=z0+50}, nbuf_default)
+	local nvals_default = perlin_objs.default:get_2dMap_flat({x=x0+150, y=z0+50}, nbuf_default)
 	local nvals_cold, nvals_ice, ndia
 
 	-- Choose biomes
@@ -239,7 +239,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local in_biome = false
 		local test
 		if nvals_default[ni] < 0.35 then
-			nvals_cold = nvals_cold or perlin_objs.cold:get2dMap_flat({x=x0, y=z0}, nbuf_cold)
+			nvals_cold = nvals_cold or perlin_objs.cold:get_2dMap_flat({x=x0, y=z0}, nbuf_cold)
 			test = math.min(nvals_cold[ni], 1)
 			if is_smooth then
 				if test >= smooth_rarity_max
@@ -291,7 +291,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			end
 		else
 			if not nvals_ice then
-				nvals_ice = perlin_objs.ice:get2dMap_flat({x=x0, y=z0}, nbuf_ice)
+				nvals_ice = perlin_objs.ice:get_2dMap_flat({x=x0, y=z0}, nbuf_ice)
 
 				nodes_added = true
 				write_to_map = true
