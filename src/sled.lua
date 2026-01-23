@@ -47,10 +47,6 @@ than I originally planned. :p  ~ LazyJ
 -- CODE STUFF
 --=============================================================
 
---
--- Helper functions
---
-
 local function table_find(t, v)
 	for i = 1,#t do
 		if t[i] == v then
@@ -64,23 +60,10 @@ local function is_water(pos)
 	return minetest.get_item_group(minetest.get_node(pos).name, "water") ~= 0
 end
 
-
---
--- Sled entity
---
-
-local sled = {
-	physical = true,
-	collisionbox = {-0.6,-0.25,-0.6, 0.6,0.3,0.6},
-	visual = "mesh",
-	mesh = "sled.x",
-	textures = {"sled.png"},
-}
-
 local players_sled = {}
 local function join_sled(self, player)
 	local pos = self.object:get_pos()
-	player:setpos(pos)
+	player:set_pos(pos)
 	local name = player:get_player_name()
 	players_sled[name] = true
 	default.player_attached[name] = true
@@ -88,7 +71,8 @@ local function join_sled(self, player)
 	player:set_properties({collisionbox = {-0.3, -0.22, -0.3, 0.3, 0.78, 0.3}})
 	self.driver = name
 	self.object:set_attach(player, "", {x=0,y=0,z=0}, {x=0,y=90,z=0})
-	self.object:set_yaw(player:get_look_yaw())-- - math.pi/2)
+	-- This yaw applies when the sled deattaches from the player
+	self.object:set_yaw(player:get_look_horizontal() - math.pi / 2)
 end
 
 local function leave_sled(self, player)
@@ -122,7 +106,7 @@ local function sled_rightclick(self, player)
 
 -- Here is part 1 of the fix. ~ LazyJ
 	self.HUD = player:hud_add({
-		hud_elem_type = "text",
+		type = "text",
 		position = {x=0.5, y=0.89},
 		name = "sled",
 		scale = {x=2, y=2},
@@ -148,6 +132,17 @@ snow.register_on_configuring(function(name, v)
 		end
 	end
 end)
+
+
+local sled = {
+	initial_properties = {
+		physical = true,
+		collisionbox = {-0.6,-0.25,-0.6, 0.6,0.3,0.6},
+		visual = "mesh",
+		mesh = "sled.x",
+		textures = {"sled.png"},
+	}
+}
 
 function sled:on_rightclick(player)
 	on_sled_click(self, player)

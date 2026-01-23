@@ -96,12 +96,14 @@ end
 
 --The snowball Entity
 local snow_snowball_ENTITY = {
-	physical = false,
+	initial_properties = {
+		physical = false,
+		collisionbox = {-5/16,-5/16,-5/16, 5/16,5/16,5/16},
+	},
 	timer = 0,
-	collisionbox = {-5/16,-5/16,-5/16, 5/16,5/16,5/16},
 }
 
-function snow_snowball_ENTITY.on_activate(self)
+function snow_snowball_ENTITY:on_activate()
 	self.object:set_properties({textures = {"default_snowball.png^[transform"..math.random(0,7)}})
 	self.object:set_acceleration({x=0, y=-get_gravity(), z=0})
 	self.lastpos = self.object:get_pos()
@@ -128,7 +130,7 @@ function snow_snowball_ENTITY.on_activate(self)
 end
 
 --Snowball_entity.on_step()--> called when snowball is moving.
-function snow_snowball_ENTITY.on_step(self, dtime)
+function snow_snowball_ENTITY:on_step(dtime)
 	self.timer = self.timer + dtime
 	if self.timer > 10 then
 		-- 10 seconds is too long for a snowball to fly somewhere
@@ -179,7 +181,7 @@ function snow_snowball_ENTITY.on_step(self, dtime)
 		self.object:set_acceleration({x=0, y=-get_gravity(), z=0})
 		--self.object:set_velocity({x=0, y=0, z=0})
 		pos = self.lastpos
-		self.object:setpos(pos)
+		self.object:set_pos(pos)
 		minetest.sound_play("default_snow_footstep", {pos=pos, gain=vector.length(self.object:get_velocity())/30})
 		self.object:set_properties({physical = true})
 		self.physical = true
