@@ -31,7 +31,7 @@ local function get_gravity()
 	return grav*snowball_gravity
 end
 
-local someone_throwing, just_acitvated
+local someone_throwing, just_activated
 
 --Shoot snowball
 function snow.shoot_snowball(item, player)
@@ -48,7 +48,7 @@ function snow.shoot_snowball(item, player)
 	if creative_mode then
 		if not someone_throwing then
 			someone_throwing = true
-			just_acitvated = true
+			just_activated = true
 		end
 		return
 	end
@@ -82,12 +82,12 @@ if creative_mode then
 		local timer
 		-- only if one holds left click
 		if someone_throwing
-		and not just_acitvated then
+		and not just_activated then
 			update_step()
 			timer = 0.006
 		else
 			timer = 0.5
-			just_acitvated = false
+			just_activated = false
 		end
 		minetest.after(timer, do_step)
 	end

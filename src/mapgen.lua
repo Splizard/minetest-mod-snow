@@ -61,7 +61,7 @@ if not snow.disable_mapgen then
 	--Identify the mapgen.
 	local mgname = minetest.get_mapgen_setting"mg_name"
 	if not mgname then
-		minetest.log("error", "[MOD] Snow Biomes: WARNING! mapgen could not be identifyed!")
+		minetest.log("error", "[MOD] Snow Biomes: WARNING! mapgen could not be identified!")
 	end
 	local path = minetest.get_modpath"snow"
 	if mgname == "v7" then
