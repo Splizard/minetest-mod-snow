@@ -60,12 +60,13 @@ local function is_water(pos)
 	return minetest.get_item_group(minetest.get_node(pos).name, "water") ~= 0
 end
 
-local players_sled = {}
-local function join_sled(self, player)
+local function sled_rightclick(self, player)
+	if self.driver then
+		return
+	end
 	local pos = self.object:get_pos()
 	player:set_pos(pos)
 	local name = player:get_player_name()
-	players_sled[name] = true
 	default.player_attached[name] = true
 	default.player_set_animation(player, "sit" , 30)
 	player:set_properties({collisionbox = {-0.3, -0.22, -0.3, 0.3, 0.78, 0.3}})
@@ -73,32 +74,7 @@ local function join_sled(self, player)
 	self.object:set_attach(player, "", {x=0,y=0,z=0}, {x=0,y=90,z=0})
 	-- This yaw applies when the sled deattaches from the player
 	self.object:set_yaw(player:get_look_horizontal() - math.pi / 2)
-end
 
-local function leave_sled(self, player)
-	local name = player:get_player_name()
-	players_sled[name] = false
-	self.driver = nil
-	self.object:set_detach()
-	default.player_attached[name] = false
-	default.player_set_animation(player, "stand" , 30)
-
-	player:set_physics_override({
-		speed = 1,
-		jump = 1,
-	})
-	player:hud_remove(self.HUD) -- And here is part 2. ~ LazyJ
-	self.object:remove()
-
-	--Give the sled back again
-	player:get_inventory():add_item("main", "snow:sled")
-end
-
-local function sled_rightclick(self, player)
-	if self.driver then
-		return
-	end
-	join_sled(self, player)
 	player:set_physics_override({
 		speed = 2, -- multiplier to default value
 		jump = 0, -- multiplier to default value
@@ -156,6 +132,24 @@ function sled:on_activate(staticdata)
 	end
 end
 
+function sled:on_deactivate()
+	if not self.driver then
+		return
+	end
+	local player = minetest.get_player_by_name(self.driver)
+	if not player then
+		return
+	end
+	default.player_attached[self.driver] = false
+	default.player_set_animation(player, "stand", 30)
+
+	player:set_physics_override({
+		speed = 1,
+		jump = 1,
+	})
+	player:hud_remove(self.HUD)
+end
+
 function sled:get_staticdata()
 	return tostring(self.v)
 end
@@ -195,7 +189,10 @@ function sled:on_step(dtime)
 	end
 	if player:get_player_control().sneak
 	or not accelerating_possible(vector.round(self.object:get_pos())) then
-		leave_sled(self, player)
+		self.object:remove()
+
+		--Give the sled back again
+		player:get_inventory():add_item("main", "snow:sled")
 	end
 end
 
@@ -210,16 +207,23 @@ minetest.register_craftitem("snow:sled", {
 	liquids_pointable = true,
 	stack_max = 1,
 
-	on_use = function(itemstack, placer)
-		if players_sled[placer:get_player_name()] then
+	on_use = function(itemstack, user)
+		if not user or not user:is_player() then
 			return
 		end
-		local pos = placer:get_pos()
+		for _, obj in ipairs(user:get_children()) do
+			local ent = obj:get_luaentity()
+			if ent and ent.name == "snow:sled" then
+				-- user already rides another sled.
+				return
+			end
+		end
+		local pos = user:get_pos()
 		if accelerating_possible(vector.round(pos)) then
 			pos.y = pos.y+0.5
 
 			--Get on the sled and remove it from inventory.
-			minetest.add_entity(pos, "snow:sled"):right_click(placer)
+			minetest.add_entity(pos, "snow:sled"):right_click(user)
 			itemstack:take_item(); return itemstack
 		end
 	end,
