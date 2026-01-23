@@ -39,8 +39,6 @@ scattered in my note-taking program. This "Oh, I'll just make a little tweak her
 little tweak there" project has evolved into something much bigger and more complex
 than I originally planned. :p  ~ LazyJ
 
-* find out why the sled disappears after rightclicking it ~ HybridDog
-
 --]]
 
 
@@ -87,8 +85,9 @@ local function join_sled(self, player)
 	players_sled[name] = true
 	default.player_attached[name] = true
 	default.player_set_animation(player, "sit" , 30)
+	player:set_properties({collisionbox = {-0.3, -0.22, -0.3, 0.3, 0.78, 0.3}})
 	self.driver = name
-	self.object:set_attach(player, "", {x=0,y=-9,z=0}, {x=0,y=90,z=0})
+	self.object:set_attach(player, "", {x=0,y=0,z=0}, {x=0,y=90,z=0})
 	self.object:set_yaw(player:get_look_yaw())-- - math.pi/2)
 end
 
