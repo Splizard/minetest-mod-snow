@@ -9,7 +9,6 @@ local nodedef = {
 	waving = 1,
 	paramtype = "light",
 	groups = {snappy=3},
-	furnace_burntime = 1,
 	drop = {
 		max_items = 1,
 		items = {
@@ -105,7 +104,6 @@ nodedef = {
 	paramtype = "light",
 	walkable = false,
 	groups = {snappy=2,dig_immediate=3},
-	furnace_burntime = 10,
 	sounds = default.node_sound_defaults(),
 }
 
@@ -177,7 +175,6 @@ minetest.register_node("snow:moss", {
 	},
 	is_ground_content = true,
 	groups = {crumbly=3, attached_node=1},
-	furnace_burntime = 3,
 })
 
 -- Shrub(s)
@@ -199,7 +196,6 @@ nodedef = {
 		type = "fixed",
 		fixed = {-0.3, -0.5, -0.3, 0.3, -5/16, 0.3},
 	},
-	furnace_burntime = 5,
 }
 minetest.register_node("snow:shrub", table.copy(nodedef))
 
@@ -208,7 +204,6 @@ nodedef.inventory_image = "snow_shrub.png^snow_shrub_covering.png"
 nodedef.wield_image = "snow_shrub.png^snow_shrub_covering.png"
 nodedef.paramtype2 = "degrotate"
 nodedef.drop = "snow:shrub"
-nodedef.furnace_burntime = 3
 minetest.register_node("snow:shrub_covered", nodedef)
 
 -- Flowers

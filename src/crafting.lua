@@ -1,8 +1,9 @@
 --[[
 
 Crafting Sections (in order, top to bottom):
-	1. Cooking
-	2. Crafting and Recycling
+	1. Fuel
+	2. Cooking
+	3. Crafting and Recycling
 
 The crafting recipe for the sled is in the sled.lua file.
 
@@ -11,7 +12,26 @@ The crafting recipe for the sled is in the sled.lua file.
 ]]
 
 
--- 1. Cooking
+-- 1. Fuel
+
+for name, burntime in pairs({
+	moss = 3,
+	needles = 1,
+	needles_decorated = 1,
+	sapling_pine = 10,
+	shrub = 5,
+	shrub_covered = 3,
+	xmas_tree = 10,
+}) do
+	minetest.register_craft({
+		type = "fuel",
+		recipe = "snow:" .. name,
+		burntime = burntime,
+	})
+end
+
+
+-- 2. Cooking
 
 --[[
 "Cooks_into_ice" is a custom group I assigned to full-sized, snow-stuff nodes
@@ -33,7 +53,7 @@ minetest.register_craft({
 
 
 
--- 2. Crafting and Recycling
+-- 3. Crafting and Recycling
 
 -- Let's make moss craftable so players can more easily create mossycobble and
 -- gives another useful purpose to pine needles. ~ LazyJ
