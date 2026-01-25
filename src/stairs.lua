@@ -6,36 +6,6 @@ local snow_nodes = {
 if minetest.get_modpath("moreblocks") and
 	 minetest.global_exists("stairsplus") then
 
-	-- For users converting from MTG stairs to stairsplus, these nodes are aliased
-	-- from the stairs namespace to their source mod.
-	local was_in_stairs = {
-		ice_brick   = true,
-		snow_brick  = true,
-		snow_cobble = true,
-		ice = false,        -- moreblocks will take care of this one, and
-		snowblock = false,  -- this one, because they are in the default namespace.
-	}
-
-	-- Some nodes were incorrectly placed into the snow namespace.  Alias these to
-	-- their proper namespace (default).
-	local was_in_snow = {
-		ice_brick   = false,
-		snow_brick  = false,
-		snow_cobble = false,
-		ice = true,
-		snowblock = true,
-	}
-
-	-- Some nodes were incorrectly placed into the moreblocks namespace.  Alias
-	-- these to their proper namespace (either snow or default).
-	local was_in_moreblocks = {
-		ice_brick   = false,
-		snow_brick  = true,
-		snow_cobble = true,
-		ice = true,
-		snowblock = true,
-	}
-
 	for mod, nodes in pairs(snow_nodes) do
 		for _, name in pairs(nodes) do
 			local nodename = mod .. ":" .. name
@@ -50,22 +20,38 @@ if minetest.get_modpath("moreblocks") and
 			else
 				ndef.use_texture_alpha = "opaque"
 			end
-			stairsplus:register_all(mod, name, nodename, ndef)
-
-			if was_in_stairs[name] then
-				minetest.register_alias("stairs:stair_" .. name, mod .. ":stair_" .. name)
-				minetest.register_alias("stairs:slab_"  .. name, mod .. ":slab_"  .. name)
+			local mod_namespace = mod
+			if mod == "default" then
+				-- moreblocks registers stairsplus nodes for default:ice with
+				-- moreblocks: prefix and no nodes for default:snowblock.
+				-- To follow its convention, we (re-)register default:
+				-- stairsplus nodes with moreblocks: prefix.
+				mod_namespace = "moreblocks"
 			end
-
-			if was_in_snow[name] then
-				minetest.register_alias("snow:stair_" .. name, mod .. ":stair_" .. name)
-				minetest.register_alias("snow:slab_"  .. name, mod .. ":slab_"  .. name)
-			end
-
-			if was_in_moreblocks[name] then
-				stairsplus:register_alias_all("moreblocks", name, mod, name)
-			end
+			stairsplus:register_all(mod_namespace, name, nodename, ndef)
 		end
+	end
+
+	-- moreblocks doesn't register snowblock stairsplus nodes, so we need to
+	-- unregister the corresponding stairs nodes using aliases ourselves.
+	minetest.register_alias_force("stairs:stair_snowblock",
+		"moreblocks:stair_snowblock")
+	minetest.register_alias_force("stairs:stair_outer_snowblock",
+		"moreblocks:stair_snowblock_outer")
+	minetest.register_alias_force("stairs:stair_inner_snowblock",
+		"moreblocks:stair_snowblock_inner")
+	minetest.register_alias_force("stairs:slab_snowblock",
+		"moreblocks:slab_snowblock")
+
+	-- Alias stairs: nodes to snow: nodes.
+	-- This is needed for users converting from MTG stairs to stairsplus.
+	for _, name in ipairs(snow_nodes.snow) do
+		minetest.register_alias("stairs:stair_" .. name, "snow:stair_" .. name)
+		minetest.register_alias("stairs:stair_outer_" .. name,
+			"snow:stair_" .. name .. "_outer")
+		minetest.register_alias("stairs:stair_inner_" .. name,
+			"snow:stair_" .. name .. "_inner")
+		minetest.register_alias("stairs:slab_"  .. name, "snow:slab_"  .. name)
 	end
 
 elseif minetest.global_exists("stairs") then -- simple stairs and slabs only

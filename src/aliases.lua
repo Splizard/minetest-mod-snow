@@ -27,78 +27,111 @@ minetest.register_alias("snowycobble", "snow:snow_cobble")
 minetest.register_alias("cobblesnow", "snow:snow_cobble")
 
 
--- To clean up my first stairsplus attempt.
--- Stair
-minetest.register_alias(":default:stair_snowblock", "moreblocks:stair_snowblock")
-minetest.register_alias(":default:stair_snowblock_half", "moreblocks:stair_snowblock_half")
-minetest.register_alias(":default:stair_snowblock_right_half", "moreblocks:stair_snowblock_right_half")
-minetest.register_alias(":default:stair_snowblock_inner", "moreblocks:stair_snowblock_inner")
-minetest.register_alias(":default:stair_snowblock_outer", "moreblocks:stair_snowblock_outer")
-minetest.register_alias(":default:stair_snowblock_alt", "moreblocks:stair_snowblock_alt")
-minetest.register_alias(":default:stair_snowblock_alt_1", "moreblocks:stair_snowblock_alt_1")
-minetest.register_alias(":default:stair_snowblock_alt_2", "moreblocks:stair_snowblock_2")
-minetest.register_alias(":default:stair_snowblock_alt_4", "moreblocks:stair_snowblock_alt_4")
+if minetest.get_modpath("moreblocks") and
+	 minetest.global_exists("stairsplus") then
+	-- To clean up my first stairsplus attempt.
+	-- Stair
+	minetest.register_alias(":default:stair_snowblock", "moreblocks:stair_snowblock")
+	minetest.register_alias(":default:stair_snowblock_half", "moreblocks:stair_snowblock_half")
+	minetest.register_alias(":default:stair_snowblock_right_half", "moreblocks:stair_snowblock_right_half")
+	minetest.register_alias(":default:stair_snowblock_inner", "moreblocks:stair_snowblock_inner")
+	minetest.register_alias(":default:stair_snowblock_outer", "moreblocks:stair_snowblock_outer")
+	minetest.register_alias(":default:stair_snowblock_alt", "moreblocks:stair_snowblock_alt")
+	minetest.register_alias(":default:stair_snowblock_alt_1", "moreblocks:stair_snowblock_alt_1")
+	minetest.register_alias(":default:stair_snowblock_alt_2", "moreblocks:stair_snowblock_2")
+	minetest.register_alias(":default:stair_snowblock_alt_4", "moreblocks:stair_snowblock_alt_4")
 
-minetest.register_alias(":default:stair_ice", "moreblocks:stair_ice")
-minetest.register_alias(":default:stair_ice_half", "moreblocks:stair_ice_half")
-minetest.register_alias(":default:stair_ice_right_half", "moreblocks:stair_ice_right_half")
-minetest.register_alias(":default:stair_ice_inner", "moreblocks:stair_ice_inner")
-minetest.register_alias(":default:stair_ice_outer", "moreblocks:stair_ice_outer")
-minetest.register_alias(":default:stair_ice_alt", "moreblocks:stair_ice_alt")
-minetest.register_alias(":default:stair_ice_alt_1", "moreblocks:stair_ice_alt_1")
-minetest.register_alias(":default:stair_ice_alt_2", "moreblocks:stair_ice_2")
-minetest.register_alias(":default:stair_ice_alt_4", "moreblocks:stair_ice_alt_4")
-
-
--- Slab
-minetest.register_alias(":default:slab_snowblock", "moreblocks:slab_snowblock")
-minetest.register_alias(":default:slab_snowblock_quarter", "moreblocks:slab_snowblock_quarter")
-minetest.register_alias(":default:slab_snowblock_three_quarter", "moreblocks:slab_snowblock_three_quarter")
-minetest.register_alias(":default:slab_snowblock_1", "moreblocks:slab_snowblock_1")
-minetest.register_alias(":default:slab_snowblock_2", "moreblocks:slab_snowblock_2")
-minetest.register_alias(":default:slab_snowblock_14", "moreblocks:slab_snowblock_14")
-minetest.register_alias(":default:slab_snowblock_15", "moreblocks:slab_snowblock_15")
-
-minetest.register_alias(":default:slab_ice", "moreblocks:slab_ice")
-minetest.register_alias(":default:slab_ice_quarter", "moreblocks:slab_ice_quarter")
-minetest.register_alias(":default:slab_ice_three_quarter", "moreblocks:slab_ice_three_quarter")
-minetest.register_alias(":default:slab_ice_1", "moreblocks:slab_ice_1")
-minetest.register_alias(":default:slab_ice_2", "moreblocks:slab_ice_2")
-minetest.register_alias(":default:slab_ice_14", "moreblocks:slab_ice_14")
-minetest.register_alias(":default:slab_ice_15", "moreblocks:slab_ice_15")
+	minetest.register_alias(":default:stair_ice", "moreblocks:stair_ice")
+	minetest.register_alias(":default:stair_ice_half", "moreblocks:stair_ice_half")
+	minetest.register_alias(":default:stair_ice_right_half", "moreblocks:stair_ice_right_half")
+	minetest.register_alias(":default:stair_ice_inner", "moreblocks:stair_ice_inner")
+	minetest.register_alias(":default:stair_ice_outer", "moreblocks:stair_ice_outer")
+	minetest.register_alias(":default:stair_ice_alt", "moreblocks:stair_ice_alt")
+	minetest.register_alias(":default:stair_ice_alt_1", "moreblocks:stair_ice_alt_1")
+	minetest.register_alias(":default:stair_ice_alt_2", "moreblocks:stair_ice_2")
+	minetest.register_alias(":default:stair_ice_alt_4", "moreblocks:stair_ice_alt_4")
 
 
--- Panel
-minetest.register_alias(":default:panel_snowblock", "moreblocks:panel_snowblock")
-minetest.register_alias(":default:panel_snowblock_1", "moreblocks:panel_snowblock_1")
-minetest.register_alias(":default:panel_snowblock_2", "moreblocks:panel_snowblock_2")
-minetest.register_alias(":default:panel_snowblock_4", "moreblocks:panel_snowblock_4")
-minetest.register_alias(":default:panel_snowblock_12", "moreblocks:panel_snowblock_12")
-minetest.register_alias(":default:panel_snowblock_14", "moreblocks:panel_snowblock_14")
-minetest.register_alias(":default:panel_snowblock_15", "moreblocks:panel_snowblock_15")
+	-- Slab
+	minetest.register_alias(":default:slab_snowblock", "moreblocks:slab_snowblock")
+	minetest.register_alias(":default:slab_snowblock_quarter", "moreblocks:slab_snowblock_quarter")
+	minetest.register_alias(":default:slab_snowblock_three_quarter", "moreblocks:slab_snowblock_three_quarter")
+	minetest.register_alias(":default:slab_snowblock_1", "moreblocks:slab_snowblock_1")
+	minetest.register_alias(":default:slab_snowblock_2", "moreblocks:slab_snowblock_2")
+	minetest.register_alias(":default:slab_snowblock_14", "moreblocks:slab_snowblock_14")
+	minetest.register_alias(":default:slab_snowblock_15", "moreblocks:slab_snowblock_15")
 
-minetest.register_alias(":default:panel_ice", "moreblocks:panel_ice")
-minetest.register_alias(":default:panel_ice_1", "moreblocks:panel_ice_1")
-minetest.register_alias(":default:panel_ice_2", "moreblocks:panel_ice_2")
-minetest.register_alias(":default:panel_ice_4", "moreblocks:panel_ice_4")
-minetest.register_alias(":default:panel_ice_12", "moreblocks:panel_ice_12")
-minetest.register_alias(":default:panel_ice_14", "moreblocks:panel_ice_14")
-minetest.register_alias(":default:panel_ice_15", "moreblocks:panel_ice_15")
+	minetest.register_alias(":default:slab_ice", "moreblocks:slab_ice")
+	minetest.register_alias(":default:slab_ice_quarter", "moreblocks:slab_ice_quarter")
+	minetest.register_alias(":default:slab_ice_three_quarter", "moreblocks:slab_ice_three_quarter")
+	minetest.register_alias(":default:slab_ice_1", "moreblocks:slab_ice_1")
+	minetest.register_alias(":default:slab_ice_2", "moreblocks:slab_ice_2")
+	minetest.register_alias(":default:slab_ice_14", "moreblocks:slab_ice_14")
+	minetest.register_alias(":default:slab_ice_15", "moreblocks:slab_ice_15")
 
 
--- Micro
-minetest.register_alias(":default:micro_snowblock", "moreblocks:micro_snowblock")
-minetest.register_alias(":default:micro_snowblock_1", "moreblocks:micro_snowblock_1")
-minetest.register_alias(":default:micro_snowblock_2", "moreblocks:micro_snowblock_2")
-minetest.register_alias(":default:micro_snowblock_4", "moreblocks:micro_snowblock_4")
-minetest.register_alias(":default:micro_snowblock_12", "moreblocks:micro_snowblock_12")
-minetest.register_alias(":default:micro_snowblock_14", "moreblocks:micro_snowblock_14")
-minetest.register_alias(":default:micro_snowblock_15", "moreblocks:micro_snowblock_15")
+	-- Panel
+	minetest.register_alias(":default:panel_snowblock", "moreblocks:panel_snowblock")
+	minetest.register_alias(":default:panel_snowblock_1", "moreblocks:panel_snowblock_1")
+	minetest.register_alias(":default:panel_snowblock_2", "moreblocks:panel_snowblock_2")
+	minetest.register_alias(":default:panel_snowblock_4", "moreblocks:panel_snowblock_4")
+	minetest.register_alias(":default:panel_snowblock_12", "moreblocks:panel_snowblock_12")
+	minetest.register_alias(":default:panel_snowblock_14", "moreblocks:panel_snowblock_14")
+	minetest.register_alias(":default:panel_snowblock_15", "moreblocks:panel_snowblock_15")
 
-minetest.register_alias(":default:micro_ice", "moreblocks:micro_ice")
-minetest.register_alias(":default:micro_ice_1", "moreblocks:micro_ice_1")
-minetest.register_alias(":default:micro_ice_2", "moreblocks:micro_ice_2")
-minetest.register_alias(":default:micro_ice_4", "moreblocks:micro_ice_4")
-minetest.register_alias(":default:micro_ice_12", "moreblocks:micro_ice_12")
-minetest.register_alias(":default:micro_ice_14", "moreblocks:micro_ice_14")
-minetest.register_alias(":default:micro_ice_15", "moreblocks:micro_ice_15")
+	minetest.register_alias(":default:panel_ice", "moreblocks:panel_ice")
+	minetest.register_alias(":default:panel_ice_1", "moreblocks:panel_ice_1")
+	minetest.register_alias(":default:panel_ice_2", "moreblocks:panel_ice_2")
+	minetest.register_alias(":default:panel_ice_4", "moreblocks:panel_ice_4")
+	minetest.register_alias(":default:panel_ice_12", "moreblocks:panel_ice_12")
+	minetest.register_alias(":default:panel_ice_14", "moreblocks:panel_ice_14")
+	minetest.register_alias(":default:panel_ice_15", "moreblocks:panel_ice_15")
+
+
+	-- Micro
+	minetest.register_alias(":default:micro_snowblock", "moreblocks:micro_snowblock")
+	minetest.register_alias(":default:micro_snowblock_1", "moreblocks:micro_snowblock_1")
+	minetest.register_alias(":default:micro_snowblock_2", "moreblocks:micro_snowblock_2")
+	minetest.register_alias(":default:micro_snowblock_4", "moreblocks:micro_snowblock_4")
+	minetest.register_alias(":default:micro_snowblock_12", "moreblocks:micro_snowblock_12")
+	minetest.register_alias(":default:micro_snowblock_14", "moreblocks:micro_snowblock_14")
+	minetest.register_alias(":default:micro_snowblock_15", "moreblocks:micro_snowblock_15")
+
+	minetest.register_alias(":default:micro_ice", "moreblocks:micro_ice")
+	minetest.register_alias(":default:micro_ice_1", "moreblocks:micro_ice_1")
+	minetest.register_alias(":default:micro_ice_2", "moreblocks:micro_ice_2")
+	minetest.register_alias(":default:micro_ice_4", "moreblocks:micro_ice_4")
+	minetest.register_alias(":default:micro_ice_12", "moreblocks:micro_ice_12")
+	minetest.register_alias(":default:micro_ice_14", "moreblocks:micro_ice_14")
+	minetest.register_alias(":default:micro_ice_15", "moreblocks:micro_ice_15")
+
+
+	-- Some nodes were incorrectly placed into the snow namespace.  Alias these
+	-- to their proper namespace.
+	for _, name in pairs({"ice", "snowblock"}) do
+		minetest.register_alias("snow:stair_" .. name,
+			"moreblocks:stair_" .. name)
+		minetest.register_alias("snow:slab_"  .. name,
+			"moreblocks:slab_"  .. name)
+	end
+
+	-- In previous versions, we have registered stairsplus nodes with default:
+	-- prefix for some time.
+	-- -> alias to moreblocks: prefix, following moreblocks's convention
+	stairsplus:register_alias_all("default", "ice", "moreblocks", "ice")
+	stairsplus:register_alias_all("default", "snowblock", "moreblocks",
+		"snowblock")
+	minetest.register_alias("default:micro_ice_bottom", "moreblocks:micro_ice")
+	minetest.register_alias("default:panel_ice_bottom", "moreblocks:panel_ice")
+	minetest.register_alias("default:micro_snowblock_bottom",
+		"moreblocks:micro_snowblock")
+	minetest.register_alias("default:panel_snowblock_bottom",
+		"moreblocks:panel_snowblock")
+
+	-- Some nodes were incorrectly placed into the moreblocks namespace.  Alias
+	-- these to snow.
+	stairsplus:register_alias_all("moreblocks", "snow_brick", "snow",
+		"snow_brick")
+	stairsplus:register_alias_all("moreblocks", "snow_cobble", "snow",
+		"snow_cobble")
+end
